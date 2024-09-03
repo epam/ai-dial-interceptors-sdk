@@ -1,7 +1,6 @@
 PORT ?= 5001
 IMAGE_NAME ?= ai-dial-interceptors-sdk
 PLATFORM ?= linux/amd64
-DEV_PYTHON ?= 3.11
 ARGS=
 
 .PHONY: all install build clean lint format test examples_serve examples_docker_serve
@@ -9,7 +8,6 @@ ARGS=
 all: build
 
 install:
-	poetry env use python$(DEV_PYTHON)
 	poetry install --all-extras
 	poetry run codegen
 
