@@ -28,7 +28,7 @@ format: install
 	poetry run nox -s format
 
 test: install
-	poetry run nox -s test -- $(ARGS)
+	poetry run nox -s test $(if $(PYTHON),--python=$(PYTHON),)
 
 examples_serve: install
 	poetry run uvicorn "examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env
