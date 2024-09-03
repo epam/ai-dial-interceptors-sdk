@@ -162,7 +162,7 @@ make examples_docker_serve
 Either of the commands will start the server on `http://localhost:5000` exposing endpoints for each of the interceptors like these:
 
 - `http://localhost:5000/openai/deployments/pii-anonymizer/chat/completions`
-- `http://localhost:5000/openai/deployments/normalize-vector/embeddings/completions`
+- `http://localhost:5000/openai/deployments/normalize-vector/embeddings`
 
 ### DIAL Core configuration
 
