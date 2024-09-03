@@ -1,0 +1,16 @@
+.DS_Store
+venv
+.venv
+.env
+.history
+.idea
+__pycache__
+.nox
+dist
+.vscode/launch.json
+.pytest_cache
+core-data
+core-logs
+config.json
+~*
+response_message_handler.py

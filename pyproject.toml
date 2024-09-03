@@ -1,0 +1,102 @@
+[tool.poetry]
+name = "aidial-interceptors-sdk"
+version = "0.1.0"
+description = "Framework for creating interceptors for AI DIAL"
+authors = ["EPAM RAIL <SpecialEPM-DIALDevTeam@epam.com>"]
+homepage = "https://epam-rail.com"
+documentation = "https://epam-rail.com/dial_api"
+license = "Apache-2.0"
+readme = "README.md"
+keywords = ["ai"]
+classifiers = [
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+repository = "https://github.com/epam/ai-dial-interceptors-sdk"
+
+[tool.poetry.scripts]
+clean = "scripts.clean:main"
+codegen = "scripts.codegen:main"
+gen-watermark = "scripts.gen_watermark:main"
+
+[pytest]
+env_files = [".env"]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+fastapi = ">=0.51,<1.0"
+httpx = ">=0.25.0,<1.0"
+aiohttp = "^3.8.3"
+openai = "^1.32.0"
+aiostream = "^0.6.2"
+aidial-sdk = {version = "0.12.0", extras = ["telemetry"]}
+
+[tool.poetry.group.examples.dependencies]
+uvicorn = "^0.30.6"
+# Spacy pipeline: https://spacy.io/models/
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0-py3-none-any.whl" }
+pillow = "^10.4.0"
+numpy = "^1.26.1"
+spacy = "^3.7.5"
+
+[tool.poetry.group.test.dependencies]
+pytest = "7.4.0"
+pytest-asyncio = "0.21.1"
+python-dotenv = "1.0.0"
+
+[tool.poetry.group.lint.dependencies]
+pyright = "1.1.324"
+black = "24.3.0"
+isort = "5.12.0"
+autoflake = "2.2.0"
+flake8 = "6.0.0"
+
+[tool.poetry.group.dev.dependencies]
+nox = "^2023.4.22"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+# muting warnings coming from opentelemetry package
+filterwarnings = [
+    "ignore::DeprecationWarning:opentelemetry.instrumentation.dependencies"
+]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+reportUnusedVariable = "error"
+reportIncompatibleMethodOverride = "error"
+exclude = [
+    ".git",
+    ".venv",
+    ".nox",
+    "**/__pycache__",
+    "docker-compose"
+]
+
+[tool.black]
+line-length = 80
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | \.nox
+  | \.__pycache__
+  | docker-compose\/local\/core-data
+)/
+'''
+
+[tool.isort]
+line_length = 80
+profile = "black"
+
+[tool.autoflake]
+ignore_init_module_imports = true
+remove_all_unused_imports = true
+in_place = true
+recursive = true
+quiet = true
+exclude = [
+    "\\.venv",
+    "\\.nox",
+]
