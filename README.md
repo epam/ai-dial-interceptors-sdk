@@ -1,5 +1,8 @@
 # AI DIAL Interceptors Python SDK
 
+> [!IMPORTANT]
+> This package is in early development and subject to rapid changes. Breaking changes between versions are likely as the project evolves.
+
 ## Overview
 
 The framework provides useful classes for creating DIAL Interceptors in Python for chat completion and embeddings models.
@@ -19,9 +22,19 @@ Interceptors could be classified into the following categories:
 2. **Post-interceptors** that only modify the response received from the upstream *(e.g. censoring the response)*
 3. **Generic interceptors** that modify both the incoming request and the response from the upstream *(e.g. caching the responses)*
 
-To create chat completion interceptor one needs to implement instance of the class `ChatCompletionInterceptor` and for embeddings interceptor - `EmbeddingsInterceptor`. See examples for more details.
+To create chat completion interceptor one needs to implement instance of the class [ChatCompletionInterceptor](aidial_interceptors_sdk/chat_completion/base.py) and for embeddings interceptor - [EmbeddingsInterceptor](aidial_interceptors_sdk/embeddings/base.py). See [example](examples/interceptor/registry.py) interceptor implementations for more details.
 
-## Developer environment
+## Environment Variables
+
+Copy `.env.example` to `.env` and customize it for your environment:
+
+|Variable|Default|Description|
+|---|---|---|
+|LOG_LEVEL|INFO|Log level. Use DEBUG for dev purposes and INFO in prod|
+|WEB_CONCURRENCY|1|Number of workers for the server|
+|DIAL_URL||The URL of the DIAL Core server|
+
+## Development
 
 This project uses [Python>=3.11](https://www.python.org/downloads/) and [Poetry>=1.6.1](https://python-poetry.org/) as a dependency manager.
 
@@ -47,14 +60,6 @@ Alternatively you can use [PyCharm](https://www.jetbrains.com/pycharm/).
 Set-up the Black formatter for PyCharm [manually](https://black.readthedocs.io/en/stable/integrations/editors.html#pycharm-intellij-idea) or
 install PyCharm>=2023.2 with [built-in Black support](https://blog.jetbrains.com/pycharm/2023/07/2023-2/#black).
 
-## Run
-
-Run the development server:
-
-```sh
-make serve
-```
-
 ### Make on Windows
 
 As of now, Windows distributions do not include the make tool. To run make commands, the tool can be installed using
@@ -67,19 +72,9 @@ winget install GnuWin32.Make
 For convenience, the tool folder can be added to the PATH environment variable as `C:\Program Files (x86)\GnuWin32\bin`.
 The command definitions inside Makefile should be cross-platform to keep the development environment setup simple.
 
-## Environment Variables
+### Lint
 
-Copy `.env.example` to `.env` and customize it for your environment:
-
-|Variable|Default|Description|
-|---|---|---|
-|LOG_LEVEL|INFO|Log level. Use DEBUG for dev purposes and INFO in prod|
-|WEB_CONCURRENCY|1|Number of workers for the server|
-|DIAL_URL||The URL of the DIAL Core server|
-
-## Lint
-
-Run the linting before committing:
+To run the linting before committing:
 
 ```sh
 make lint
@@ -91,15 +86,15 @@ To auto-fix formatting issues run:
 make format
 ```
 
-## Test
+### Test
 
-Run unit tests locally:
+To run unit tests:
 
 ```sh
 make test
 ```
 
-## Clean
+### Clean
 
 To remove the virtual environment and build artifacts:
 
@@ -181,9 +176,9 @@ The interceptor endpoints are defined in the `interceptors` section of the DIAL 
 }
 ```
 
-where `INTERCEPTOR_SERVICE_URL` is the URL of the interceptor service.
+where `INTERCEPTOR_SERVICE_URL` is the URL of the interceptor service, which is `http://localhost:5000` when run locally, or the interceptor service URL when deployed within Kubernetes.
 
-They could be then attached to particular models and applications:
+The declared interceptors could be then attached to particular models and applications:
 
 ```json
 {
