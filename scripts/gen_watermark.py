@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as ImageObject
 
-from examples.utils.path import package_root_dir
+from aidial_interceptors_sdk.examples.utils.path import package_root_dir
 
 
 def find_seamless_crop(image: ImageObject) -> tuple[int, int, int, int]:

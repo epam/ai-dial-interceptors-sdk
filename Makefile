@@ -31,7 +31,7 @@ test: install
 	poetry run nox -s test $(if $(PYTHON),--python=$(PYTHON),)
 
 examples_serve: install
-	poetry run uvicorn "examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env
+	poetry run uvicorn "aidial_interceptors_sdk.examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env
 
 examples_docker_serve:
 	docker build --platform $(PLATFORM) -t $(IMAGE_NAME):dev .

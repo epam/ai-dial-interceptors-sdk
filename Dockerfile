@@ -51,4 +51,4 @@ EXPOSE 5000
 USER appuser
 ENTRYPOINT ["/docker_entrypoint.sh"]
 
-CMD uvicorn examples.app:app --host 0.0.0.0 --port 5000
+CMD uvicorn aidial_interceptors_sdk.examples.app:app --host 0.0.0.0 --port 5000

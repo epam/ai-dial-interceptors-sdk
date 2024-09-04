@@ -3,7 +3,10 @@ from typing import List
 from typing_extensions import override
 
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
-from examples.utils.embedding_encoding import base64_to_vector, vector_to_base64
+from aidial_interceptors_sdk.examples.utils.embedding_encoding import (
+    base64_to_vector,
+    vector_to_base64,
+)
 
 
 def project(vec: List[float], dim: int) -> List[float]:

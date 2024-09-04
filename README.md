@@ -24,7 +24,7 @@ Interceptors could be classified into the following categories:
 
 To create chat completion interceptor one needs to implement instance of the class [ChatCompletionInterceptor](aidial_interceptors_sdk/chat_completion/base.py) and for embedding interceptor - [EmbeddingsInterceptor](aidial_interceptors_sdk/embeddings/base.py).
 
-See [example](examples/interceptor/registry.py) interceptor implementations for more details.
+See [example](aidial_interceptors_sdk/examples/interceptor/registry.py) interceptor implementations for more details.
 
 ## Environment Variables
 

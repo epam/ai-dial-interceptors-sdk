@@ -1,6 +1,6 @@
 import pytest
 
-from examples.utils.markdown import escape_table_cell
+from aidial_interceptors_sdk.examples.utils.markdown import escape_table_cell
 
 test_cases = [
     ("Simple text", "Simple text"),

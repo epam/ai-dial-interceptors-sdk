@@ -10,7 +10,7 @@ def pytest_configure():
 
 @pytest_asyncio.fixture
 async def test_app():
-    from examples.app import app
+    from aidial_interceptors_sdk.examples.app import app
 
     async with httpx.AsyncClient(
         app=app, base_url="http://test-app.com"

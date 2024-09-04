@@ -7,12 +7,12 @@ from typing_extensions import override
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
-from aidial_interceptors_sdk.utils.env import get_env_list
-from examples.interceptor.chat_completion.pii_anonymiser.spacy_anonymizer import (
+from aidial_interceptors_sdk.examples.interceptor.chat_completion.pii_anonymiser.spacy_anonymizer import (
     DEFAULT_LABELS_TO_REDACT,
     SpacyAnonymizer,
 )
-from examples.utils.markdown import MarkdownTable
+from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
+from aidial_interceptors_sdk.utils.env import get_env_list
 
 PII_ANONYMIZER_LABELS_TO_REDACT = get_env_list(
     "PII_ANONYMIZER_LABELS_TO_REDACT", DEFAULT_LABELS_TO_REDACT

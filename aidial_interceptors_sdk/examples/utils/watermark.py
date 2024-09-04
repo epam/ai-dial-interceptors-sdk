@@ -5,7 +5,7 @@ from typing import Literal
 from PIL import Image
 from PIL.Image import Image as ImageObject
 
-from examples.utils.path import package_root_dir
+from aidial_interceptors_sdk.examples.utils.path import package_root_dir
 
 
 def resize_tiling(image: ImageObject, box: tuple[int, int]) -> ImageObject:

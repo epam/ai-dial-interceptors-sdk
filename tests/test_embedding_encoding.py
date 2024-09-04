@@ -4,7 +4,10 @@ from typing import List
 import numpy as np
 import pytest
 
-from examples.utils.embedding_encoding import base64_to_vector, vector_to_base64
+from aidial_interceptors_sdk.examples.utils.embedding_encoding import (
+    base64_to_vector,
+    vector_to_base64,
+)
 
 vectors = [
     [],

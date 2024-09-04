@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 from aidial_sdk.pydantic_v1 import BaseModel
 from spacy import load
 
-from examples.utils.markdown import MarkdownTable
+from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
 
 _PIPELINE = load("en_core_web_sm")
 
