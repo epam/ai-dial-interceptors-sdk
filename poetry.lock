@@ -314,7 +314,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 name = "blis"
 version = "0.7.11"
 description = "The Blis BLAS-like linear algebra library, as a self-contained C-extension."
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "blis-0.7.11-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:cd5fba34c5775e4c440d80e4dea8acb40e2d3855b546e07c4e21fad8f972404c"},
@@ -360,7 +360,7 @@ numpy = {version = ">=1.19.0", markers = "python_version >= \"3.9\""}
 name = "catalogue"
 version = "2.0.10"
 description = "Super lightweight function registries for your library"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "catalogue-2.0.10-py3-none-any.whl", hash = "sha256:58c2de0020aa90f4a2da7dfad161bf7b3b054c86a5f09fcedc0b2b740c109a9f"},
@@ -495,7 +495,7 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 name = "cloudpathlib"
 version = "0.18.1"
 description = "pathlib-style classes for cloud storage services."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "cloudpathlib-0.18.1-py3-none-any.whl", hash = "sha256:20efd5d772c75df91bb2ac52e053be53fd9000f5e9755fd92375a2a9fe6005e0"},
@@ -540,7 +540,7 @@ development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 name = "confection"
 version = "0.1.5"
 description = "The sweetest config system for Python"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "confection-0.1.5-py3-none-any.whl", hash = "sha256:e29d3c3f8eac06b3f77eb9dfb4bf2fc6bcc9622a98ca00a698e3d019c6430b14"},
@@ -555,7 +555,7 @@ srsly = ">=2.4.0,<3.0.0"
 name = "cymem"
 version = "2.0.8"
 description = "Manage calls to calloc/free through Cython"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "cymem-2.0.8-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:77b5d3a73c41a394efd5913ab7e48512054cd2dabb9582d489535456641c7666"},
@@ -636,7 +636,7 @@ files = [
 name = "en-core-web-sm"
 version = "3.7.0"
 description = "English pipeline optimized for CPU. Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer."
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "en_core_web_sm-3.7.0-py3-none-any.whl", hash = "sha256:6215d71a3212690e9aec49408a27e3fe6ad7cd6c715476e93d70dc784041e93e"},
@@ -970,7 +970,7 @@ requirements-deprecated-finder = ["pip-api", "pipreqs"]
 name = "jinja2"
 version = "3.1.4"
 description = "A very fast and expressive template engine."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "jinja2-3.1.4-py3-none-any.whl", hash = "sha256:bc5dd2abb727a5319567b7a813e6a2e7318c39f4f487cfe6c89c6f9c7d25197d"},
@@ -987,7 +987,7 @@ i18n = ["Babel (>=2.7)"]
 name = "langcodes"
 version = "3.4.0"
 description = "Tools for labeling human languages with IETF language tags"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "langcodes-3.4.0-py3-none-any.whl", hash = "sha256:10a4cc078b8e8937d8485d3352312a0a89a3125190db9f2bb2074250eef654e9"},
@@ -1005,7 +1005,7 @@ test = ["pytest", "pytest-cov"]
 name = "language-data"
 version = "1.2.0"
 description = "Supplementary data about languages used by the langcodes module"
-optional = false
+optional = true
 python-versions = "*"
 files = [
     {file = "language_data-1.2.0-py3-none-any.whl", hash = "sha256:77d5cab917f91ee0b2f1aa7018443e911cf8985ef734ca2ba3940770f6a3816b"},
@@ -1023,7 +1023,7 @@ test = ["pytest", "pytest-cov"]
 name = "marisa-trie"
 version = "1.2.0"
 description = "Static memory-efficient and fast Trie-like structures for Python."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "marisa_trie-1.2.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:61fab91fef677f0af0e818e61595f2334f7e0b3e122b24ec65889aae69ba468d"},
@@ -1126,7 +1126,7 @@ test = ["hypothesis", "pytest", "readme-renderer"]
 name = "markdown-it-py"
 version = "3.0.0"
 description = "Python port of markdown-it. Markdown parsing, done right!"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "markdown-it-py-3.0.0.tar.gz", hash = "sha256:e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb"},
@@ -1150,7 +1150,7 @@ testing = ["coverage", "pytest", "pytest-cov", "pytest-regressions"]
 name = "markupsafe"
 version = "2.1.5"
 description = "Safely add untrusted strings to HTML/XML markup."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "MarkupSafe-2.1.5-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:a17a92de5231666cfbe003f0e4b9b3a7ae3afb1ec2845aadc2bacc93ff85febc"},
@@ -1230,7 +1230,7 @@ files = [
 name = "mdurl"
 version = "0.1.2"
 description = "Markdown URL utilities"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8"},
@@ -1324,7 +1324,7 @@ files = [
 name = "murmurhash"
 version = "1.0.10"
 description = "Cython bindings for MurmurHash"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "murmurhash-1.0.10-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:3e90eef568adca5e17a91f96975e9a782ace3a617bbb3f8c8c2d917096e9bfeb"},
@@ -1411,7 +1411,7 @@ tox-to-nox = ["jinja2", "tox (<4)"]
 name = "numpy"
 version = "1.26.4"
 description = "Fundamental package for array computing in Python"
-optional = false
+optional = true
 python-versions = ">=3.9"
 files = [
     {file = "numpy-1.26.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:9ff0f4f29c51e2803569d7a51c2304de5554655a60c5d776e35b4a41413830d0"},
@@ -1823,7 +1823,7 @@ files = [
 name = "pillow"
 version = "10.4.0"
 description = "Python Imaging Library (Fork)"
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "pillow-10.4.0-cp310-cp310-macosx_10_10_x86_64.whl", hash = "sha256:4d9667937cfa347525b319ae34375c37b9ee6b525440f3ef48542fcf66f2731e"},
@@ -1950,7 +1950,7 @@ testing = ["pytest", "pytest-benchmark"]
 name = "preshed"
 version = "3.0.9"
 description = "Cython hash table that trusts the keys are pre-hashed"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "preshed-3.0.9-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:4f96ef4caf9847b2bb9868574dcbe2496f974e41c2b83d6621c24fb4c3fc57e3"},
@@ -2132,7 +2132,7 @@ files = [
 name = "pygments"
 version = "2.18.0"
 description = "Pygments is a syntax highlighting package written in Python."
-optional = false
+optional = true
 python-versions = ">=3.8"
 files = [
     {file = "pygments-2.18.0-py3-none-any.whl", hash = "sha256:b8e6aca0523f3ab76fee51799c488e38782ac06eafcf95e7ba832985c8e7b13a"},
@@ -2237,7 +2237,7 @@ use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
 name = "rich"
 version = "13.7.1"
 description = "Render rich text, tables, progress bars, syntax highlighting, markdown and more to the terminal"
-optional = false
+optional = true
 python-versions = ">=3.7.0"
 files = [
     {file = "rich-13.7.1-py3-none-any.whl", hash = "sha256:4edbae314f59eb482f54e9e30bf00d33350aaa94f4bfcd4e9e3110e64d0d7222"},
@@ -2270,7 +2270,7 @@ testing = ["build[virtualenv] (>=1.0.3)", "filelock (>=3.4.0)", "importlib-metad
 name = "shellingham"
 version = "1.5.4"
 description = "Tool to Detect Surrounding Shell"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "shellingham-1.5.4-py2.py3-none-any.whl", hash = "sha256:7ecfff8f2fd72616f7481040475a65b2bf8af90a56c89140852d1120324e8686"},
@@ -2281,7 +2281,7 @@ files = [
 name = "smart-open"
 version = "7.0.4"
 description = "Utils for streaming large files (S3, HDFS, GCS, Azure Blob Storage, gzip, bz2...)"
-optional = false
+optional = true
 python-versions = "<4.0,>=3.7"
 files = [
     {file = "smart_open-7.0.4-py3-none-any.whl", hash = "sha256:4e98489932b3372595cddc075e6033194775165702887216b65eba760dfd8d47"},
@@ -2317,7 +2317,7 @@ files = [
 name = "spacy"
 version = "3.7.5"
 description = "Industrial-strength Natural Language Processing (NLP) in Python"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "spacy-3.7.5-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:8002897701429ee2ab5ff6921ae43560f4cd17184cb1e10dad761901c12dcb85"},
@@ -2404,7 +2404,7 @@ transformers = ["spacy-transformers (>=1.1.2,<1.4.0)"]
 name = "spacy-legacy"
 version = "3.0.12"
 description = "Legacy registered functions for spaCy backwards compatibility"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "spacy-legacy-3.0.12.tar.gz", hash = "sha256:b37d6e0c9b6e1d7ca1cf5bc7152ab64a4c4671f59c85adaf7a3fcb870357a774"},
@@ -2415,7 +2415,7 @@ files = [
 name = "spacy-loggers"
 version = "1.0.5"
 description = "Logging utilities for SpaCy"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "spacy-loggers-1.0.5.tar.gz", hash = "sha256:d60b0bdbf915a60e516cc2e653baeff946f0cfc461b452d11a4d5458c6fe5f24"},
@@ -2426,7 +2426,7 @@ files = [
 name = "srsly"
 version = "2.4.8"
 description = "Modern high-performance serialization utilities for Python"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "srsly-2.4.8-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:17f3bcb418bb4cf443ed3d4dcb210e491bd9c1b7b0185e6ab10b6af3271e63b2"},
@@ -2489,7 +2489,7 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7
 name = "thinc"
 version = "8.2.4"
 description = "A refreshing functional take on deep learning, compatible with your favorite libraries"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "thinc-8.2.4-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:aaae34c28ebc7a0ba980e6c774f148e272375ff7d4ef6ae2977698edae052e52"},
@@ -2591,7 +2591,7 @@ telegram = ["requests"]
 name = "typer"
 version = "0.12.3"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "typer-0.12.3-py3-none-any.whl", hash = "sha256:070d7ca53f785acbccba8e7d28b08dcd88f79f1fbda035ade0aecec71ca5c914"},
@@ -2674,7 +2674,7 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 name = "wasabi"
 version = "1.1.3"
 description = "A lightweight console printing and formatting toolkit"
-optional = false
+optional = true
 python-versions = ">=3.6"
 files = [
     {file = "wasabi-1.1.3-py3-none-any.whl", hash = "sha256:f76e16e8f7e79f8c4c8be49b4024ac725713ab10cd7f19350ad18a8e3f71728c"},
@@ -2688,7 +2688,7 @@ colorama = {version = ">=0.4.6", markers = "sys_platform == \"win32\" and python
 name = "weasel"
 version = "0.4.1"
 description = "Weasel: A small and easy workflow system"
-optional = false
+optional = true
 python-versions = ">=3.7"
 files = [
     {file = "weasel-0.4.1-py3-none-any.whl", hash = "sha256:24140a090ea1ac512a2b2f479cc64192fd1d527a7f3627671268d08ed5ac418c"},
@@ -2892,7 +2892,10 @@ files = [
 doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (>=3.5)", "sphinx-lint"]
 test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-itertools", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
 
+[extras]
+examples = ["en-core-web-sm", "numpy", "pillow", "spacy"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "c9d3d5c2f7f1694d25ef03ccb86d96fc67341897767dd1946ec6142922e95b9d"
+content-hash = "f10c1cbe2e1df389fb00f09889e964b4646aacdea02b8f863ae06646c35ec207"

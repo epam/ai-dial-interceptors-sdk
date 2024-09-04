@@ -15,7 +15,7 @@ def format_with_args(session: nox.Session, *args):
 def lint(session: nox.Session):
     """Runs linters and fixers"""
     try:
-        session.run("poetry", "install", external=True)
+        session.run("poetry", "install", "--all-extras", external=True)
         session.run("poetry", "check", "--lock", external=True)
         session.run("pyright", SRC)
         session.run("flake8", SRC)
@@ -29,7 +29,7 @@ def lint(session: nox.Session):
 @nox.session
 def format(session: nox.Session):
     """Runs linters and fixers"""
-    session.run("poetry", "install", external=True)
+    session.run("poetry", "install", "--all-extras", external=True)
     format_with_args(session, SRC)
 
 
@@ -39,7 +39,7 @@ def format(session: nox.Session):
 @nox.parametrize("httpx", ["0.25.0", "0.27.0"])
 def test(session: nox.Session, pydantic: str, httpx: str) -> None:
     """Runs tests"""
-    session.run("poetry", "install", external=True)
+    session.run("poetry", "install", "--all-extras", external=True)
     session.install(f"pydantic=={pydantic}")
     session.install(f"httpx=={httpx}")
     session.run("pytest")
