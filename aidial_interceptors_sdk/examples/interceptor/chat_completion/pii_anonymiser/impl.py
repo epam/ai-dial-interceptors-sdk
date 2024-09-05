@@ -7,6 +7,7 @@ from typing_extensions import override
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
+from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.examples.interceptor.chat_completion.pii_anonymiser.spacy_anonymizer import (
     DEFAULT_LABELS_TO_REDACT,
     SpacyAnonymizer,
@@ -41,7 +42,8 @@ class PIIAnonymizerInterceptor(ChatCompletionInterceptor):
         # Then apply the replacements
         if not self.anonymizer.is_empty():
             chat_table = MarkdownTable(
-                title="Anonymized chat history", headers=["Role", "Content"]
+                title="Anonymized chat history",
+                headers=["Role", "Content"],
             )
 
             for message in messages:
@@ -89,38 +91,30 @@ class PIIAnonymizerInterceptor(ChatCompletionInterceptor):
             self.original_response_stages[choice_idx].open()
 
     @override
-    async def on_stream_chunk(self, chunk: dict) -> None:
+    async def on_response_choice(
+        self, path: ElementPath, choice: Dict
+    ) -> List[Dict] | Dict:
         # NOTE: re-chunking invalidates streaming usage reported by the upstream model
+        choice_idx = path.choice_idx
+        assert choice_idx is not None
 
-        assert self.original_response_stages is not None
+        if content := (choice.get("delta") or {}).get("content") or "":
+            self.original_response_stages[choice_idx].append_content(content)
 
-        for choice in chunk.get("choices") or []:
-            choice_idx = choice.get("index") or 0
+            buffer: str = self.content_buffers[choice_idx] + content
 
-            content = (choice.get("delta") or {}).get("content") or ""
-            finish_reason = choice.get("finish_reason")
+            br_open = buffer.count("[")
+            br_closed = buffer.count("]")
 
-            if content:
-                self.original_response_stages[choice_idx].append_content(
-                    content
-                )
+            if br_open <= br_closed or choice.get("finish_reason"):
+                choice["delta"]["content"] = self.anonymizer.deanonymize(buffer)
+                buffer = ""
+            else:
+                choice["delta"]["content"] = ""
 
-                buffer = self.content_buffers[choice_idx] + content
+            self.content_buffers[choice_idx] = buffer
 
-                br_open = buffer.count("[")
-                br_closed = buffer.count("]")
-
-                if br_open <= br_closed or finish_reason:
-                    choice["delta"]["content"] = self.anonymizer.deanonymize(
-                        buffer
-                    )
-                    buffer = ""
-                else:
-                    choice["delta"]["content"] = ""
-
-                self.content_buffers[choice_idx] = buffer
-
-        self.send_chunk(chunk)
+        return choice
 
     async def on_stream_end(self) -> None:
         for choice_idx in range(self.request_n):
