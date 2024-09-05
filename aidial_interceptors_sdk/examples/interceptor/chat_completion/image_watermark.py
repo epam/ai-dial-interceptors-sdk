@@ -6,7 +6,9 @@ from typing_extensions import override
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
-from aidial_interceptors_sdk.examples.utils.watermark import stamp_watermark
+from aidial_interceptors_sdk.examples.utils.watermark.stamp import (
+    stamp_watermark,
+)
 
 
 class ImageWatermarkInterceptor(ChatCompletionInterceptor):

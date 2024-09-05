@@ -5,10 +5,12 @@ from typing import Literal
 from PIL import Image
 from PIL.Image import Image as ImageObject
 
-from aidial_interceptors_sdk.examples.utils.path import package_root_dir
+from aidial_interceptors_sdk.examples.utils.watermark.generate import (
+    gen_watermark_image,
+)
 
 
-def resize_tiling(image: ImageObject, box: tuple[int, int]) -> ImageObject:
+def _resize_tiling(image: ImageObject, box: tuple[int, int]) -> ImageObject:
     width, height = box
     tiled_image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
 
@@ -21,10 +23,10 @@ def resize_tiling(image: ImageObject, box: tuple[int, int]) -> ImageObject:
     return tiled_image
 
 
-def stamp_watermark_image(
+def _stamp_watermark_image(
     image: ImageObject, watermark: ImageObject
 ) -> ImageObject:
-    tiled_watermark = resize_tiling(watermark, image.size)
+    tiled_watermark = _resize_tiling(watermark, image.size)
 
     if image.mode != "RGBA":
         image = image.convert("RGBA")
@@ -37,8 +39,8 @@ def stamp_watermark_image(
 
 
 @cache
-def watermark_image() -> ImageObject:
-    return Image.open(package_root_dir() / "assets" / "watermark.png")
+def _watermark_image() -> ImageObject:
+    return gen_watermark_image("EPAM DIAL")
 
 
 def stamp_watermark(
@@ -47,7 +49,7 @@ def stamp_watermark(
 
     image = Image.open(io.BytesIO(image_bytes))
 
-    watermarked_image = stamp_watermark_image(image, watermark_image())
+    watermarked_image = _stamp_watermark_image(image, _watermark_image())
 
     output_bytes = io.BytesIO()
     watermarked_image.save(output_bytes, format=output_format)

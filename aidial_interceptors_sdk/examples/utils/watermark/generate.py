@@ -4,10 +4,8 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 from PIL.Image import Image as ImageObject
 
-from aidial_interceptors_sdk.examples.utils.path import package_root_dir
 
-
-def find_seamless_crop(image: ImageObject) -> tuple[int, int, int, int]:
+def _find_seamless_crop(image: ImageObject) -> tuple[int, int, int, int]:
     width, height = image.size
 
     image_gray = image.convert("L")
@@ -42,12 +40,12 @@ def find_seamless_crop(image: ImageObject) -> tuple[int, int, int, int]:
     return (0, 0, vertical_seam, horizontal_seam)
 
 
-def create_watermark_texture(
+def _create_watermark_texture(
     *,
+    text: str,
     size: int = 800,
     font_size: int = 60,
     angle: int = 45,
-    text: str,
 ) -> ImageObject:
 
     padded_size = int(size * math.sqrt(2))
@@ -88,15 +86,11 @@ def create_watermark_texture(
     )
 
 
-def main():
-    image = create_watermark_texture(text="EPAM DIAL")
-    crop_box = find_seamless_crop(image)
-    image = image.crop(crop_box)
-
-    path = package_root_dir() / "assets"
-    path.mkdir(exist_ok=True)
-    image.save(path / "watermark.png", "PNG")
+def gen_watermark_image(text: str) -> ImageObject:
+    image = _create_watermark_texture(text=text)
+    crop_box = _find_seamless_crop(image)
+    return image.crop(crop_box)
 
 
 if __name__ == "__main__":
-    main()
+    gen_watermark_image("EPAM DIAL").save("watermark.png", "PNG")

@@ -16,7 +16,6 @@ repository = "https://github.com/epam/ai-dial-interceptors-sdk"
 [tool.poetry.scripts]
 clean = "scripts.clean:main"
 codegen = "scripts.codegen:main"
-gen-watermark = "scripts.gen_watermark:main"
 
 [pytest]
 env_files = [".env"]
