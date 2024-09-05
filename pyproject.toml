@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aidial-interceptors-sdk"
-version = "0.1.0"
+version = "0.1.0rc"
 description = "Framework for creating interceptors for AI DIAL"
 authors = ["EPAM RAIL <SpecialEPM-DIALDevTeam@epam.com>"]
 homepage = "https://epam-rail.com"
@@ -30,14 +30,12 @@ aiostream = "^0.6.2"
 aidial-sdk = { version = "^0.13.0", extras = ["telemetry"] }
 
 # Extras
-# Spacy pipeline: https://spacy.io/models/
-en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0-py3-none-any.whl", optional = true }
 pillow = { version = "^10.4.0", optional = true }
 numpy = { version = "^1.26.1", optional = true }
 spacy = { version = "^3.7.5", optional = true }
 
 [tool.poetry.extras]
-examples = ["en-core-web-sm", "pillow", "numpy", "spacy"]
+examples = ["pillow", "numpy", "spacy"]
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.4.0"

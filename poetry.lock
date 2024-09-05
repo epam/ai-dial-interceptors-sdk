@@ -633,23 +633,6 @@ files = [
 ]
 
 [[package]]
-name = "en-core-web-sm"
-version = "3.7.0"
-description = "English pipeline optimized for CPU. Components: tok2vec, tagger, parser, senter, ner, attribute_ruler, lemmatizer."
-optional = true
-python-versions = "*"
-files = [
-    {file = "en_core_web_sm-3.7.0-py3-none-any.whl", hash = "sha256:6215d71a3212690e9aec49408a27e3fe6ad7cd6c715476e93d70dc784041e93e"},
-]
-
-[package.dependencies]
-spacy = ">=3.7.0,<3.8.0"
-
-[package.source]
-type = "url"
-url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.0/en_core_web_sm-3.7.0-py3-none-any.whl"
-
-[[package]]
 name = "fastapi"
 version = "0.109.2"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -2893,9 +2876,9 @@ doc = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linke
 test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-itertools", "pytest (>=6,!=8.1.*)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-ignore-flaky", "pytest-mypy", "pytest-ruff (>=0.2.1)"]
 
 [extras]
-examples = ["en-core-web-sm", "numpy", "pillow", "spacy"]
+examples = ["numpy", "pillow", "spacy"]
 
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "62257a45708cb3861852acc4b13ef95e0a5d331825863f7e650b5407a9e67a5b"
+content-hash = "ec49dfa9620394cac9277b06d82b21119e820860df69953c769d108daebd6507"

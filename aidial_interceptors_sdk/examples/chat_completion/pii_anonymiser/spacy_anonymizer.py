@@ -1,20 +1,32 @@
 import re
 from collections import defaultdict
+from functools import cache
 from typing import Dict, List, Optional
 
 from aidial_sdk.pydantic_v1 import BaseModel
-from spacy import load
+from spacy import load as load_model
+from spacy.cli.download import download as download_model
+from spacy.language import Language
 
 from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
 
-_PIPELINE = load("en_core_web_sm")
+# Find spaCy models here: https://spacy.io/models/
+DEFAULT_MODEL = "en_core_web_sm"
 
+# Find the full list of entities here:
+# https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140
 DEFAULT_LABELS_TO_REDACT = [
     "PERSON",
     "ORG",
     "GPE",  # Geo-political entity
     "PRODUCT",
 ]
+
+
+@cache
+def _get_pipeline(model: str) -> Language:
+    download_model(model)
+    return load_model(model)
 
 
 class Replacement(BaseModel):
@@ -65,7 +77,7 @@ class SpacyAnonymizer(BaseModel):
         )
 
     def anonymize(self, text: str) -> str:
-        doc = _PIPELINE(text)
+        doc = _get_pipeline(DEFAULT_MODEL)(text)
         redacted = []
         idx = 0
 
