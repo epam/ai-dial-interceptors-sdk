@@ -19,7 +19,7 @@ from aidial_interceptors_sdk.chat_completion.index_mapper import IndexMapper
 from aidial_interceptors_sdk.chat_completion.response_message_handler import (
     ResponseMessageHandler,
 )
-from aidial_interceptors_sdk.utils.dial_sdk import send_chunk_to_response
+from aidial_interceptors_sdk.utils._dial_sdk import send_chunk_to_response
 from aidial_interceptors_sdk.utils.not_given import NotGiven
 
 

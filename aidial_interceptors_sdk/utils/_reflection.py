@@ -9,7 +9,7 @@ T = TypeVar("T")
 async def call_with_extra_body(
     func: Callable[..., Coroutine[Any, Any, T]], arg: dict
 ) -> T:
-    if has_kwargs_argument(func):
+    if _has_kwargs_argument(func):
         return await func(**arg)
 
     expected_args = set(inspect.signature(func).parameters.keys())
@@ -31,7 +31,7 @@ async def call_with_extra_body(
     return await func(**arg)
 
 
-def has_kwargs_argument(func: Callable[..., Coroutine[Any, Any, Any]]) -> bool:
+def _has_kwargs_argument(func: Callable[..., Coroutine[Any, Any, Any]]) -> bool:
     """
     Determines if the given function accepts a variable keyword argument (**kwargs).
     """

@@ -11,10 +11,6 @@ def get_env(name: str, err_msg: Optional[str] = None) -> str:
     raise Exception(err_msg or f"{name} env variable is not set")
 
 
-def get_env_bool(name: str, default: bool = False) -> bool:
-    return os.getenv(name, str(default)).lower() == "true"
-
-
 def get_env_list(name: str, default: List[str] = []) -> List[str]:
     value = os.getenv(name)
     if value is None:

@@ -1,16 +1,4 @@
-from typing import Any, Callable, Iterable, List, Mapping, TypeVar
-
-
-def censor_ci_dict(d: Mapping[str, str], keys: List[str]) -> dict:
-    key_set = {k.lower() for k in keys}
-    return {
-        k: v if k.lower() not in key_set else "**********" for k, v in d.items()
-    }
-
-
-def get_keys(d: dict, keys: Iterable[str]) -> dict:
-    return {k: d[k] for k in keys if k in d}
-
+from typing import Any, Callable, List, TypeVar
 
 Path = List[str | int]
 PathLike = Path | str

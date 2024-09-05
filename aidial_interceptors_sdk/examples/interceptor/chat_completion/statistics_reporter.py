@@ -10,8 +10,8 @@ from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
+from aidial_interceptors_sdk.examples.utils.dict import collect_at_path
 from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
-from aidial_interceptors_sdk.utils.dict import collect_at_path
 from aidial_interceptors_sdk.utils.not_given import NotGiven
 
 

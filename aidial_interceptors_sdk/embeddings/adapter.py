@@ -5,9 +5,9 @@ from openai.types import CreateEmbeddingResponse
 
 from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
-from aidial_interceptors_sdk.utils.debug import debug_logging
-from aidial_interceptors_sdk.utils.exceptions import dial_exception_decorator
-from aidial_interceptors_sdk.utils.reflection import call_with_extra_body
+from aidial_interceptors_sdk.utils._debug import debug_logging
+from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
+from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
 
 
 def interceptor_to_embeddings_handler(cls: Type[EmbeddingsInterceptor]):

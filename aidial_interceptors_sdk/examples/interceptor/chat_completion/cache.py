@@ -9,8 +9,8 @@ from typing_extensions import override
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
+from aidial_interceptors_sdk.error import EarlyStreamExit
 from aidial_interceptors_sdk.examples.utils.lru_cache import LRUCache
-from aidial_interceptors_sdk.utils.exceptions import EarlyStreamExit
 
 _log = logging.getLogger(__name__)
 

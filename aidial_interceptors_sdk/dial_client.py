@@ -2,8 +2,8 @@ from aidial_sdk.exceptions import invalid_request_error
 from aidial_sdk.pydantic_v1 import BaseModel
 from openai import AsyncAzureOpenAI
 
-from aidial_interceptors_sdk.utils.env import get_env
-from aidial_interceptors_sdk.utils.http_client import get_http_client
+from aidial_interceptors_sdk.utils._env import get_env
+from aidial_interceptors_sdk.utils._http_client import get_http_client
 from aidial_interceptors_sdk.utils.storage import FileStorage
 
 DIAL_URL = get_env("DIAL_URL")

@@ -13,14 +13,12 @@ from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
 from aidial_interceptors_sdk.dial_client import DialClient
-from aidial_interceptors_sdk.utils.debug import debug_logging
-from aidial_interceptors_sdk.utils.exceptions import (
-    EarlyStreamExit,
-    dial_exception_decorator,
-)
-from aidial_interceptors_sdk.utils.reflection import call_with_extra_body
+from aidial_interceptors_sdk.error import EarlyStreamExit
+from aidial_interceptors_sdk.utils._debug import debug_logging
+from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
+from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
 from aidial_interceptors_sdk.utils.streaming import (
-    block_to_chunk,
+    block_response_to_streaming_chunk,
     handle_streaming_errors,
     map_stream,
     singleton_stream,
@@ -72,7 +70,7 @@ def interceptor_to_chat_completion(
                             f"upstream response[{call_context}]: {json.dumps(resp)}"
                         )
 
-                    chunk = block_to_chunk(resp)
+                    chunk = block_response_to_streaming_chunk(resp)
                     stream = singleton_stream(chunk)
                 else:
 

@@ -12,7 +12,7 @@ from aidial_interceptors_sdk.examples.interceptor.chat_completion.pii_anonymiser
     SpacyAnonymizer,
 )
 from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
-from aidial_interceptors_sdk.utils.env import get_env_list
+from aidial_interceptors_sdk.utils._env import get_env_list
 
 PII_ANONYMIZER_LABELS_TO_REDACT = get_env_list(
     "PII_ANONYMIZER_LABELS_TO_REDACT", DEFAULT_LABELS_TO_REDACT

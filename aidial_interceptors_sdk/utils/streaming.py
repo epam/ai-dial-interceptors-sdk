@@ -1,18 +1,5 @@
 import logging
-from typing import (
-    Any,
-    AsyncGenerator,
-    AsyncIterable,
-    AsyncIterator,
-    Awaitable,
-    Callable,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    TypeVar,
-    assert_never,
-)
+from typing import Any, AsyncIterator, Callable, List, Optional, TypeVar
 
 import aiostream
 import openai
@@ -64,7 +51,7 @@ def _add_indices(chunk: Any) -> Any:
 
 
 # TODO: add to SDK as an inverse of merge_chunks
-def block_to_chunk(response: dict) -> dict:
+def block_response_to_streaming_chunk(response: dict) -> dict:
     for choice in response["choices"]:
         choice["delta"] = choice["message"]
         del choice["message"]
@@ -72,61 +59,11 @@ def block_to_chunk(response: dict) -> dict:
     return response
 
 
-async def async_iterator_to_generator(
-    iterator: AsyncIterator[_T],
-) -> AsyncGenerator[_T, None]:
-    async for item in iterator:
-        yield item
-
-
 async def map_stream(
     func: Callable[[_T], Optional[_V]], iterator: AsyncIterator[_T]
 ) -> AsyncIterator[_V]:
     async for item in iterator:
         new_item = func(item)
-        if new_item is not None:
-            yield new_item
-
-
-async def aflatmap_stream(
-    func: Callable[
-        [_T],
-        Awaitable[
-            Iterable[_V] | Iterator[_V] | AsyncIterable[_V] | AsyncIterator[_V]
-        ]
-        | AsyncIterable[_V]
-        | AsyncIterator[_V],
-    ],
-    iterator: AsyncIterator[_T],
-) -> AsyncIterator[_V]:
-    async for item in iterator:
-        iter = func(item)
-        if isinstance(iter, Awaitable):
-            iter = await iter
-        if isinstance(iter, (Iterable, Iterator)):
-            for item in iter:
-                yield item
-        elif isinstance(iter, (AsyncIterable, AsyncIterator)):
-            async for item in iter:
-                yield item
-        else:
-            assert_never(iter)
-
-
-async def aextend_stream(
-    iterator: AsyncIterator[_T], func: Callable[[], AsyncIterator[_T]]
-) -> AsyncIterator[_T]:
-    async for item in iterator:
-        yield item
-    async for item in func():
-        yield item
-
-
-async def amap_stream(
-    func: Callable[[_T], Awaitable[Optional[_V]]], iterator: AsyncIterator[_T]
-) -> AsyncIterator[_V]:
-    async for item in iterator:
-        new_item = await func(item)
         if new_item is not None:
             yield new_item
 

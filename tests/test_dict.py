@@ -2,7 +2,7 @@ from typing import Any, Callable
 
 import pytest
 
-from aidial_interceptors_sdk.utils.dict import (
+from aidial_interceptors_sdk.examples.utils.dict import (
     Path,
     PathLike,
     get_at_path,
