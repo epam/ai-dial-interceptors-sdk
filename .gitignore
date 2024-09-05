@@ -13,4 +13,3 @@ core-data
 core-logs
 config.json
 ~*
-response_message_handler.py
