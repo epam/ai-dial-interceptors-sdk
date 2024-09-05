@@ -1,4 +1,4 @@
-from aidial_sdk.exceptions import invalid_request_error
+from aidial_sdk.exceptions import InvalidRequestError
 from typing_extensions import override
 
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
@@ -12,7 +12,7 @@ class BlacklistedWordsInterceptor(EmbeddingsInterceptor):
         for word in self.BLACKLIST:
             if word.lower() in input.lower():
                 message = "The embedding input contains a blacklisted word."
-                raise invalid_request_error(
+                raise InvalidRequestError(
                     message=message,
                     display_message=message,
                 )

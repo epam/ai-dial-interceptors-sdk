@@ -1,6 +1,6 @@
 from typing import List
 
-from aidial_sdk.exceptions import invalid_request_error
+from aidial_sdk.exceptions import InvalidRequestError
 from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -20,7 +20,7 @@ class BlacklistedWordsInterceptor(ChatCompletionInterceptor):
                 error_message = (
                     f"The chat completion {entity} contains a blacklisted word."
                 )
-                raise invalid_request_error(
+                raise InvalidRequestError(
                     message=error_message,
                     display_message=error_message,
                 )

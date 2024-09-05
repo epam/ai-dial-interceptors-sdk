@@ -27,7 +27,7 @@ httpx = ">=0.25.0,<1.0"
 aiohttp = "^3.8.3"
 openai = "^1.32.0"
 aiostream = "^0.6.2"
-aidial-sdk = { version = "0.12.0", extras = ["telemetry"] }
+aidial-sdk = { version = "^0.13.0", extras = ["telemetry"] }
 
 # Extras
 # Spacy pipeline: https://spacy.io/models/

@@ -1,4 +1,4 @@
-from aidial_sdk.exceptions import invalid_request_error
+from aidial_sdk.exceptions import InvalidRequestError
 from aidial_sdk.pydantic_v1 import BaseModel
 from openai import AsyncAzureOpenAI
 
@@ -25,21 +25,23 @@ class DialClient(BaseModel):
         cls, api_key: str | None, api_version: str | None
     ) -> "DialClient":
         if not api_key:
-            raise invalid_request_error(
-                "The 'api-key' request header is missing"
-            )
+            raise InvalidRequestError("The 'api-key' request header is missing")
 
         client = AsyncAzureOpenAI(
             azure_endpoint=DIAL_URL,
             azure_deployment="interceptor",
             api_key=api_key,
-            # NOTE: defaulting missing api-version to an empty string, because
-            # 1. openai library doesn't allow for a missing api-version parameter.
-            # A workaround for it would be a recreation of AsyncAzureOpenAI with the check disabled:
+            # NOTE: api-version query parameter is not required in the chat completions DIAL API.
+            # However, it is required in Azure OpenAI API, that's why the openai library fails when it's missing:
             # https://github.com/openai/openai-python/blob/9850c169c4126fd04dc6796e4685f1b9e4924aa4/src/openai/lib/azure.py#L174-L177
-            # which is really not worth it.
-            # 2. OpenAI adapter treats a missing api-version in the same way as an empty string and
-            # that's the only place where api-version has any meaning, so the query param modification is safe.
+            #
+            # A workaround for it could be to patch the AsyncAzureOpenAI class in order to disable the check.
+            # This would be hard to maintain though.
+            #
+            # However, since DIAL OpenAI adapter treats a missing api-version in the same way as an empty string,
+            # we could actually default the api-version to an empty string here too.
+            # DIAL OpenAI adapter is the only place where api-version has any effect,
+            # so the query param modification is safe.
             # https://github.com/epam/ai-dial-adapter-openai/blob/b462d1c26ce8f9d569b9c085a849206aad91becf/aidial_adapter_openai/app.py#L93
             api_version=api_version or "",
             max_retries=0,

@@ -1,7 +1,7 @@
 from typing import List
 from urllib.parse import urljoin
 
-from aidial_sdk.exceptions import invalid_request_error
+from aidial_sdk.exceptions import InvalidRequestError
 from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -20,7 +20,7 @@ class RejectExternalLinksInterceptor(ChatCompletionInterceptor):
         abs_url = urljoin(dial_url, url)
         if not abs_url.startswith(dial_url):
             message = f"External links are not allowed: {url!r}"
-            raise invalid_request_error(
+            raise InvalidRequestError(
                 message=message,
                 display_message=message,
             )

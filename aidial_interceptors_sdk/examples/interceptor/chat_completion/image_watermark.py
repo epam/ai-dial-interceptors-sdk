@@ -1,6 +1,6 @@
 import base64
 
-from aidial_sdk.exceptions import invalid_request_error
+from aidial_sdk.exceptions import InvalidRequestError
 from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -41,7 +41,7 @@ class ImageWatermarkInterceptor(ChatCompletionInterceptor):
             try:
                 bytes = base64.b64decode(data)
             except Exception:
-                raise invalid_request_error(
+                raise InvalidRequestError(
                     "Attachment data isn't base64 encoded",
                 )
 
