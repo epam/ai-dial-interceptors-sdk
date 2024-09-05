@@ -8,13 +8,13 @@ from aidial_interceptors_sdk.embeddings.base import (
     EmbeddingsInterceptor,
     EmbeddingsNoOpInterceptor,
 )
-from aidial_interceptors_sdk.examples.interceptor.chat_completion import (
+from aidial_interceptors_sdk.examples.chat_completion import (
     BlacklistedWordsInterceptor as ChatBlacklistedWordsInterceptor,
 )
-from aidial_interceptors_sdk.examples.interceptor.chat_completion import (
+from aidial_interceptors_sdk.examples.chat_completion import (
     CachingInterceptor as ChatCachingInterceptor,
 )
-from aidial_interceptors_sdk.examples.interceptor.chat_completion import (
+from aidial_interceptors_sdk.examples.chat_completion import (
     ImageWatermarkInterceptor,
     PIIAnonymizerInterceptor,
     PirateInterceptor,
@@ -22,10 +22,10 @@ from aidial_interceptors_sdk.examples.interceptor.chat_completion import (
     ReplicatorInterceptor,
     StatisticsReporterInterceptor,
 )
-from aidial_interceptors_sdk.examples.interceptor.embeddings import (
+from aidial_interceptors_sdk.examples.embeddings import (
     BlacklistedWordsInterceptor as EmbeddingsBlacklistedWordsInterceptor,
 )
-from aidial_interceptors_sdk.examples.interceptor.embeddings import (
+from aidial_interceptors_sdk.examples.embeddings import (
     NormalizeVectorInterceptor,
     ProjectVectorInterceptor,
 )

@@ -8,7 +8,7 @@ from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
-from aidial_interceptors_sdk.examples.interceptor.chat_completion.pii_anonymiser.spacy_anonymizer import (
+from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser.spacy_anonymizer import (
     DEFAULT_LABELS_TO_REDACT,
     SpacyAnonymizer,
 )

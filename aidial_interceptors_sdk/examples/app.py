@@ -5,7 +5,7 @@ from aidial_interceptors_sdk.chat_completion import (
     interceptor_to_chat_completion,
 )
 from aidial_interceptors_sdk.embeddings import interceptor_to_embeddings_handler
-from aidial_interceptors_sdk.examples.interceptor.registry import (
+from aidial_interceptors_sdk.examples.registry import (
     chat_completion_interceptors,
     embeddings_interceptors,
 )

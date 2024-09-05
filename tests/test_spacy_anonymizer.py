@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 
 import pytest
 
-from aidial_interceptors_sdk.examples.interceptor.chat_completion.pii_anonymiser.spacy_anonymizer import (
+from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser.spacy_anonymizer import (
     SpacyAnonymizer,
 )
 
