@@ -144,22 +144,44 @@ Copy `.env.example` to `.env` and customize it for your environment:
 
 ### Running interceptor as a DIAL service
 
-To run dev application locally run:
+#### From package
+
+To run the server with examples using pip:
+
+```sh
+pip install uvicorn python-dotenv "aidial-interceptors-sdk[examples]"
+echo "DIAL_URL=URL" > .env
+uvicorn "aidial_interceptors_sdk.examples.app:app" --host "0.0.0.0" --port 5000 --env-file ./.env
+```
+
+Don't forget to set the appropriate `DIAL_URL` in the `.env` file.
+
+The command will start the server on `http://localhost:5000` exposing endpoints for each of the interceptors like the following:
+
+- `http://localhost:5000/openai/deployments/pii-anonymizer/chat/completions`
+- `http://localhost:5000/openai/deployments/normalize-vector/embeddings`
+
+#### From sources
+
+First clone the repository:
+
+```sh
+git clone https://github.com/epam/ai-dial-interceptors-sdk.git .
+cd ai-dial-interceptors-sdk
+echo "DIAL_URL=URL" > .env
+```
+
+Then run dev server with examples:
 
 ```sh
 make examples_serve
 ```
 
-To run from Docker container:
+Or run the server from Docker container:
 
 ```sh
 make examples_docker_serve
 ```
-
-Either of the commands will start the server on `http://localhost:5000` exposing endpoints for each of the interceptors like these:
-
-- `http://localhost:5000/openai/deployments/pii-anonymizer/chat/completions`
-- `http://localhost:5000/openai/deployments/normalize-vector/embeddings`
 
 ### DIAL Core configuration
 
