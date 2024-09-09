@@ -10,11 +10,14 @@ from aidial_interceptors_sdk.examples.registry import (
     embeddings_interceptors,
 )
 from aidial_interceptors_sdk.examples.utils.log_config import configure_loggers
+from aidial_interceptors_sdk.utils._env import get_env
 
 app = DIALApp(
     description="Examples of DIAL interceptors",
     telemetry_config=TelemetryConfig(),
     add_healthcheck=True,
+    dial_url=get_env("DIAL_URL"),
+    propagate_auth_headers=True,
 )
 
 configure_loggers()
