@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aidial-interceptors-sdk"
-version = "0.1.0"
+version = "0.1.1"
 description = "Framework for creating interceptors for AI DIAL"
 authors = ["EPAM RAIL <SpecialEPM-DIALDevTeam@epam.com>"]
 homepage = "https://epam-rail.com"
