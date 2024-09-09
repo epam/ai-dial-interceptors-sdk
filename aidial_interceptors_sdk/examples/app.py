@@ -15,6 +15,7 @@ app = DIALApp(
     description="Examples of DIAL interceptors",
     telemetry_config=TelemetryConfig(),
     add_healthcheck=True,
+    propagate_auth_headers=True,
 )
 
 configure_loggers()

@@ -30,7 +30,8 @@ class DialClient(BaseModel):
         client = AsyncAzureOpenAI(
             azure_endpoint=DIAL_URL,
             azure_deployment="interceptor",
-            api_key=api_key,
+            # NOTE: DIAL SDK takes care of propagating auth headers
+            api_key="dummy",
             # NOTE: api-version query parameter is not required in the chat completions DIAL API.
             # However, it is required in Azure OpenAI API, that's why the openai library fails when it's missing:
             # https://github.com/openai/openai-python/blob/9850c169c4126fd04dc6796e4685f1b9e4924aa4/src/openai/lib/azure.py#L174-L177
