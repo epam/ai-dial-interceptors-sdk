@@ -22,16 +22,23 @@ class DialClient(BaseModel):
 
     @classmethod
     async def create(
-        cls, api_key: str | None, api_version: str | None
+        cls,
+        api_key: str | None,
+        authorization: str | None,
+        api_version: str | None,
     ) -> "DialClient":
         if not api_key:
             raise InvalidRequestError("The 'api-key' request header is missing")
 
+        extra_headers = {}
+        if authorization is not None:
+            extra_headers["Authorization"] = authorization
+
         client = AsyncAzureOpenAI(
             azure_endpoint=DIAL_URL,
             azure_deployment="interceptor",
-            # NOTE: DIAL SDK takes care of propagating auth headers
-            api_key="dummy",
+            # NOTE: DIAL SDK takes care of propagating api-key header
+            api_key="-",
             # NOTE: api-version query parameter is not required in the chat completions DIAL API.
             # However, it is required in Azure OpenAI API, that's why the openai library fails when it's missing:
             # https://github.com/openai/openai-python/blob/9850c169c4126fd04dc6796e4685f1b9e4924aa4/src/openai/lib/azure.py#L174-L177
@@ -47,6 +54,11 @@ class DialClient(BaseModel):
             api_version=api_version or "",
             max_retries=0,
             http_client=get_http_client(),
+            # NOTE: if Authorization header was provided in the request,
+            # then propagate it to the upstream.
+            # Whether interceptor gets the header or not, is determined by
+            # `forwardAuthToken` option set for the interceptor in the DIAL Core config.
+            default_headers=extra_headers,
         )
 
         storage = FileStorage(dial_url=DIAL_URL, api_key=api_key)
