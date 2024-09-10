@@ -15,8 +15,9 @@ def interceptor_to_embeddings_handler(cls: Type[EmbeddingsInterceptor]):
     async def _handler(request: Request) -> dict:
 
         dial_client = await DialClient.create(
-            api_key=request.headers.get("api-key", None),
+            api_key=request.headers.get("api-key"),
             api_version=request.query_params.get("api-version"),
+            authorization=request.headers.get("authorization"),
         )
 
         interceptor = cls(dial_client=dial_client, **request.path_params)

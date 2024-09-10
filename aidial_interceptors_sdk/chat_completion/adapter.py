@@ -36,10 +36,10 @@ def interceptor_to_chat_completion(
         async def chat_completion(
             self, request: DialRequest, response: DialResponse
         ) -> None:
-
             dial_client = await DialClient.create(
                 api_key=request.api_key,
                 api_version=request.api_version,
+                authorization=request.jwt,
             )
 
             interceptor = cls(
