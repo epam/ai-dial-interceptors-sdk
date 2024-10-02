@@ -23,6 +23,7 @@ async def call_with_extra_body(
         )
 
     arg["extra_body"] = arg.get("extra_body") or {}
+    arg["model"] = arg.get("model")  # model arg is required in AsyncAzureOpenAI
 
     for extra_arg in extra_args:
         arg["extra_body"][extra_arg] = arg[extra_arg]
