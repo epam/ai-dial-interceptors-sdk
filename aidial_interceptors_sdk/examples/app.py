@@ -4,7 +4,7 @@ from aidial_sdk.telemetry.types import TelemetryConfig
 from aidial_interceptors_sdk.chat_completion import (
     interceptor_to_chat_completion,
 )
-from aidial_interceptors_sdk.embeddings import interceptor_to_embeddings_handler
+from aidial_interceptors_sdk.embeddings.adapter import interceptor_to_embeddings
 from aidial_interceptors_sdk.examples.registry import (
     chat_completion_interceptors,
     embeddings_interceptors,
@@ -23,9 +23,7 @@ app = DIALApp(
 configure_loggers()
 
 for id, cls in embeddings_interceptors.items():
-    app.post(f"/openai/deployments/{id}/embeddings")(
-        interceptor_to_embeddings_handler(cls)
-    )
+    app.add_embeddings(id, interceptor_to_embeddings(cls))
 
 for id, cls in chat_completion_interceptors.items():
     app.add_chat_completion(id, interceptor_to_chat_completion(cls))

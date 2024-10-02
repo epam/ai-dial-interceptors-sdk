@@ -1,6 +1,8 @@
 from typing import Type
 
-from fastapi import Request
+from aidial_sdk.embeddings import Embeddings
+from aidial_sdk.embeddings.request import Request
+from aidial_sdk.embeddings.response import Response
 from openai.types import CreateEmbeddingResponse
 
 from aidial_interceptors_sdk.dial_client import DialClient
@@ -10,29 +12,36 @@ from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
 from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
 
 
-def interceptor_to_embeddings_handler(cls: Type[EmbeddingsInterceptor]):
-    @dial_exception_decorator
-    async def _handler(request: Request) -> dict:
+def interceptor_to_embeddings(cls: Type[EmbeddingsInterceptor]) -> Embeddings:
 
-        dial_client = await DialClient.create(
-            api_key=request.headers.get("api-key"),
-            api_version=request.query_params.get("api-version"),
-            authorization=request.headers.get("authorization"),
-        )
+    class Impl(Embeddings):
+        @dial_exception_decorator
+        async def embeddings(self, request: Request) -> Response:
 
-        interceptor = cls(dial_client=dial_client, **request.path_params)
+            dial_client = await DialClient.create(
+                api_key=request.api_key,
+                api_version=request.api_version,
+                authorization=request.jwt,
+            )
 
-        body = await request.json()
-        body = await debug_logging("request")(interceptor.modify_request)(body)
+            interceptor = cls(
+                dial_client=dial_client,
+                **request.original_request.path_params,
+            )
 
-        response: CreateEmbeddingResponse = await call_with_extra_body(
-            dial_client.client.embeddings.create, body
-        )
+            body = await request.original_request.json()
+            body = await debug_logging("request")(interceptor.modify_request)(
+                body
+            )
 
-        resp = response.to_dict()
-        resp = await debug_logging("response")(interceptor.modify_response)(
-            resp
-        )
-        return resp
+            response: CreateEmbeddingResponse = await call_with_extra_body(
+                dial_client.client.embeddings.create, body
+            )
 
-    return _handler
+            response_dict = await debug_logging("response")(
+                interceptor.modify_response
+            )(response.to_dict())
+
+            return Response.parse_obj(response_dict)
+
+    return Impl()
