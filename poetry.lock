@@ -2882,4 +2882,4 @@ examples = ["numpy", "pillow", "spacy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "7e6f6d7d75aeda5e7aeb3671b47b22d8533afae0aa80dcc12801b9a9af88a443"
+content-hash = "ec49dfa9620394cac9277b06d82b21119e820860df69953c769d108daebd6507"
