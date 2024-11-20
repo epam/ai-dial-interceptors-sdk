@@ -19,7 +19,7 @@ async def handle_streaming_errors(
         async for chunk in stream:
             yield chunk
     except openai.APIError as e:
-        _log.error(f"error during steaming: {e.body}")
+        _log.error(f"error during streaming: {e.body}")
 
         display_message = None
         if e.body is not None and isinstance(e.body, dict):

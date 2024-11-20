@@ -24,15 +24,17 @@ env_files = [".env"]
 python = ">=3.11,<4.0"
 fastapi = ">=0.51,<1.0"
 httpx = ">=0.25.0,<1.0"
-aiohttp = "^3.8.3"
-openai = "^1.32.0"
-aiostream = "^0.6.2"
-aidial-sdk = { version = "^0.13.0", extras = ["telemetry"] }
+openai = "~1.32.0"
+aidial-sdk = { version = "~0.13.0", extras = ["telemetry"] }
+
+# TODO: move these deps to "examples" extras
+aiohttp = "~3.10.2"
+aiostream = "~0.6.2"
 
 # Extras
-pillow = { version = "^10.4.0", optional = true }
-numpy = { version = "^1.26.1", optional = true }
-spacy = { version = "^3.7.5", optional = true }
+pillow = { version = "~10.4.0", optional = true }
+numpy = { version = "~1.26.1", optional = true }
+spacy = { version = "~3.7.5", optional = true }
 
 [tool.poetry.extras]
 examples = ["pillow", "numpy", "spacy"]
