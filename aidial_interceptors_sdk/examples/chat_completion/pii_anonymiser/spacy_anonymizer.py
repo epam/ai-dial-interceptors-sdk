@@ -29,6 +29,11 @@ def _get_pipeline(model: str) -> Language:
     return load_model(model)
 
 
+# Preemptively load the default model on the server start-up
+# to avoid waiting during the first request.
+_get_pipeline(DEFAULT_MODEL)
+
+
 class Replacement(BaseModel):
     entity_type: str
     idx: int
