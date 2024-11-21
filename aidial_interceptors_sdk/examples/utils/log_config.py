@@ -2,16 +2,20 @@ import logging
 import os
 import sys
 
+from aidial_sdk import logger as aidial_logger
 from uvicorn.logging import DefaultFormatter
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
+AIDIAL_LOG_LEVEL = os.getenv("AIDIAL_LOG_LEVEL", "WARNING")
+aidial_logger.setLevel(AIDIAL_LOG_LEVEL)
+
 
 def configure_loggers():
-    # Making the uvicorn logger delegate logging to the root logger
-    uvicorn_logger = logging.getLogger("uvicorn")
-    uvicorn_logger.handlers = []
-    uvicorn_logger.propagate = True
+    # Making the uvicorn and dial sdk loggers delegate logging to the root logger
+    for logger in [aidial_logger, logging.getLogger("uvicorn")]:
+        logger.handlers = []
+        logger.propagate = True
 
     # Setting up log levels
     for name in ["aidial_interceptors_sdk", "uvicorn"]:
