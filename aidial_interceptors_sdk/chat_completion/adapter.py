@@ -25,7 +25,10 @@ from aidial_interceptors_sdk.utils.streaming import (
 )
 
 _log = logging.getLogger(__name__)
-_debug = _log.isEnabledFor(logging.DEBUG)
+
+
+def _debug():
+    return _log.isEnabledFor(logging.DEBUG)
 
 
 def interceptor_to_chat_completion(
@@ -65,7 +68,7 @@ def interceptor_to_chat_completion(
 
                 if isinstance(upstream_response, ChatCompletion):
                     resp = upstream_response.to_dict()
-                    if _debug:
+                    if _debug():
                         _log.debug(
                             f"upstream response[{call_context}]: {json.dumps(resp)}"
                         )
@@ -76,7 +79,7 @@ def interceptor_to_chat_completion(
 
                     def on_upstream_chunk(chunk: ChatCompletionChunk) -> dict:
                         d = chunk.to_dict()
-                        if _debug:
+                        if _debug():
                             _log.debug(
                                 f"upstream chunk[{call_context}]: {json.dumps(d)}"
                             )

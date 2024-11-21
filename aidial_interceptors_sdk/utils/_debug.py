@@ -3,7 +3,11 @@ import logging
 from typing import Callable, Coroutine, TypeVar
 
 _log = logging.getLogger(__name__)
-_debug = _log.isEnabledFor(logging.DEBUG)
+
+
+def _debug():
+    return _log.isEnabledFor(logging.DEBUG)
+
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -18,7 +22,7 @@ def debug_logging(
     def decorator(
         fn: Callable[[A], Coroutine[None, None, B]]
     ) -> Callable[[A], Coroutine[None, None, B]]:
-        if not _debug:
+        if not _debug():
             return fn
 
         async def _fn(a: A) -> B:
