@@ -7,9 +7,6 @@ from uvicorn.logging import DefaultFormatter
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
-AIDIAL_LOG_LEVEL = os.getenv("AIDIAL_LOG_LEVEL", "WARNING")
-aidial_logger.setLevel(AIDIAL_LOG_LEVEL)
-
 
 def configure_loggers():
     # Making the uvicorn and dial sdk loggers delegate logging to the root logger

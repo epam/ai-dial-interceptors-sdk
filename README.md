@@ -33,7 +33,6 @@ Copy `.env.example` to `.env` and customize it for your environment:
 |Variable|Default|Description|
 |---|---|---|
 |LOG_LEVEL|INFO|Log level. Use DEBUG for dev purposes and INFO in prod|
-|AIDIAL_LOG_LEVEL|WARNING|AI DIAL SDK log level|
 |WEB_CONCURRENCY|1|Number of workers for the server|
 |DIAL_URL||The URL of the DIAL Core server|
 |UPSTREAM_DEPLOYMENT|interceptor|The interceptors calls `${DIAL_URL}/openai/deployments/${UPSTREAM_DEPLOYMENT}/(chat/completions\|embeddings)` endpoint as an upstream. Useful for local debugging.|
