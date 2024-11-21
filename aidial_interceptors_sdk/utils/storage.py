@@ -3,32 +3,23 @@ import logging
 from typing import Mapping
 from urllib.parse import urljoin
 
-import aiohttp
+import httpx
 from aidial_sdk.pydantic_v1 import BaseModel
 
 _log = logging.getLogger(__name__)
 
 
 class FileStorage(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
     dial_url: str
     api_key: str
+    http_client: httpx.AsyncClient
 
     @property
     def headers(self) -> Mapping[str, str]:
         return {"api-key": self.api_key}
-
-    @staticmethod
-    def _to_form_data(
-        filename: str, content_type: str | None, content: bytes
-    ) -> aiohttp.FormData:
-        data = aiohttp.FormData()
-        data.add_field(
-            "file",
-            io.BytesIO(content),
-            filename=filename,
-            content_type=content_type,
-        )
-        return data
 
     async def upload(
         self, url: str, content_type: str | None, content: bytes
@@ -37,16 +28,16 @@ class FileStorage(BaseModel):
             raise ValueError(f"URL isn't DIAL url: {url!r}")
         url = self._to_abs_url(url)
 
-        data = FileStorage._to_form_data(url, content_type, content)
-        async with aiohttp.ClientSession() as session:
-            async with session.put(
-                url=url,
-                data=data,
-                headers=self.headers,
-            ) as response:
-                response.raise_for_status()
-                meta = await response.json()
-                _log.debug(f"uploaded file: url={url!r}, metadata={meta}")
+        response = await self.http_client.put(
+            url=url,
+            files={"file": (url, io.BytesIO(content), content_type)},
+            headers=self.headers,
+        )
+        response.raise_for_status()
+
+        meta = response.json()
+
+        _log.debug(f"uploaded file: url={url!r}, metadata={meta}")
 
     def to_dial_url(self, link: str) -> str | None:
         url = self._to_abs_url(link)
@@ -57,15 +48,13 @@ class FileStorage(BaseModel):
 
     def _to_abs_url(self, link: str) -> str:
         base_url = f"{self.dial_url}/v1/"
-        ret = urljoin(base_url, link)
-        return ret
+        return urljoin(base_url, link)
 
     async def download(self, url: str) -> bytes:
         if self.to_dial_url(url) is None:
             raise ValueError(f"URL isn't DIAL url: {url!r}")
         url = self._to_abs_url(url)
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=self.headers) as response:
-                response.raise_for_status()
-                return await response.read()
+        response = await self.http_client.get(url, headers=self.headers)
+        response.raise_for_status()
+        return response.content

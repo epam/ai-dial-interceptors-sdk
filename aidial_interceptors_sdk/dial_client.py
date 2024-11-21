@@ -37,6 +37,8 @@ class DialClient(BaseModel):
         if authorization is not None:
             extra_headers["Authorization"] = authorization
 
+        http_client = get_http_client()
+
         client = AsyncAzureOpenAI(
             azure_endpoint=DIAL_URL,
             azure_deployment=UPSTREAM_DEPLOYMENT,
@@ -56,7 +58,7 @@ class DialClient(BaseModel):
             # https://github.com/epam/ai-dial-adapter-openai/blob/b462d1c26ce8f9d569b9c085a849206aad91becf/aidial_adapter_openai/app.py#L93
             api_version=api_version or "",
             max_retries=0,
-            http_client=get_http_client(),
+            http_client=http_client,
             # NOTE: if Authorization header was provided in the request,
             # then propagate it to the upstream.
             # Whether interceptor gets the header or not, is determined by
@@ -64,6 +66,10 @@ class DialClient(BaseModel):
             default_headers=extra_headers,
         )
 
-        storage = FileStorage(dial_url=DIAL_URL, api_key=api_key)
+        storage = FileStorage(
+            dial_url=DIAL_URL,
+            api_key=api_key,
+            http_client=http_client,
+        )
 
         return cls(client=client, storage=storage)

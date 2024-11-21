@@ -27,9 +27,6 @@ httpx = ">=0.25.0,<1.0"
 openai = "~1.32.0"
 aidial-sdk = { version = "~0.13.0", extras = ["telemetry"] }
 
-# TODO: move these deps to "examples" extras
-aiohttp = "~3.10.2"
-
 # Extras for examples
 aiostream = { version = "~0.6.2", optional = true }
 pillow = { version = "~10.4.0", optional = true }
