@@ -35,6 +35,7 @@ Copy `.env.example` to `.env` and customize it for your environment:
 |LOG_LEVEL|INFO|Log level. Use DEBUG for dev purposes and INFO in prod|
 |WEB_CONCURRENCY|1|Number of workers for the server|
 |DIAL_URL||The URL of the DIAL Core server|
+|UPSTREAM_DEPLOYMENT|interceptor|The interceptors calls `${DIAL_URL}/openai/deployments/${UPSTREAM_DEPLOYMENT}/(chat/completions\|embeddings)` endpoint as an upstream. Useful for local debugging.|
 
 ## Development
 
@@ -166,7 +167,7 @@ The command will start the server on `http://localhost:5000` exposing endpoints 
 First clone the repository:
 
 ```sh
-git clone https://github.com/epam/ai-dial-interceptors-sdk.git .
+git clone https://github.com/epam/ai-dial-interceptors-sdk.git
 cd ai-dial-interceptors-sdk
 echo "DIAL_URL=URL" > .env
 ```

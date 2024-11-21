@@ -1,3 +1,5 @@
+import os
+
 from aidial_sdk.exceptions import InvalidRequestError
 from aidial_sdk.pydantic_v1 import BaseModel
 from openai import AsyncAzureOpenAI
@@ -7,6 +9,7 @@ from aidial_interceptors_sdk.utils._http_client import get_http_client
 from aidial_interceptors_sdk.utils.storage import FileStorage
 
 DIAL_URL = get_env("DIAL_URL")
+UPSTREAM_DEPLOYMENT = os.getenv("UPSTREAM_DEPLOYMENT", "interceptor")
 
 
 class DialClient(BaseModel):
@@ -36,7 +39,7 @@ class DialClient(BaseModel):
 
         client = AsyncAzureOpenAI(
             azure_endpoint=DIAL_URL,
-            azure_deployment="interceptor",
+            azure_deployment=UPSTREAM_DEPLOYMENT,
             # NOTE: DIAL SDK takes care of propagating api-key header
             api_key="-",
             # NOTE: api-version query parameter is not required in the chat completions DIAL API.
