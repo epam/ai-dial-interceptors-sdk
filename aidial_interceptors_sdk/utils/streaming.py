@@ -1,7 +1,6 @@
 import logging
-from typing import Any, AsyncIterator, Callable, List, Optional, TypeVar
+from typing import Any, AsyncIterator, Callable, Optional, TypeVar
 
-import aiostream
 import openai
 from aidial_sdk.exceptions import HTTPException as DialException
 
@@ -70,10 +69,3 @@ async def map_stream(
 
 async def singleton_stream(item: _T) -> AsyncIterator[_T]:
     yield item
-
-
-async def join_iterators(iters: List[AsyncIterator[_T]]) -> AsyncIterator[_T]:
-    combine = aiostream.stream.merge(*iters)
-    # FIXME: UserWarning: Streamer is iterated outside of its context
-    async for item in combine:
-        yield item

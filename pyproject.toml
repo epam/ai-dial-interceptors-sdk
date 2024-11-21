@@ -29,15 +29,15 @@ aidial-sdk = { version = "~0.13.0", extras = ["telemetry"] }
 
 # TODO: move these deps to "examples" extras
 aiohttp = "~3.10.2"
-aiostream = "~0.6.2"
 
-# Extras
+# Extras for examples
+aiostream = { version = "~0.6.2", optional = true }
 pillow = { version = "~10.4.0", optional = true }
 numpy = { version = "~1.26.1", optional = true }
 spacy = { version = "~3.7.5", optional = true }
 
 [tool.poetry.extras]
-examples = ["pillow", "numpy", "spacy"]
+examples = ["aiostream", "pillow", "numpy", "spacy"]
 
 [tool.poetry.group.test.dependencies]
 pytest = "7.4.0"
@@ -71,8 +71,7 @@ exclude = [
     ".git",
     ".venv",
     ".nox",
-    "**/__pycache__",
-    "docker-compose"
+    "**/__pycache__"
 ]
 
 [tool.black]
@@ -83,7 +82,6 @@ exclude = '''
   | \.venv
   | \.nox
   | \.__pycache__
-  | docker-compose\/local\/core-data
 )/
 '''
 

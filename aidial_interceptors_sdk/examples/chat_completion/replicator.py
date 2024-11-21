@@ -1,5 +1,15 @@
-from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Tuple
+from typing import (
+    Any,
+    AsyncIterator,
+    Callable,
+    Coroutine,
+    Dict,
+    List,
+    Tuple,
+    TypeVar,
+)
 
+import aiostream
 from aidial_sdk.chat_completion import Stage
 from aidial_sdk.chat_completion.chunks import (
     ContentChunk,
@@ -18,7 +28,6 @@ from aidial_interceptors_sdk.chat_completion.base import (
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.chat_completion.index_mapper import IndexMapper
 from aidial_interceptors_sdk.utils.not_given import NotGiven
-from aidial_interceptors_sdk.utils.streaming import join_iterators
 
 
 class ReplicatorInterceptor(ChatCompletionInterceptor):
@@ -77,7 +86,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
 
         iterators = [get_iterator(idx) for idx in range(self.n)]
         # TODO: create tasks
-        return join_iterators(iterators)
+        return _join_iterators(iterators)
 
     @override
     async def on_response_stage(
@@ -181,3 +190,13 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
             else FinishReason(self.finish_reasons[1])
         )
         self.send_chunk(EndChoiceChunk(finish_reason, 0))
+
+
+_T = TypeVar("_T")
+
+
+async def _join_iterators(iters: List[AsyncIterator[_T]]) -> AsyncIterator[_T]:
+    combine = aiostream.stream.merge(*iters)
+    # FIXME: UserWarning: Streamer is iterated outside of its context
+    async for item in combine:
+        yield item
