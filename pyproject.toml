@@ -24,8 +24,8 @@ env_files = [".env"]
 python = ">=3.11,<4.0"
 fastapi = ">=0.51,<1.0"
 httpx = ">=0.25.0,<1.0"
-openai = "~1.32.0"
-aidial-sdk = { version = "~0.13.0", extras = ["telemetry"] }
+openai = ">=1.32.0,<2.0"
+aidial-sdk = { version = "^0.13.0", extras = ["telemetry"] }
 
 # Extras for examples
 aiostream = { version = "~0.6.2", optional = true }

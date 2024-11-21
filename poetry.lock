@@ -3013,4 +3013,4 @@ examples = ["aiostream", "numpy", "pillow", "spacy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "6b92dac7bb1710b049ec837db002b16c903bd093140c5736fa3c62d67d73a06b"
+content-hash = "94550128a8978dbcd0e87dd2a6a4b633c0b8433a8d7721e6c1354fefd81bd84e"
