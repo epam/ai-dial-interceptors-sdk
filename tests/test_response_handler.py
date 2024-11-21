@@ -2,7 +2,7 @@ import fastapi
 import pytest
 from aidial_sdk.chat_completion import Request, Response
 from aidial_sdk.pydantic_v1 import SecretStr
-from aidial_sdk.utils.streaming import merge_chunks
+from aidial_sdk.utils.streaming import to_block_response
 
 from aidial_interceptors_sdk.chat_completion.annotated_chunk import (
     AnnotatedChunk,
@@ -67,8 +67,8 @@ async def get_response(cls: type[ResponseHandler], **kwargs) -> dict:
         ann_chunk = AnnotatedChunk(chunk=RESPONSE_CHUNK)
         await handler.traverse_response_chunk(ann_chunk)
 
-    first_chunk = await response._generator(producer, dummy_request)
-    return await merge_chunks(response._generate_stream(first_chunk))
+    stream = response._generate_stream(producer)
+    return await to_block_response(stream)
 
 
 # Test 1: Add a second choice, which is same as the first one, but with index=1
