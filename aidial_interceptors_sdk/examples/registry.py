@@ -34,14 +34,12 @@ from aidial_interceptors_sdk.examples.embeddings import (
 
 
 class Interceptors(BaseModel):
-    chat_completion_interceptors: dict[str, Type[ChatCompletionInterceptor]] = (
-        {}
-    )
-    embeddings_interceptors: dict[str, Type[EmbeddingsInterceptor]] = {}
+    chat_completions: dict[str, Type[ChatCompletionInterceptor]] = {}
+    embeddings: dict[str, Type[EmbeddingsInterceptor]] = {}
 
 
 EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
-    chat_completion_interceptors={
+    chat_completions={
         "reply-as-pirate": PirateInterceptor,
         "reject-external-links": RejectExternalLinksInterceptor,
         "image-watermark": ImageWatermarkInterceptor,
@@ -52,7 +50,7 @@ EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
         "cache": ChatCachingInterceptor,
         "no-op": ChatCompletionNoOpInterceptor,
     },
-    embeddings_interceptors={
+    embeddings={
         "reject-blacklisted-words": EmbeddingsBlacklistedWordsInterceptor,
         "normalize-vector": NormalizeVectorInterceptor,
         "project-vector:{dim:int}": ProjectVectorInterceptor,

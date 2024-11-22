@@ -26,12 +26,12 @@ def create_app(
 
     configure_loggers()
 
-    for id, cls in interceptors.embeddings_interceptors.items():
+    for id, cls in interceptors.embeddings.items():
         app.add_embeddings(
             id, interceptor_to_embeddings(cls, dial_url, client_factory)
         )
 
-    for id, cls in interceptors.chat_completion_interceptors.items():
+    for id, cls in interceptors.chat_completions.items():
         app.add_chat_completion(
             id, interceptor_to_chat_completion(cls, dial_url, client_factory)
         )
