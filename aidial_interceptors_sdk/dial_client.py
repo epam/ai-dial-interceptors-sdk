@@ -1,9 +1,13 @@
+from typing import Mapping
+
 from aidial_sdk.exceptions import InvalidRequestError
 from aidial_sdk.pydantic_v1 import BaseModel
 from openai import AsyncAzureOpenAI
 
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 from aidial_interceptors_sdk.utils.storage import FileStorage
+
+_UPSTREAMS_HEADER = "X-UPSTREAMS"
 
 
 class DialClient(BaseModel):
@@ -17,24 +21,34 @@ class DialClient(BaseModel):
     @classmethod
     async def create(
         cls,
+        *,
         dial_url: str,
         api_key: str | None,
         authorization: str | None,
         api_version: str | None,
+        headers: Mapping[str, str],
         client_factory: HTTPClientFactory,
     ) -> "DialClient":
         if not api_key:
             raise InvalidRequestError("The 'api-key' request header is missing")
 
-        extra_headers = {}
+        extra_headers: dict[str, str] = {}
         if authorization is not None:
             extra_headers["Authorization"] = authorization
+
+        azure_deployment = "interceptor"
+        if upstreams_header := headers.get(_UPSTREAMS_HEADER):
+            azure_deployment, *upstreams = upstreams_header.split(
+                ",", maxsplit=1
+            )
+            if upstreams:
+                extra_headers[_UPSTREAMS_HEADER] = "".join(upstreams)
 
         http_client = await client_factory()
 
         client = AsyncAzureOpenAI(
             azure_endpoint=dial_url,
-            azure_deployment="interceptor",
+            azure_deployment=azure_deployment,
             # NOTE: DIAL SDK takes care of propagating api-key header
             api_key="-",
             # NOTE: api-version query parameter is not required in the chat completions DIAL API.

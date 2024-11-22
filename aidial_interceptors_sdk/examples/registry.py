@@ -1,5 +1,7 @@
 from typing import Type
 
+from aidial_sdk.pydantic_v1 import BaseModel
+
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
     ChatCompletionNoOpInterceptor,
@@ -30,21 +32,30 @@ from aidial_interceptors_sdk.examples.embeddings import (
     ProjectVectorInterceptor,
 )
 
-chat_completion_interceptors: dict[str, Type[ChatCompletionInterceptor]] = {
-    "reply-as-pirate": PirateInterceptor,
-    "reject-external-links": RejectExternalLinksInterceptor,
-    "image-watermark": ImageWatermarkInterceptor,
-    "statistics-reporter": StatisticsReporterInterceptor,
-    "pii-anonymizer": PIIAnonymizerInterceptor,
-    "replicator:{n:int}": ReplicatorInterceptor,
-    "reject-blacklisted-words": ChatBlacklistedWordsInterceptor,
-    "cache": ChatCachingInterceptor,
-    "no-op": ChatCompletionNoOpInterceptor,
-}
 
-embeddings_interceptors: dict[str, Type[EmbeddingsInterceptor]] = {
-    "reject-blacklisted-words": EmbeddingsBlacklistedWordsInterceptor,
-    "normalize-vector": NormalizeVectorInterceptor,
-    "project-vector:{dim:int}": ProjectVectorInterceptor,
-    "no-op": EmbeddingsNoOpInterceptor,
-}
+class Interceptors(BaseModel):
+    chat_completion_interceptors: dict[str, Type[ChatCompletionInterceptor]] = (
+        {}
+    )
+    embeddings_interceptors: dict[str, Type[EmbeddingsInterceptor]] = {}
+
+
+EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
+    chat_completion_interceptors={
+        "reply-as-pirate": PirateInterceptor,
+        "reject-external-links": RejectExternalLinksInterceptor,
+        "image-watermark": ImageWatermarkInterceptor,
+        "statistics-reporter": StatisticsReporterInterceptor,
+        "pii-anonymizer": PIIAnonymizerInterceptor,
+        "replicator:{n:int}": ReplicatorInterceptor,
+        "reject-blacklisted-words": ChatBlacklistedWordsInterceptor,
+        "cache": ChatCachingInterceptor,
+        "no-op": ChatCompletionNoOpInterceptor,
+    },
+    embeddings_interceptors={
+        "reject-blacklisted-words": EmbeddingsBlacklistedWordsInterceptor,
+        "normalize-vector": NormalizeVectorInterceptor,
+        "project-vector:{dim:int}": ProjectVectorInterceptor,
+        "no-op": EmbeddingsNoOpInterceptor,
+    },
+)

@@ -1,11 +1,9 @@
-import asyncio
-
-import httpx
-import openai
 from aidial_sdk.chat_completion import ChatCompletion, Request, Response
-from fastapi.testclient import TestClient
 
-from aidial_interceptors_sdk.examples.app_factory import create_app
+from aidial_interceptors_sdk.chat_completion.base import (
+    ChatCompletionNoOpInterceptor,
+)
+from tests.examples.utils import create_openai_client
 
 
 class EchoApplication(ChatCompletion):
@@ -18,32 +16,17 @@ class EchoApplication(ChatCompletion):
             choice.append_content(last_message.text())
 
 
-def create_http_client() -> TestClient:
-    base_url = "http://test-app.com"
-    client_future: asyncio.Future[httpx.AsyncClient] = asyncio.Future()
-
-    app = create_app(dial_url=base_url, client_factory=lambda: client_future)
-    app.add_chat_completion("interceptor", EchoApplication())
-
-    client_future.set_result(httpx.AsyncClient(app=app, base_url=base_url))
-
-    return TestClient(app)
-
-
 def test_noop():
-
-    http_client = create_http_client()
-
-    openai_client = openai.AzureOpenAI(
-        azure_endpoint=str(http_client.base_url),
-        http_client=http_client,
-        api_key="-",
-        api_version="2024-10-21",
-        max_retries=0,
+    openai_client = create_openai_client(
+        [
+            ("final", EchoApplication()),
+            ("no-op", ChatCompletionNoOpInterceptor),
+        ],
+        ["no-op", "no-op", "final"],
     )
 
     response = openai_client.chat.completions.create(
-        model="no-op",
+        model=None,  # type: ignore
         messages=[
             {
                 "role": "user",

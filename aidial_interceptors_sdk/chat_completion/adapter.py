@@ -48,6 +48,7 @@ def interceptor_to_chat_completion(
                 api_key=request.api_key,
                 api_version=request.api_version,
                 authorization=request.jwt,
+                headers=request.headers,
                 client_factory=client_factory,
             )
 

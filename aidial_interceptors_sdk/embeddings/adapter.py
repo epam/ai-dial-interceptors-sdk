@@ -28,6 +28,7 @@ def interceptor_to_embeddings(
                 api_key=request.api_key,
                 api_version=request.api_version,
                 authorization=request.jwt,
+                headers=request.headers,
                 client_factory=client_factory,
             )
 

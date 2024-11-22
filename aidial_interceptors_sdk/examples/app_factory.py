@@ -5,15 +5,17 @@ from aidial_interceptors_sdk.chat_completion import (
     interceptor_to_chat_completion,
 )
 from aidial_interceptors_sdk.embeddings.adapter import interceptor_to_embeddings
-from aidial_interceptors_sdk.examples.registry import (
-    chat_completion_interceptors,
-    embeddings_interceptors,
-)
+from aidial_interceptors_sdk.examples.registry import Interceptors
 from aidial_interceptors_sdk.examples.utils.log_config import configure_loggers
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 
 
-def create_app(dial_url: str, client_factory: HTTPClientFactory) -> DIALApp:
+def create_app(
+    *,
+    dial_url: str,
+    client_factory: HTTPClientFactory,
+    interceptors: Interceptors
+) -> DIALApp:
     app = DIALApp(
         description="Examples of DIAL interceptors",
         dial_url=dial_url,
@@ -24,12 +26,12 @@ def create_app(dial_url: str, client_factory: HTTPClientFactory) -> DIALApp:
 
     configure_loggers()
 
-    for id, cls in embeddings_interceptors.items():
+    for id, cls in interceptors.embeddings_interceptors.items():
         app.add_embeddings(
             id, interceptor_to_embeddings(cls, dial_url, client_factory)
         )
 
-    for id, cls in chat_completion_interceptors.items():
+    for id, cls in interceptors.chat_completion_interceptors.items():
         app.add_chat_completion(
             id, interceptor_to_chat_completion(cls, dial_url, client_factory)
         )
