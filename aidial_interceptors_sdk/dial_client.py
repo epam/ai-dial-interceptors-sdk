@@ -2,30 +2,26 @@ from aidial_sdk.exceptions import InvalidRequestError
 from aidial_sdk.pydantic_v1 import BaseModel
 from openai import AsyncAzureOpenAI
 
-from aidial_interceptors_sdk.utils._env import get_env
-from aidial_interceptors_sdk.utils._http_client import get_http_client
+from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 from aidial_interceptors_sdk.utils.storage import FileStorage
-
-DIAL_URL = get_env("DIAL_URL")
 
 
 class DialClient(BaseModel):
+    dial_url: str
     client: AsyncAzureOpenAI
     storage: FileStorage
 
     class Config:
         arbitrary_types_allowed = True
 
-    @property
-    def dial_url(self) -> str:
-        return self.storage.dial_url
-
     @classmethod
     async def create(
         cls,
+        dial_url: str,
         api_key: str | None,
         authorization: str | None,
         api_version: str | None,
+        client_factory: HTTPClientFactory,
     ) -> "DialClient":
         if not api_key:
             raise InvalidRequestError("The 'api-key' request header is missing")
@@ -34,10 +30,10 @@ class DialClient(BaseModel):
         if authorization is not None:
             extra_headers["Authorization"] = authorization
 
-        http_client = get_http_client()
+        http_client = await client_factory()
 
         client = AsyncAzureOpenAI(
-            azure_endpoint=DIAL_URL,
+            azure_endpoint=dial_url,
             azure_deployment="interceptor",
             # NOTE: DIAL SDK takes care of propagating api-key header
             api_key="-",
@@ -64,9 +60,13 @@ class DialClient(BaseModel):
         )
 
         storage = FileStorage(
-            dial_url=DIAL_URL,
+            dial_url=dial_url,
             api_key=api_key,
             http_client=http_client,
         )
 
-        return cls(client=client, storage=storage)
+        return cls(
+            dial_url=dial_url,
+            client=client,
+            storage=storage,
+        )
