@@ -1,3 +1,4 @@
+import logging
 import re
 from collections import defaultdict
 from functools import cache
@@ -22,11 +23,19 @@ DEFAULT_LABELS_TO_REDACT = [
     "PRODUCT",
 ]
 
+_log = logging.getLogger(__name__)
+
 
 @cache
 def _get_pipeline(model: str) -> Language:
-    download_model(model)
-    return load_model(model)
+    try:
+        return load_model(model)
+    except Exception as e:
+        _log.warning(
+            f"Failed to load spaCy model {model!r}: {str(e)}\nDownloading the model..."
+        )
+        download_model(model)
+        return load_model(model)
 
 
 # Preemptively load the default model on the server start-up

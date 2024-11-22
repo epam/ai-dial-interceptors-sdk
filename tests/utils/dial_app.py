@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Tuple, Type
+from typing import List, Tuple, Type, assert_never
 
 import httpx
 import openai
@@ -55,6 +55,8 @@ def add_endpoints(
                     endpoint, dial_url, client_factory
                 ),
             )
+        else:
+            assert_never(endpoint)
 
 
 def create_recursive_app(endpoints: AppEndpoints) -> DIALApp:
