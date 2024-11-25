@@ -59,6 +59,7 @@ flake8 = "6.0.0"
 nox = "^2023.4.22"
 
 [tool.pytest.ini_options]
+addopts = "--asyncio-mode=auto"
 testpaths = [
     "tests"
 ]

@@ -77,7 +77,6 @@ class AddSecondChoice(ResponseHandler):
         return [choice, {**choice, "index": 1}]
 
 
-@pytest.mark.asyncio
 async def test_add_second_choice():
     response = await get_response(AddSecondChoice, n=2)
     assert len(response["choices"]) == 2
@@ -90,7 +89,6 @@ class RemoveAttachmentsNotGiven(ResponseHandler):
         return NOT_GIVEN
 
 
-@pytest.mark.asyncio
 async def test_remove_attachments_not_given():
     response = await get_response(RemoveAttachmentsNotGiven)
     assert (
@@ -104,7 +102,6 @@ class RemoveAttachmentsNone(ResponseHandler):
         return None
 
 
-@pytest.mark.asyncio
 async def test_remove_attachments_none():
     response = await get_response(RemoveAttachmentsNone)
     assert (
@@ -121,7 +118,6 @@ class SetStageAttachmentTitle(ResponseHandler):
         return [attachment]
 
 
-@pytest.mark.asyncio
 async def test_set_stage_attachment_title():
     response = await get_response(SetStageAttachmentTitle)
     assert (
@@ -142,7 +138,6 @@ class MultiplyUsageNumbers(ResponseHandler):
         return usage
 
 
-@pytest.mark.asyncio
 async def test_multiply_usage_numbers():
     response = await get_response(MultiplyUsageNumbers)
     assert response["usage"]["prompt_tokens"] == 18
@@ -156,7 +151,6 @@ class AddState(ResponseHandler):
         return {"status": "done"}
 
 
-@pytest.mark.asyncio
 async def test_add_state():
     response = await get_response(AddState)
     assert response["choices"][0]["message"]["custom_content"]["state"] == {
