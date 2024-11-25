@@ -1,4 +1,5 @@
 import http
+import itertools
 
 import pytest
 
@@ -19,7 +20,8 @@ to_many_requests_error = DialExceptionWithHeaders.create(
 
 
 @pytest.mark.parametrize("stream", [False, True])
-async def test_interceptor_errors(stream: bool):
+@pytest.mark.parametrize("repeats", [1, 2, 3])
+async def test_interceptor_errors(stream: bool, repeats: int):
     httpx_client = create_httpx_client(
         [
             (
@@ -32,9 +34,9 @@ async def test_interceptor_errors(stream: bool):
             ("no-op", ChatCompletionNoOpInterceptor),
         ],
         [
-            "no-op",
+            *itertools.repeat("no-op", repeats),
             "upstream",
-        ],  # TODO: PARAMETRIZE NUMBER OF TIMES we apply no-op
+        ],
     )
 
     response = await httpx_client.post(
@@ -79,6 +81,7 @@ async def test_interceptor_errors(stream: bool):
             chunk_checker(),
             {
                 # FIXME: error chunks shouldn't have id/created/object fields
+                # https://github.com/epam/ai-dial-sdk/blob/development/aidial_sdk/chat_completion/chunks.py#L31-L35
                 "id": id_checker,
                 "created": created_checker,
                 "object": "chat.completion.chunk",
