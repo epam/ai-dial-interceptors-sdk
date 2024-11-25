@@ -1,45 +1,76 @@
-import logging
-from functools import wraps
+import dataclasses
+from typing import Any
 
-import openai
 from aidial_sdk.exceptions import HTTPException as DialException
+from fastapi.responses import JSONResponse as FastAPIResponse
+from httpx import Headers
+from openai import APIConnectionError, APIStatusError, APITimeoutError
 
-_log = logging.getLogger(__name__)
+
+@dataclasses.dataclass
+class ResponseWrapper:
+    status_code: int
+    headers: Headers | None
+    content: Any
+
+    def to_fastapi_response(self) -> FastAPIResponse:
+        return FastAPIResponse(
+            content=self.content,
+            status_code=self.status_code,
+            headers=self.headers,
+        )
 
 
-def _to_dial_exception(e: Exception) -> Exception:
-    """
-    Converting certain interceptor-specific exceptions into DialException.
+def to_dial_exception(exc: Exception) -> DialException | ResponseWrapper:
+    if isinstance(exc, APIStatusError):
+        r = exc.response
+        headers = r.headers
 
-    The rest of the exceptions will be handled by the DIAL SDK.
-    """
+        # The original content length may have changed
+        # due to the response modification in the adapter.
+        if "Content-Length" in headers:
+            del headers["Content-Length"]
 
-    if isinstance(e, openai.APIStatusError):
-        r = e.response
-        # FIXME: the headers aren't propagated,
-        # so we may miss something useful like Retry-After.
-        return DialException(r.text, r.status_code)
+        # httpx library (used by openai) automatically sets
+        # "Accept-Encoding:gzip,deflate" header in requests to the upstream.
+        # Therefore, we may receive from the upstream gzip-encoded
+        # response along with "Content-Encoding:gzip" header.
+        # We either need to encode the response, or
+        # remove the "Content-Encoding" header.
+        if "Content-Encoding" in headers:
+            del headers["Content-Encoding"]
 
-    if isinstance(e, openai.APITimeoutError):
+        try:
+            content = r.json()
+        except Exception:
+            content = r.text
+
+        return ResponseWrapper(
+            status_code=r.status_code,
+            headers=headers,
+            content=content,
+        )
+
+    if isinstance(exc, APITimeoutError):
         return DialException("Request timed out", 504, "timeout")
 
-    if isinstance(e, openai.APIConnectionError):
+    if isinstance(exc, APIConnectionError):
         return DialException(
             "Error communicating with OpenAI", 502, "connection"
         )
 
-    return e
+    if isinstance(exc, DialException):
+        return exc
+
+    return DialException(
+        status_code=500,
+        type="internal_server_error",
+        message=str(exc),
+    )
 
 
-def dial_exception_decorator(func):
-    @wraps(func)
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except Exception as e:
-            _log.exception(
-                f"caught exception: {type(e).__module__}.{type(e).__name__}"
-            )
-            raise _to_dial_exception(e) from e
-
-    return wrapper
+def to_json_content(exc: DialException | ResponseWrapper) -> Any:
+    if isinstance(exc, DialException):
+        return exc.json_error()
+    else:
+        return exc.content

@@ -1,8 +1,10 @@
 import logging
 from typing import Any, AsyncIterator, Callable, Optional, TypeVar
 
-import openai
-from aidial_sdk.exceptions import HTTPException as DialException
+from aidial_interceptors_sdk.utils._exceptions import (
+    to_dial_exception,
+    to_json_content,
+)
 
 _log = logging.getLogger(__name__)
 
@@ -17,20 +19,13 @@ async def handle_streaming_errors(
     try:
         async for chunk in stream:
             yield chunk
-    except openai.APIError as e:
-        _log.error(f"error during streaming: {e.body}")
+    except Exception as e:
+        _log.exception(
+            f"caught exception while streaming: {type(e).__module__}.{type(e).__name__}"
+        )
 
-        display_message = None
-        if e.body is not None and isinstance(e.body, dict):
-            display_message = e.body.get("display_message", None)
-
-        yield DialException(
-            message=e.message,
-            type=e.type,
-            param=e.param,
-            code=e.code,
-            display_message=display_message,
-        ).json_error()
+        dial_exception = to_dial_exception(e)
+        yield to_json_content(dial_exception)
 
 
 # TODO: add to SDK as a inverse of cleanup_indices
