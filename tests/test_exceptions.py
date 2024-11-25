@@ -1,21 +1,20 @@
 import http
 
-import httpx
 import pytest
 
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionNoOpInterceptor,
 )
-from aidial_interceptors_sdk.utils._exceptions import ResponseWrapper
+from aidial_interceptors_sdk.utils._exceptions import DialExceptionWithHeaders
 from tests.utils.applications import create_broken_application
 from tests.utils.chunks import create_chunk_checker, create_sse_stream_checker
 from tests.utils.dial_app import create_httpx_client
 from tests.utils.json import has_type, match_objects, memorize
 
-to_many_requests_error = ResponseWrapper(
+to_many_requests_error = DialExceptionWithHeaders.create(
     status_code=http.HTTPStatus.TOO_MANY_REQUESTS,
     content={"error": {"message": "Too many requests"}},
-    headers=httpx.Headers(headers={"Retry-After": "42"}),
+    headers={"retry-after": "42"},
 )
 
 
@@ -32,7 +31,10 @@ async def test_interceptor_errors(stream: bool):
             ),
             ("no-op", ChatCompletionNoOpInterceptor),
         ],
-        ["no-op", "no-op", "upstream"],
+        [
+            "no-op",
+            "upstream",
+        ],  # TODO: PARAMETRIZE NUMBER OF TIMES we apply no-op
     )
 
     response = await httpx_client.post(
@@ -44,26 +46,21 @@ async def test_interceptor_errors(stream: bool):
     )
 
     if not stream:
-        print(response.__dict__)
-        assert response.status_code == 500
+        assert response.status_code == 429
         actual_headers = {
             k.decode(): v.decode() for k, v in response.headers.raw
         }
         # FIXME: Retry-After should actually be propagated
+        # See https://github.com/epam/ai-dial-sdk/blob/45681f3763679e115d95bc5ce32cf382e0083420/aidial_sdk/_errors.py#L21C1-L26C6
         assert match_objects(
             actual_headers,
             {
-                "content-length": "95",
+                "content-length": has_type(str),
                 "content-type": "application/json",
             },
         )
-        # FIXME: the error message and status_code should be propagated
         assert response.json() == {
-            "error": {
-                "message": "Error during processing the request",
-                "type": "runtime_error",
-                "code": "500",
-            }
+            "error": {"message": "Too many requests", "code": "429"}
         }
     else:
         assert response.status_code == 200
@@ -81,16 +78,74 @@ async def test_interceptor_errors(stream: bool):
         expected = create_sse_stream_checker(
             chunk_checker(),
             {
+                # FIXME: error chunks shouldn't have id/created/object fields
                 "id": id_checker,
                 "created": created_checker,
                 "object": "chat.completion.chunk",
-                "error": {
-                    "message": "Too many requests",
-                    "type": "internal_server_error",
-                    # FIXME: the status code should be propagated
-                    "code": "500",
-                },
+                "error": {"message": "Too many requests", "code": "429"},
             },
+            "[DONE]",
+        )
+
+        match_objects(actual, expected)
+
+
+@pytest.mark.parametrize("stream", [False, True])
+async def test_direct_errors(stream: bool):
+    httpx_client = create_httpx_client(
+        [
+            (
+                "upstream",
+                (
+                    "chat/completions",
+                    create_broken_application(to_many_requests_error),
+                ),
+            ),
+            ("no-op", ChatCompletionNoOpInterceptor),
+        ],
+        ["upstream"],
+    )
+
+    response = await httpx_client.post(
+        "chat/completions",
+        json={
+            "stream": stream,
+            "messages": [{"role": "user", "content": "hello"}],
+        },
+    )
+
+    if not stream:
+        assert response.status_code == 429
+        actual_headers = {
+            k.decode(): v.decode() for k, v in response.headers.raw
+        }
+        assert match_objects(
+            actual_headers,
+            {
+                "content-length": has_type(str),
+                "content-type": "application/json",
+                "retry-after": "42",
+            },
+        )
+        assert response.json() == {
+            "error": {"message": "Too many requests", "code": "429"}
+        }
+    else:
+        assert response.status_code == 200
+
+        actual = [line async for line in response.aiter_lines()]
+
+        id_checker = memorize(has_type(str))
+        created_checker = memorize(has_type(int))
+        chunk_checker = create_chunk_checker(
+            stream=stream,
+            id=id_checker,
+            created=created_checker,
+        )
+
+        expected = create_sse_stream_checker(
+            chunk_checker(),
+            {"error": {"message": "Too many requests", "code": "429"}},
             "[DONE]",
         )
 

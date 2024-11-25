@@ -8,6 +8,7 @@ from openai.types import CreateEmbeddingResponse
 from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
 from aidial_interceptors_sdk.utils._debug import debug_logging
+from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
 
@@ -19,8 +20,8 @@ def interceptor_to_embeddings(
 ) -> Embeddings:
 
     class Impl(Embeddings):
+        @dial_exception_decorator
         async def embeddings(self, request: Request) -> Response:
-
             dial_client = await DialClient.create(
                 dial_url=dial_url,
                 api_key=request.api_key,

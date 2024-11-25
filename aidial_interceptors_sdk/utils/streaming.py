@@ -1,10 +1,7 @@
 import logging
 from typing import Any, AsyncIterator, Callable, Optional, TypeVar
 
-from aidial_interceptors_sdk.utils._exceptions import (
-    to_dial_exception,
-    to_json_content,
-)
+from aidial_interceptors_sdk.utils._exceptions import to_dial_exception
 
 _log = logging.getLogger(__name__)
 
@@ -25,7 +22,7 @@ async def handle_streaming_errors(
         )
 
         dial_exception = to_dial_exception(e)
-        yield to_json_content(dial_exception)
+        yield dial_exception.json_error()
 
 
 # TODO: add to SDK as a inverse of cleanup_indices

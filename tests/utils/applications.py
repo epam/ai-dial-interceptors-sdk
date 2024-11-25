@@ -1,11 +1,8 @@
 from aidial_sdk.chat_completion import ChatCompletion, Request, Response
+from aidial_sdk.exceptions import HTTPException as DialException
 from fastapi.requests import Request as FastAPIRequest
 from fastapi.responses import StreamingResponse as FastAPIStreamingResponse
 
-from aidial_interceptors_sdk.utils._exceptions import (
-    ResponseWrapper,
-    to_json_content,
-)
 from tests.utils.chunks import create_chunk, format_chunk
 
 
@@ -17,7 +14,7 @@ class EchoApplication(ChatCompletion):
             choice.append_content(request.messages[-1].text())
 
 
-def create_broken_application(error: ResponseWrapper):
+def create_broken_application(error: DialException):
     async def _handler(request: FastAPIRequest):
         req = await request.json()
         stream = bool(req.get("stream"))
@@ -30,7 +27,7 @@ def create_broken_application(error: ResponseWrapper):
                 # A valid chunk should be generated first,
                 # otherwise, SDK throws "Not all choices were generated" error.
                 yield format_chunk(create_chunk(stream=stream))
-                yield format_chunk(to_json_content(error))
+                yield format_chunk(error.json_error())
                 yield format_chunk("[DONE]")
 
             return FastAPIStreamingResponse(_gen())
