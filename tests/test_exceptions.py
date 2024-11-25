@@ -44,7 +44,20 @@ async def test_interceptor_errors(stream: bool):
     )
 
     if not stream:
+        print(response.__dict__)
         assert response.status_code == 500
+        actual_headers = {
+            k.decode(): v.decode() for k, v in response.headers.raw
+        }
+        # FIXME: Retry-After should actually be propagated
+        assert match_objects(
+            actual_headers,
+            {
+                "content-length": "95",
+                "content-type": "application/json",
+            },
+        )
+        # FIXME: the error message and status_code should be propagated
         assert response.json() == {
             "error": {
                 "message": "Error during processing the request",
@@ -74,6 +87,7 @@ async def test_interceptor_errors(stream: bool):
                 "error": {
                     "message": "Too many requests",
                     "type": "internal_server_error",
+                    # FIXME: the status code should be propagated
                     "code": "500",
                 },
             },

@@ -54,9 +54,15 @@ def _match_objects(path: str, actual: Any, expected: Any) -> None:
             assert isinstance(
                 actual, dict
             ), f"The actual value is not a dict: {_print_type(type(actual))!r}"
-            assert (e_keys := list(sorted(expected.keys()))) == (
-                a_keys := list(sorted(actual.keys()))
-            ), f"The expected keys are not matching with actual keys: {e_keys} != {a_keys}"
+
+            a_keys = set(actual.keys())
+            e_keys = set(expected.keys())
+            a_only_keys = a_keys - e_keys
+            e_only_keys = e_keys - a_keys
+
+            assert (
+                not a_only_keys and not e_only_keys
+            ), f"The keys present only in the actual value: {a_only_keys}. The keys present only in the expected value: {e_only_keys}."
 
             for k, v in expected.items():
                 _match_objects(f"{path}.{k}", actual[k], v)
@@ -93,8 +99,9 @@ def _match_objects(path: str, actual: Any, expected: Any) -> None:
             ), f"The expected value is mismatching the actual value: {actual!r} != {expected!r}"
 
     except AssertionError as e:
-        raise MatchingException(path=path, msg=str(e)[:100]) from e
+        raise MatchingException(path=path, msg=str(e)) from e
 
 
-def match_objects(actual: Any, expected: Any, path: str = "actual") -> None:
+def match_objects(actual: Any, expected: Any, path: str = "actual") -> bool:
     _match_objects(path, actual, expected)
+    return True
