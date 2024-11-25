@@ -1,7 +1,7 @@
 import json
 from typing import Any, Mapping
 
-from tests.utils.json import Check, has_type
+from tests.utils.json import Check, has_type, match_objects
 
 _DATA_PREFIX = "data: "
 
@@ -38,6 +38,37 @@ def create_chunk_checker(
         }
 
     return _checker
+
+
+def _data_prefix_checker(expected):
+    def _check(path: str, string: Any):
+        assert isinstance(string, str)
+        assert string.startswith(
+            "data: "
+        ), f"Invalid data entry in SSE stream: {string!r}"
+        string = string.removeprefix("data: ")
+
+        if string == "[DONE]":
+            actual = string
+        else:
+            try:
+                actual = json.loads(string)
+            except Exception:
+                assert (
+                    False
+                ), f"The data entry in SSE stream isn't a valid JSON: {string!r}"
+
+        match_objects(actual, expected, path)
+
+    return _check
+
+
+def create_sse_stream_checker(*chunk_checkers: Any):
+    ret = []
+    for checker in chunk_checkers:
+        ret.append(_data_prefix_checker(checker))
+        ret.append("")
+    return ret
 
 
 def create_chunk(

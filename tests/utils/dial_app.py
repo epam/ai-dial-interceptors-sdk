@@ -107,3 +107,19 @@ def create_openai_client(
         max_retries=0,
         default_headers={_UPSTREAMS_HEADER: ",".join(upstreams)},
     )
+
+
+def create_httpx_client(
+    endpoints: AppEndpoints, upstreams: List[str]
+) -> httpx.AsyncClient:
+    dial_app = create_recursive_app(endpoints)
+    http_client = TestClient(dial_app)
+
+    deployment, *upstreams = upstreams
+
+    return httpx.AsyncClient(
+        app=dial_app,
+        headers={"api-key": "-", _UPSTREAMS_HEADER: ",".join(upstreams)},
+        params={"api-version": "2024-10-21"},
+        base_url=f"{str(http_client.base_url)}/openai/deployments/{deployment}",
+    )

@@ -96,5 +96,5 @@ def _match_objects(path: str, actual: Any, expected: Any) -> None:
         raise MatchingException(path=path, msg=str(e)[:100]) from e
 
 
-def match_objects(actual: Any, expected: Any) -> None:
-    _match_objects("actual", actual, expected)
+def match_objects(actual: Any, expected: Any, path: str = "actual") -> None:
+    _match_objects(path, actual, expected)
