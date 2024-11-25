@@ -10,8 +10,8 @@ from openai import APIConnectionError, APIStatusError, APITimeoutError
 @dataclasses.dataclass
 class ResponseWrapper:
     status_code: int
-    headers: Headers | None
     content: Any
+    headers: Headers | None = None
 
     def to_fastapi_response(self) -> FastAPIResponse:
         return FastAPIResponse(

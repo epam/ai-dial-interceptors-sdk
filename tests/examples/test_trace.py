@@ -32,8 +32,8 @@ def test_trace_interceptor(stream: bool):
 
     checker = create_chunk_checker(
         stream=stream,
-        id_check=memorize(has_type(str)),
-        created_check=memorize(has_type(int)),
+        id=memorize(has_type(str)),
+        created=memorize(has_type(int)),
     )
 
     if isinstance(response, ChatCompletion):

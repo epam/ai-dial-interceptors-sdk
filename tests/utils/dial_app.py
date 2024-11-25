@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Tuple, Type, assert_never
+from typing import Any, Callable, List, Literal, Tuple, Type, assert_never
 
 import httpx
 import openai
@@ -21,11 +21,16 @@ from aidial_interceptors_sdk.examples.app_factory import create_app
 from aidial_interceptors_sdk.examples.registry import Interceptors
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 
+CustomEndpoint = Tuple[
+    Literal["embeddings", "chat/completions"], Callable[..., Any]
+]
+
 AppEndpoint = (
     Type[ChatCompletionInterceptor]
     | Type[EmbeddingsInterceptor]
     | ChatCompletion
     | Embeddings
+    | CustomEndpoint
 )
 
 AppEndpoints = List[Tuple[str, AppEndpoint]]
@@ -43,6 +48,10 @@ def add_endpoints(
             app.add_chat_completion(name, endpoint)
         elif isinstance(endpoint, Embeddings):
             app.add_embeddings(name, endpoint)
+        elif isinstance(endpoint, tuple):
+            ty, handler = endpoint
+            path = f"/openai/deployments/{name}/" + ty
+            app.add_api_route(path, handler, methods=["POST"])
         elif issubclass(endpoint, EmbeddingsInterceptor):
             app.add_embeddings(
                 name,
