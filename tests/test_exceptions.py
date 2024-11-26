@@ -82,6 +82,8 @@ async def test_interceptor_errors(stream: bool, repeats: int):
             {
                 # FIXME: error chunks shouldn't have id/created/object fields
                 # https://github.com/epam/ai-dial-sdk/blob/development/aidial_sdk/chat_completion/chunks.py#L31-L35
+                # Alternatively, the errors in the stream should be
+                # translated to DIALExceptions in the Interceptors SDK
                 "id": id_checker,
                 "created": created_checker,
                 "object": "chat.completion.chunk",

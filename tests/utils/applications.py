@@ -22,7 +22,7 @@ def create_broken_application(error: DialException):
         if stream:
 
             def _gen():
-                # Due to a bug in DIAL SDK we could not simply
+                # FIXME: Due to a bug in DIAL SDK we could not simply
                 # return an error as a first chunk.
                 # A valid chunk should be generated first,
                 # otherwise, SDK throws "Not all choices were generated" error.
