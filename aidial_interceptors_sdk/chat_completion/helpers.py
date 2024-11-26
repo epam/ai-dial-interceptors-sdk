@@ -1,4 +1,4 @@
-from typing import Any, Callable, Coroutine, List, TypeVar, overload
+from typing import Awaitable, Callable, List, TypeVar, overload
 
 from aidial_interceptors_sdk.utils.not_given import NOT_GIVEN, NotGiven
 
@@ -13,7 +13,7 @@ async def traverse_dict_value(
     key: str,
     on_value: Callable[
         [P, T | NotGiven | None],
-        Coroutine[Any, Any, T | NotGiven | None],
+        Awaitable[T | NotGiven | None],
     ],
 ) -> dict: ...
 
@@ -25,7 +25,7 @@ async def traverse_dict_value(
     key: str,
     on_value: Callable[
         [P, T | NotGiven | None],
-        Coroutine[Any, Any, T | NotGiven | None],
+        Awaitable[T | NotGiven | None],
     ],
 ) -> NotGiven: ...
 
@@ -37,7 +37,7 @@ async def traverse_dict_value(
     key: str,
     on_value: Callable[
         [P, T | NotGiven | None],
-        Coroutine[Any, Any, T | NotGiven | None],
+        Awaitable[T | NotGiven | None],
     ],
 ) -> None: ...
 
@@ -48,7 +48,7 @@ async def traverse_dict_value(
     key: str,
     on_value: Callable[
         [P, T | NotGiven | None],
-        Coroutine[Any, Any, T | NotGiven | None],
+        Awaitable[T | NotGiven | None],
     ],
 ) -> dict | NotGiven | None:
     if d is None or isinstance(d, NotGiven):
@@ -71,7 +71,7 @@ async def traverse_required_dict_value(
     path: P,
     d: None,
     key: str,
-    on_value: Callable[[P, T], Coroutine[Any, Any, T]],
+    on_value: Callable[[P, T], Awaitable[T]],
 ) -> None: ...
 
 
@@ -80,7 +80,7 @@ async def traverse_required_dict_value(
     path: P,
     d: NotGiven,
     key: str,
-    on_value: Callable[[P, T], Coroutine[Any, Any, T]],
+    on_value: Callable[[P, T], Awaitable[T]],
 ) -> NotGiven: ...
 
 
@@ -89,7 +89,7 @@ async def traverse_required_dict_value(
     path: P,
     d: dict,
     key: str,
-    on_value: Callable[[P, T], Coroutine[Any, Any, T]],
+    on_value: Callable[[P, T], Awaitable[T]],
 ) -> dict: ...
 
 
@@ -97,7 +97,7 @@ async def traverse_required_dict_value(
     path: P,
     d: dict | NotGiven | None,
     key: str,
-    on_value: Callable[[P, T], Coroutine[Any, Any, T]],
+    on_value: Callable[[P, T], Awaitable[T]],
 ) -> dict | NotGiven | None:
     if d is None or isinstance(d, NotGiven):
         return d
@@ -115,7 +115,7 @@ async def traverse_required_dict_value(
 async def traverse_list(
     create_elem_path: Callable[[int], P],
     lst: NotGiven,
-    on_elem: Callable[[P, T], Coroutine[Any, Any, List[T] | T]],
+    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
 ) -> NotGiven: ...
 
 
@@ -123,7 +123,7 @@ async def traverse_list(
 async def traverse_list(
     create_elem_path: Callable[[int], P],
     lst: None,
-    on_elem: Callable[[P, T], Coroutine[Any, Any, List[T] | T]],
+    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
 ) -> None: ...
 
 
@@ -131,14 +131,14 @@ async def traverse_list(
 async def traverse_list(
     create_elem_path: Callable[[int], P],
     lst: List[T],
-    on_elem: Callable[[P, T], Coroutine[Any, Any, List[T] | T]],
+    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
 ) -> List[T]: ...
 
 
 async def traverse_list(
     create_elem_path: Callable[[int], P],
     lst: List[T] | NotGiven | None,
-    on_elem: Callable[[P, T], Coroutine[Any, Any, List[T] | T]],
+    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
 ) -> List[T] | NotGiven | None:
     if lst is None or isinstance(lst, NotGiven):
         return lst

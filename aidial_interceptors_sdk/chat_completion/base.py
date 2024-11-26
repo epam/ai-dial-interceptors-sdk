@@ -1,10 +1,11 @@
-from typing import Any, AsyncIterator, Callable, Coroutine
+from typing import AsyncIterator, Awaitable, Callable
 
 from aidial_sdk.exceptions import HTTPException as DialException
 
 from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedException,
     AnnotatedValue,
+    Annotation,
 )
 from aidial_interceptors_sdk.chat_completion.request_handler import (
     RequestHandler,
@@ -15,16 +16,18 @@ from aidial_interceptors_sdk.chat_completion.response_handler import (
 from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.utils.streaming import annotate_stream
 
+RequestDict = dict
+
 
 class ChatCompletionInterceptor(RequestHandler, ResponseHandler):
     dial_client: DialClient
 
     async def call_upstreams(
         self,
-        request: dict,
+        request: RequestDict,
         call_upstream: Callable[
-            [Any | None, dict],
-            Coroutine[Any, Any, AsyncIterator[dict | DialException]],
+            [Annotation, RequestDict],
+            Awaitable[AsyncIterator[dict | DialException]],
         ],
     ) -> AsyncIterator[AnnotatedValue]:
         annotation = None

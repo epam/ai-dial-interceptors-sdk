@@ -7,6 +7,7 @@ from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedChunk,
     AnnotatedException,
     AnnotatedValue,
+    Annotation,
 )
 from aidial_interceptors_sdk.utils._exceptions import to_dial_exception
 
@@ -32,7 +33,7 @@ async def materialize_streaming_errors(
 
 
 def annotate_stream(
-    annotation: Any | None, stream: AsyncIterator[dict | DialException]
+    annotation: Annotation, stream: AsyncIterator[dict | DialException]
 ) -> AsyncIterator[AnnotatedValue]:
     def _annotate(value: dict | DialException) -> AnnotatedValue:
         if isinstance(value, dict):

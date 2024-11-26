@@ -1,8 +1,7 @@
 from typing import (
-    Any,
     AsyncIterator,
+    Awaitable,
     Callable,
-    Coroutine,
     Dict,
     List,
     Tuple,
@@ -22,9 +21,11 @@ from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedValue,
+    Annotation,
 )
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
+    RequestDict,
 )
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.chat_completion.index_mapper import IndexMapper
@@ -74,10 +75,10 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
     @override
     async def call_upstreams(
         self,
-        request: dict,
+        request: RequestDict,
         call_upstream: Callable[
-            [Any | None, dict],
-            Coroutine[Any, Any, AsyncIterator[dict | DialException]],
+            [Annotation, RequestDict],
+            Awaitable[AsyncIterator[dict | DialException]],
         ],
     ) -> AsyncIterator[AnnotatedValue]:
         request["n"] = 1
