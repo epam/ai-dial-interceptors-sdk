@@ -26,6 +26,10 @@ def create_broken_application(error: DialException):
                 # return an error as a first chunk.
                 # A valid chunk should be generated first,
                 # otherwise, SDK throws "Not all choices were generated" error.
+                # This could be fixed by converting error chunks
+                # into DIAL Exceptions in the Interceptors SDK instead of
+                # treating them as normal chat completion chunks.
+                # See `handle_streaming_errors`.
                 yield format_chunk(create_chunk(stream=stream))
                 yield format_chunk(error.json_error())
                 yield format_chunk("[DONE]")
