@@ -6,13 +6,13 @@ import pytest
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionNoOpInterceptor,
 )
-from aidial_interceptors_sdk.utils._exceptions import DialExceptionWithHeaders
+from aidial_interceptors_sdk.utils._exceptions import _parse_dial_exception
 from tests.utils.applications import create_broken_application
 from tests.utils.chunks import create_chunk_checker, create_sse_stream_checker
 from tests.utils.dial_app import create_httpx_client
 from tests.utils.json import has_type, match_objects, memorize
 
-to_many_requests_error = DialExceptionWithHeaders.create(
+to_many_requests_error = _parse_dial_exception(
     status_code=http.HTTPStatus.TOO_MANY_REQUESTS,
     content={"error": {"message": "Too many requests"}},
     headers={"retry-after": "42"},
@@ -52,11 +52,10 @@ async def test_interceptor_errors(stream: bool, repeats: int):
         actual_headers = {
             k.decode(): v.decode() for k, v in response.headers.raw
         }
-        # FIXME: Retry-After should actually be propagated
-        # See https://github.com/epam/ai-dial-sdk/blob/45681f3763679e115d95bc5ce32cf382e0083420/aidial_sdk/_errors.py#L21C1-L26C6
         assert match_objects(
             actual_headers,
             {
+                "retry-after": "42",
                 "content-length": has_type(str),
                 "content-type": "application/json",
             },

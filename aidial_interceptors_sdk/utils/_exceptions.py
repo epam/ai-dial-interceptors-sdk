@@ -3,68 +3,39 @@ import logging
 from typing import Dict
 
 from aidial_sdk.exceptions import HTTPException as DialException
-from fastapi import HTTPException as FastAPIException
-from fastapi.responses import JSONResponse as FastAPIResponse
 from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError
-from typing_extensions import override
 
 _log = logging.getLogger(__name__)
 
 
-# TODO: support headers in DIAL SDK exception
-class DialExceptionWithHeaders(DialException):
-    headers: Dict[str, str] | None = None
-
-    def __init__(self, *, headers: Dict[str, str] | None = None, **kwargs):
-        super().__init__(**kwargs)
-        self.headers = headers
-
-    @classmethod
-    def create(
-        cls,
-        status_code: int,
-        content: dict | str,
-        headers: Dict[str, str] | None = None,
+def _parse_dial_exception(
+    status_code: int,
+    content: dict | str,
+    headers: Dict[str, str] | None = None,
+):
+    if (
+        isinstance(content, dict)
+        and (error := content.get("error"))
+        and isinstance(error, dict)
     ):
-        if (
-            isinstance(content, dict)
-            and (error := content.get("error"))
-            and isinstance(error, dict)
-        ):
-            message = error.get("message") or "Unknown error"
-            code = error.get("code")
-            type = error.get("type")
-            param = error.get("param")
-            display_message = error.get("display_message")
-        else:
-            message = content
-            code = type = param = display_message = None
+        message = error.get("message") or "Unknown error"
+        code = error.get("code")
+        type = error.get("type")
+        param = error.get("param")
+        display_message = error.get("display_message")
+    else:
+        message = str(content)
+        code = type = param = display_message = None
 
-        return cls(
-            status_code=status_code,
-            message=message,
-            type=type,
-            param=param,
-            code=code,
-            display_message=display_message,
-            headers=headers,
-        )
-
-    @override
-    def to_fastapi_response(self) -> FastAPIResponse:
-        return FastAPIResponse(
-            status_code=self.status_code,
-            content=self.json_error(),
-            headers=self.headers,
-        )
-
-    @override
-    def to_fastapi_exception(self) -> FastAPIException:
-        return FastAPIException(
-            status_code=self.status_code,
-            detail=self.json_error(),
-            headers=self.headers,
-        )
+    return DialException(
+        status_code=status_code,
+        message=message,
+        type=type,
+        param=param,
+        code=code,
+        display_message=display_message,
+        headers=headers,
+    )
 
 
 def to_dial_exception(exc: Exception) -> DialException:
@@ -95,7 +66,7 @@ def to_dial_exception(exc: Exception) -> DialException:
         except Exception:
             content = r.text
 
-        return DialExceptionWithHeaders.create(
+        return _parse_dial_exception(
             status_code=r.status_code,
             headers=plain_headers,
             content=content,
@@ -110,7 +81,7 @@ def to_dial_exception(exc: Exception) -> DialException:
             except Exception:
                 pass
 
-        return DialExceptionWithHeaders.create(
+        return _parse_dial_exception(
             status_code=status_code,
             headers={},
             content={"error": exc.body or {}},
