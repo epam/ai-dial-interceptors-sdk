@@ -1,3 +1,4 @@
+import functools
 import json
 import logging
 from typing import Awaitable, Callable, TypeVar
@@ -20,17 +21,18 @@ def debug_logging(
     Callable[[_A], Awaitable[_B]],
 ]:
     def decorator(
-        fn: Callable[[_A], Awaitable[_B]]
+        func: Callable[[_A], Awaitable[_B]]
     ) -> Callable[[_A], Awaitable[_B]]:
         if not _debug():
-            return fn
+            return func
 
-        async def _fn(a: _A) -> _B:
+        @functools.wraps(func)
+        async def wrapper(a: _A) -> _B:
             _log.debug(f"{title} old: {json.dumps(a)}")
-            b = await fn(a)
+            b = await func(a)
             _log.debug(f"{title} new: {json.dumps(b)}")
             return b
 
-        return _fn
+        return wrapper
 
     return decorator
