@@ -14,7 +14,7 @@ class EchoApplication(ChatCompletion):
             choice.append_content(request.messages[-1].text())
 
 
-def create_broken_application(error: DialException):
+def create_broken_application(error: DialException, is_first_chunk_error: bool):
     async def _handler(request: FastAPIRequest):
         req = await request.json()
         stream = bool(req.get("stream"))
@@ -22,15 +22,8 @@ def create_broken_application(error: DialException):
         if stream:
 
             def _gen():
-                # FIXME: Due to a bug in DIAL SDK we could not simply
-                # return an error as a first chunk.
-                # A valid chunk should be generated first,
-                # otherwise, SDK throws "Not all choices were generated" error.
-                # This could be fixed by converting error chunks
-                # into DIAL Exceptions in the Interceptors SDK instead of
-                # treating them as normal chat completion chunks.
-                # See `handle_streaming_errors`.
-                yield format_chunk(create_chunk(stream=stream))
+                if not is_first_chunk_error:
+                    yield format_chunk(create_chunk(stream=stream))
                 yield format_chunk(error.json_error())
                 yield format_chunk("[DONE]")
 

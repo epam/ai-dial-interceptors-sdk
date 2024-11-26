@@ -1,6 +1,13 @@
 import logging
 from typing import Any, AsyncIterator, Callable, Optional, TypeVar
 
+from aidial_sdk.exceptions import HTTPException as DialException
+
+from aidial_interceptors_sdk.chat_completion.annotated_value import (
+    AnnotatedChunk,
+    AnnotatedException,
+    AnnotatedValue,
+)
 from aidial_interceptors_sdk.utils._exceptions import to_dial_exception
 
 _log = logging.getLogger(__name__)
@@ -9,9 +16,9 @@ _T = TypeVar("_T")
 _V = TypeVar("_V")
 
 
-async def handle_streaming_errors(
+async def materialize_streaming_errors(
     stream: AsyncIterator[dict],
-) -> AsyncIterator[dict]:
+) -> AsyncIterator[dict | DialException]:
 
     try:
         async for chunk in stream:
@@ -21,8 +28,19 @@ async def handle_streaming_errors(
             f"caught exception while streaming: {type(e).__module__}.{type(e).__name__}"
         )
 
-        dial_exception = to_dial_exception(e)
-        yield dial_exception.json_error()
+        yield to_dial_exception(e)
+
+
+def annotate_stream(
+    annotation: Any | None, stream: AsyncIterator[dict | DialException]
+) -> AsyncIterator[AnnotatedValue]:
+    def _annotate(value: dict | DialException) -> AnnotatedValue:
+        if isinstance(value, dict):
+            return AnnotatedChunk(chunk=value, annotation=annotation)
+        else:
+            return AnnotatedException(error=value, annotation=annotation)
+
+    return map_stream(_annotate, stream)
 
 
 # TODO: add to SDK as a inverse of cleanup_indices
