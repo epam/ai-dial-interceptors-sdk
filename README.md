@@ -1,5 +1,7 @@
 # AI DIAL Interceptors Python SDK
 
+[![PyPI version](https://img.shields.io/pypi/v/aidial-interceptors-sdk.svg)](https://pypi.org/project/aidial-interceptors-sdk/)
+
 > [!IMPORTANT]
 > This package is in early development and subject to rapid changes. Breaking changes between versions are likely as the project evolves.
 
