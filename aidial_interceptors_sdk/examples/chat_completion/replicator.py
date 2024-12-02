@@ -198,7 +198,6 @@ _T = TypeVar("_T")
 
 
 async def _join_iterators(iters: List[AsyncIterator[_T]]) -> AsyncIterator[_T]:
-    combine = aiostream.stream.merge(*iters)
-    # FIXME: UserWarning: Streamer is iterated outside of its context
-    async for item in combine:
-        yield item
+    async with aiostream.stream.merge(*iters).stream() as combine:
+        async for item in combine:
+            yield item
