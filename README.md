@@ -168,7 +168,7 @@ The command will start the server on `http://localhost:5000` exposing endpoints 
 First clone the repository:
 
 ```sh
-git clone https://github.com/epam/ai-dial-interceptors-sdk.git .
+git clone https://github.com/epam/ai-dial-interceptors-sdk.git
 cd ai-dial-interceptors-sdk
 echo "DIAL_URL=URL" > .env
 ```

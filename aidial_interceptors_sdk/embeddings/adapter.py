@@ -9,19 +9,26 @@ from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
 from aidial_interceptors_sdk.utils._debug import debug_logging
 from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
+from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
 
 
-def interceptor_to_embeddings(cls: Type[EmbeddingsInterceptor]) -> Embeddings:
+def interceptor_to_embeddings(
+    cls: Type[EmbeddingsInterceptor],
+    dial_url: str,
+    client_factory: HTTPClientFactory,
+) -> Embeddings:
 
     class Impl(Embeddings):
         @dial_exception_decorator
         async def embeddings(self, request: Request) -> Response:
-
             dial_client = await DialClient.create(
+                dial_url=dial_url,
                 api_key=request.api_key,
                 api_version=request.api_version,
                 authorization=request.jwt,
+                headers=request.headers,
+                client_factory=client_factory,
             )
 
             interceptor = cls(

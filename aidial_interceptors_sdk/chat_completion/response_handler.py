@@ -4,7 +4,7 @@ from aidial_sdk.chat_completion import Response
 from aidial_sdk.chat_completion.chunks import BaseChunk
 from aidial_sdk.pydantic_v1 import PrivateAttr
 
-from aidial_interceptors_sdk.chat_completion.annotated_chunk import (
+from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedChunk,
 )
 from aidial_interceptors_sdk.chat_completion.element_path import (

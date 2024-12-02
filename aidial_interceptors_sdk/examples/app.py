@@ -1,29 +1,17 @@
-from aidial_sdk import DIALApp
-from aidial_sdk.telemetry.types import TelemetryConfig
-
-from aidial_interceptors_sdk.chat_completion import (
-    interceptor_to_chat_completion,
-)
-from aidial_interceptors_sdk.embeddings.adapter import interceptor_to_embeddings
-from aidial_interceptors_sdk.examples.registry import (
-    chat_completion_interceptors,
-    embeddings_interceptors,
-)
-from aidial_interceptors_sdk.examples.utils.log_config import configure_loggers
+from aidial_interceptors_sdk.examples.app_factory import create_app
+from aidial_interceptors_sdk.examples.registry import EXAMPLE_INTERCEPTORS
 from aidial_interceptors_sdk.utils._env import get_env
+from aidial_interceptors_sdk.utils._http_client import get_http_client
 
-app = DIALApp(
-    description="Examples of DIAL interceptors",
-    telemetry_config=TelemetryConfig(),
-    add_healthcheck=True,
-    dial_url=get_env("DIAL_URL"),
-    propagate_auth_headers=True,
+dial_url = get_env("DIAL_URL")
+
+
+async def client_factory():
+    return get_http_client()
+
+
+app = create_app(
+    dial_url=dial_url,
+    client_factory=client_factory,
+    interceptors=EXAMPLE_INTERCEPTORS,
 )
-
-configure_loggers()
-
-for id, cls in embeddings_interceptors.items():
-    app.add_embeddings(id, interceptor_to_embeddings(cls))
-
-for id, cls in chat_completion_interceptors.items():
-    app.add_chat_completion(id, interceptor_to_chat_completion(cls))

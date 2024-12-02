@@ -1,4 +1,5 @@
 import functools
+from typing import Awaitable, Callable
 
 import httpx
 
@@ -9,6 +10,8 @@ DEFAULT_TIMEOUT = httpx.Timeout(600, connect=10)
 DEFAULT_CONNECTION_LIMITS = httpx.Limits(
     max_connections=1000, max_keepalive_connections=100
 )
+
+HTTPClientFactory = Callable[[], Awaitable[httpx.AsyncClient]]
 
 
 @functools.cache

@@ -1,9 +1,15 @@
 import logging
-from typing import Any, AsyncIterator, Callable, List, Optional, TypeVar
+from typing import Any, AsyncIterator, Callable, Optional, TypeVar
 
-import aiostream
-import openai
 from aidial_sdk.exceptions import HTTPException as DialException
+
+from aidial_interceptors_sdk.chat_completion.annotated_value import (
+    AnnotatedChunk,
+    AnnotatedException,
+    AnnotatedValue,
+    Annotation,
+)
+from aidial_interceptors_sdk.utils._exceptions import to_dial_exception
 
 _log = logging.getLogger(__name__)
 
@@ -11,27 +17,31 @@ _T = TypeVar("_T")
 _V = TypeVar("_V")
 
 
-async def handle_streaming_errors(
+async def materialize_streaming_errors(
     stream: AsyncIterator[dict],
-) -> AsyncIterator[dict]:
+) -> AsyncIterator[dict | DialException]:
 
     try:
         async for chunk in stream:
             yield chunk
-    except openai.APIError as e:
-        _log.error(f"error during steaming: {e.body}")
+    except Exception as e:
+        _log.exception(
+            f"caught exception while streaming: {type(e).__module__}.{type(e).__name__}"
+        )
 
-        display_message = None
-        if e.body is not None and isinstance(e.body, dict):
-            display_message = e.body.get("display_message", None)
+        yield to_dial_exception(e)
 
-        yield DialException(
-            message=e.message,
-            type=e.type,
-            param=e.param,
-            code=e.code,
-            display_message=display_message,
-        ).json_error()
+
+def annotate_stream(
+    annotation: Annotation, stream: AsyncIterator[dict | DialException]
+) -> AsyncIterator[AnnotatedValue]:
+    def _annotate(value: dict | DialException) -> AnnotatedValue:
+        if isinstance(value, dict):
+            return AnnotatedChunk(chunk=value, annotation=annotation)
+        else:
+            return AnnotatedException(error=value, annotation=annotation)
+
+    return map_stream(_annotate, stream)
 
 
 # TODO: add to SDK as a inverse of cleanup_indices
@@ -70,10 +80,3 @@ async def map_stream(
 
 async def singleton_stream(item: _T) -> AsyncIterator[_T]:
     yield item
-
-
-async def join_iterators(iters: List[AsyncIterator[_T]]) -> AsyncIterator[_T]:
-    combine = aiostream.stream.merge(*iters)
-    # FIXME: UserWarning: Streamer is iterated outside of its context
-    async for item in combine:
-        yield item

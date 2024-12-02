@@ -1,5 +1,14 @@
-from typing import Any, AsyncIterator, Callable, Coroutine, Dict, List, Tuple
+from typing import (
+    AsyncIterator,
+    Awaitable,
+    Callable,
+    Dict,
+    List,
+    Tuple,
+    TypeVar,
+)
 
+import aiostream
 from aidial_sdk.chat_completion import Stage
 from aidial_sdk.chat_completion.chunks import (
     ContentChunk,
@@ -7,18 +16,21 @@ from aidial_sdk.chat_completion.chunks import (
     FinishReason,
     UsageChunk,
 )
+from aidial_sdk.exceptions import HTTPException as DialException
 from typing_extensions import override
 
-from aidial_interceptors_sdk.chat_completion.annotated_chunk import (
-    AnnotatedChunk,
+from aidial_interceptors_sdk.chat_completion.annotated_value import (
+    AnnotatedValue,
+    Annotation,
 )
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
+    RequestDict,
 )
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.chat_completion.index_mapper import IndexMapper
 from aidial_interceptors_sdk.utils.not_given import NotGiven
-from aidial_interceptors_sdk.utils.streaming import join_iterators
+from aidial_interceptors_sdk.utils.streaming import annotate_stream
 
 
 class ReplicatorInterceptor(ChatCompletionInterceptor):
@@ -63,21 +75,20 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
     @override
     async def call_upstreams(
         self,
-        request: dict,
+        request: RequestDict,
         call_upstream: Callable[
-            [dict, Any | None], Coroutine[Any, Any, AsyncIterator[dict]]
+            [Annotation, RequestDict],
+            Awaitable[AsyncIterator[dict | DialException]],
         ],
-    ) -> AsyncIterator[AnnotatedChunk]:
+    ) -> AsyncIterator[AnnotatedValue]:
         request["n"] = 1
 
-        async def get_iterator(idx: int) -> AsyncIterator[AnnotatedChunk]:
-            call_context = idx
-            async for chunk in await call_upstream(request, call_context):
-                yield AnnotatedChunk(chunk=chunk, annotation=call_context)
-
-        iterators = [get_iterator(idx) for idx in range(self.n)]
+        streams = [
+            annotate_stream(idx, await call_upstream(idx, request))
+            for idx in range(self.n)
+        ]
         # TODO: create tasks
-        return join_iterators(iterators)
+        return _join_iterators(streams)
 
     @override
     async def on_response_stage(
@@ -181,3 +192,12 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
             else FinishReason(self.finish_reasons[1])
         )
         self.send_chunk(EndChoiceChunk(finish_reason, 0))
+
+
+_T = TypeVar("_T")
+
+
+async def _join_iterators(iters: List[AsyncIterator[_T]]) -> AsyncIterator[_T]:
+    async with aiostream.stream.merge(*iters).stream() as combine:
+        async for item in combine:
+            yield item

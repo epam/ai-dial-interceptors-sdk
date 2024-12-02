@@ -3,20 +3,8 @@ All kinds of logic which is a good candidate
 to be moved eventually to the SDK itself.
 """
 
-from typing import Any, Dict
-
 from aidial_sdk.chat_completion import Response
-from aidial_sdk.chat_completion.chunks import BaseChunk
-
-
-class _UnstructuredChunk(BaseChunk):
-    data: Dict[str, Any]
-
-    def __init__(self, data: Dict[str, Any]):
-        self.data = data
-
-    def to_dict(self):
-        return self.data
+from aidial_sdk.chat_completion.chunks import ArbitraryChunk, BaseChunk
 
 
 def send_chunk_to_response(response: Response, chunk: BaseChunk | dict):
@@ -26,6 +14,6 @@ def send_chunk_to_response(response: Response, chunk: BaseChunk | dict):
                 response._last_choice_index = max(
                     response._last_choice_index, index + 1
                 )
-        response._queue.put_nowait(_UnstructuredChunk(data=chunk))
+        response._queue.put_nowait(ArbitraryChunk(chunk=chunk))
     else:
         response._queue.put_nowait(chunk)

@@ -1,10 +1,9 @@
 import fastapi
-import pytest
 from aidial_sdk.chat_completion import Request, Response
 from aidial_sdk.pydantic_v1 import SecretStr
-from aidial_sdk.utils.streaming import merge_chunks
+from aidial_sdk.utils.streaming import to_block_response
 
-from aidial_interceptors_sdk.chat_completion.annotated_chunk import (
+from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedChunk,
 )
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
@@ -67,8 +66,8 @@ async def get_response(cls: type[ResponseHandler], **kwargs) -> dict:
         ann_chunk = AnnotatedChunk(chunk=RESPONSE_CHUNK)
         await handler.traverse_response_chunk(ann_chunk)
 
-    first_chunk = await response._generator(producer, dummy_request)
-    return await merge_chunks(response._generate_stream(first_chunk))
+    stream = response._generate_stream(producer)
+    return await to_block_response(stream)
 
 
 # Test 1: Add a second choice, which is same as the first one, but with index=1
@@ -77,7 +76,6 @@ class AddSecondChoice(ResponseHandler):
         return [choice, {**choice, "index": 1}]
 
 
-@pytest.mark.asyncio
 async def test_add_second_choice():
     response = await get_response(AddSecondChoice, n=2)
     assert len(response["choices"]) == 2
@@ -90,7 +88,6 @@ class RemoveAttachmentsNotGiven(ResponseHandler):
         return NOT_GIVEN
 
 
-@pytest.mark.asyncio
 async def test_remove_attachments_not_given():
     response = await get_response(RemoveAttachmentsNotGiven)
     assert (
@@ -104,7 +101,6 @@ class RemoveAttachmentsNone(ResponseHandler):
         return None
 
 
-@pytest.mark.asyncio
 async def test_remove_attachments_none():
     response = await get_response(RemoveAttachmentsNone)
     assert (
@@ -121,7 +117,6 @@ class SetStageAttachmentTitle(ResponseHandler):
         return [attachment]
 
 
-@pytest.mark.asyncio
 async def test_set_stage_attachment_title():
     response = await get_response(SetStageAttachmentTitle)
     assert (
@@ -142,7 +137,6 @@ class MultiplyUsageNumbers(ResponseHandler):
         return usage
 
 
-@pytest.mark.asyncio
 async def test_multiply_usage_numbers():
     response = await get_response(MultiplyUsageNumbers)
     assert response["usage"]["prompt_tokens"] == 18
@@ -156,7 +150,6 @@ class AddState(ResponseHandler):
         return {"status": "done"}
 
 
-@pytest.mark.asyncio
 async def test_add_state():
     response = await get_response(AddState)
     assert response["choices"][0]["message"]["custom_content"]["state"] == {
