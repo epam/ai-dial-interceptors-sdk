@@ -36,7 +36,7 @@ spacy = { version = "3.7.5", optional = true }
 [tool.poetry.dependencies.en_core_web_sm]
 # Pinning particular combination of Spacy and en_core_web_sm versions:
 # https://github.com/explosion/spaCy/issues/13690#issuecomment-2487873386
-# otherwise, have a chance of running into 403 error in runtime.
+# otherwise, there is a chance of running into 403 error in runtime.
 url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl"
 optional = true
 
