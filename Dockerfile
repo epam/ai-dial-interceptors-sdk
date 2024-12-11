@@ -15,11 +15,11 @@ WORKDIR /app
 
 # Install dependencies using Poetry
 COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-interaction --no-ansi --no-cache --no-root --with=main,examples
+RUN poetry install --no-interaction --no-ansi --no-cache --no-root --with=main --extras=examples
 
 # Copy the rest of the application
 COPY . .
-RUN poetry install --no-interaction --no-ansi --no-cache --with=main,examples
+RUN poetry install --no-interaction --no-ansi --no-cache --with=main --extras=examples
 RUN poetry run codegen
 
 # Stage 2: Final image
