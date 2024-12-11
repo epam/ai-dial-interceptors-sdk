@@ -12,7 +12,10 @@ from spacy.language import Language
 from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
 
 # Find spaCy models here: https://spacy.io/models/
-DEFAULT_MODEL = "en_core_web_sm"
+# NOTE: Pinning the version of en_core_web_sm:
+# https://github.com/explosion/spaCy/issues/13690#issuecomment-2487873386
+# otherwise, there is a chance of running into 403 error in runtime.
+DEFAULT_MODEL = "en_core_web_sm-3.7.1"
 
 # Find the full list of entities here:
 # https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140
@@ -34,7 +37,7 @@ def _get_pipeline(model: str) -> Language:
         _log.warning(
             f"Failed to load spaCy model {model!r}: {str(e)}\nDownloading the model..."
         )
-        download_model(model)
+        download_model(model, direct=True)
         return load_model(model)
 
 
