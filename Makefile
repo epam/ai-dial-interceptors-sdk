@@ -1,37 +1,44 @@
 PORT ?= 5001
 IMAGE_NAME ?= ai-dial-interceptors-sdk
 PLATFORM ?= linux/amd64
+VENV ?= .venv
+POETRY ?= $(VENV)/bin/poetry
+POETRY_VERSION ?= 1.8.5
 ARGS=
 
-.PHONY: all install build clean lint format test examples_serve examples_docker_serve
+.PHONY: all init_env install build clean lint format test examples_serve examples_docker_serve
 
 all: build
 
-install:
-	poetry install --all-extras
-	poetry run codegen
+init_env:
+	python -m venv $(VENV)
+	$(VENV)/bin/pip install poetry==$(POETRY_VERSION) --quiet
+
+install: init_env
+	$(POETRY) install --all-extras
+	$(POETRY) run codegen
 
 build: install
-	poetry build
+	$(POETRY) build
 
 clean:
-	poetry run clean
-	poetry env remove --all
+	$(POETRY) run clean
+	$(POETRY) env remove --all
 
 publish: build
-	poetry publish -u __token__ -p ${PYPI_TOKEN} --skip-existing
+	$(POETRY) publish -u __token__ -p ${PYPI_TOKEN} --skip-existing
 
 lint: install
-	poetry run nox -s lint
+	$(POETRY) run nox -s lint
 
 format: install
-	poetry run nox -s format
+	$(POETRY) run nox -s format
 
 test: install
-	poetry run nox -s test $(if $(PYTHON),--python=$(PYTHON),)
+	$(POETRY) run nox -s test $(if $(PYTHON),--python=$(PYTHON),)
 
 examples_serve: install
-	poetry run uvicorn "aidial_interceptors_sdk.examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env
+	$(POETRY) run uvicorn "aidial_interceptors_sdk.examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env
 
 examples_docker_serve:
 	docker build --platform $(PLATFORM) -t $(IMAGE_NAME):dev .
