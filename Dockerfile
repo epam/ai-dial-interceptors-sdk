@@ -7,7 +7,7 @@ RUN apt-get update && apt-get upgrade -y \
     build-essential \
     python3-dev \
     && pip install --upgrade pip \
-    && pip install poetry \
+    && pip install poetry==1.8.5 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get upgrade -y \
     build-essential \
     python3-dev \
     && pip install --upgrade pip \
-    && pip install poetry \
+    && pip install poetry==1.8.5 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
