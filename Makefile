@@ -1,8 +1,8 @@
 PORT ?= 5001
 IMAGE_NAME ?= ai-dial-interceptors-sdk
 PLATFORM ?= linux/amd64
-VENV ?= .venv
-POETRY ?= $(VENV)/bin/poetry
+VENV_DIR ?= .venv
+POETRY ?= $(VENV_DIR)/bin/poetry
 POETRY_VERSION ?= 1.8.5
 ARGS=
 
@@ -11,8 +11,8 @@ ARGS=
 all: build
 
 init_env:
-	python -m venv $(VENV)
-	$(VENV)/bin/pip install poetry==$(POETRY_VERSION) --quiet
+	python -m venv $(VENV_DIR)
+	$(VENV_DIR)/bin/pip install poetry==$(POETRY_VERSION) --quiet
 
 install: init_env
 	$(POETRY) install --all-extras
@@ -26,7 +26,7 @@ clean:
 	$(POETRY) env remove --all
 
 publish: build
-	$(POETRY) publish -u __token__ -p ${PYPI_TOKEN} --skip-existing
+	$(POETRY) publish -u __token__ -p $(PYPI_TOKEN) --skip-existing
 
 lint: install
 	$(POETRY) run nox -s lint
