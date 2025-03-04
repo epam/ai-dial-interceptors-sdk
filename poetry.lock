@@ -2,13 +2,13 @@
 
 [[package]]
 name = "aidial-sdk"
-version = "0.16.0"
+version = "0.19.0"
 description = "Framework to create applications and model adapters for AI DIAL"
 optional = false
 python-versions = "<4.0,>=3.8.1"
 files = [
-    {file = "aidial_sdk-0.16.0-py3-none-any.whl", hash = "sha256:76bfa50fd08bfabedd572f06974c68cca9dc18b5c38a8d00bf5d59e1f61cb2d9"},
-    {file = "aidial_sdk-0.16.0.tar.gz", hash = "sha256:eddb1f00949bd0e4263c18be03df7b80093ce8caf7e4ed46a550f3a790e01875"},
+    {file = "aidial_sdk-0.19.0-py3-none-any.whl", hash = "sha256:3f9e6d6d37b96aa5df22a53fefa757ac8a22a0361f6eb0b964985ab1b9b67715"},
+    {file = "aidial_sdk-0.19.0.tar.gz", hash = "sha256:7ff9d802f1af5c2fd50a9b17ccd25f5f768e75f50f140b4f69b13863b0d398b8"},
 ]
 
 [package.dependencies]
@@ -2474,4 +2474,4 @@ examples = ["aiostream", "numpy", "pillow", "spacy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "5faf2d013b333d5cef2b9f355a99b1ac25a66610b0674ebb73b9c04ed45a2f98"
+content-hash = "92d0e84bd8b2409c248770c783f38980e1cac7a0ed1bb7efa9f0bf276169d01e"
