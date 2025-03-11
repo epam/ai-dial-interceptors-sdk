@@ -31,3 +31,6 @@ resolutions:
     - message: ".*PyPI::aiohappyeyeballs:2\\.4\\.0.*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "PSF-2.0: https://github.com/aio-libs/aiohappyeyeballs/commit/ca9c1fca4d63c54855fbe582132b5dcb229c7591"
+    - message: ".*PyPI::jinja2:3\\.1\\.6.*"
+      reason: "CANT_FIX_EXCEPTION"
+      comment: "BSD 3-Clause New or Revised License: https://github.com/pallets/jinja/blob/3.1.6/LICENSE.txt"
