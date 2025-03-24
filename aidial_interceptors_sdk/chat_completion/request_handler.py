@@ -1,5 +1,7 @@
 from typing import List
 
+from aidial_sdk.chat_completion import Request
+
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.chat_completion.helpers import (
     traverse_list,
@@ -11,6 +13,8 @@ from aidial_interceptors_sdk.chat_completion.request_message_handler import (
 
 
 class RequestHandler(RequestMessageHandler):
+    request: Request
+
     async def on_request_message(
         self, path: ElementPath, message: dict
     ) -> List[dict]:

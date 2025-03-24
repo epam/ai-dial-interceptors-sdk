@@ -56,6 +56,7 @@ def interceptor_to_chat_completion(
 
             interceptor = cls(
                 dial_client=dial_client,
+                request=request,
                 response=response,
                 **request.original_request.path_params,
             )
