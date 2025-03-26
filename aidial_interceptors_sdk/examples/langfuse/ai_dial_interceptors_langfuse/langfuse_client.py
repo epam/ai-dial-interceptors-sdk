@@ -1,0 +1,59 @@
+from typing import Optional
+from langfuse import Langfuse
+from datetime import datetime
+from pydantic import BaseModel
+
+
+class LangfuseClient(BaseModel):
+    session_id: str
+    tags: list[str]
+    request_messages: list
+    response_message: dict
+    model_name: str = ""
+    deployment_id: str = ""
+    start_time: datetime
+    end_time: datetime
+    user_id: Optional[str]
+    langfuse_secret_key: str
+    langfuse_public_key: str
+    langfuse_host: str
+    metadata: dict = {}
+    is_model: bool
+
+    def connect(self):
+        return Langfuse(
+            secret_key=self.langfuse_secret_key,
+            public_key=self.langfuse_public_key,
+            host=self.langfuse_host,
+        )
+
+    def transmit(self):
+        conn = self.connect()
+        trace = conn.trace(
+            name=self.model_name,
+            # id=self.response._response_id, # NOTICE: id can be useful for rate.
+            session_id=self.session_id,
+            tags=self.tags,
+            input=self.request_messages,
+            output=self.response_message,
+            user_id=self.user_id,
+            metadata=self.metadata,
+        )
+        if self.is_model:
+            trace.generation(
+                model=self.model_name,
+                input=self.request_messages,
+                output=self.response_message,
+                start_time=self.start_time,
+                end_time=self.end_time,
+            )
+        else:
+            trace.span(
+                name="Processing",
+                input=self.request_messages,
+                output=self.response_message,
+                start_time=self.start_time,
+                end_time=self.end_time,
+            )
+        conn.flush()
+        return
