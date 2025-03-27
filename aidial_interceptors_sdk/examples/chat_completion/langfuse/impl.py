@@ -1,13 +1,13 @@
+import uuid
+import requests
 from datetime import datetime
 from typing import Optional
 from typing_extensions import override
 from aidial_interceptors_sdk.chat_completion.base import ChatCompletionInterceptor
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.utils.not_given import NotGiven
-from .langfuse_client import LangfuseClient
-
-import uuid
-import requests
+from aidial_interceptors_sdk.utils._env import get_env
+from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client import LangfuseClient
 
 
 class State:
@@ -32,6 +32,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     x_conversation_id: str = ""
     is_model: bool = False
     model_info: dict = {}
+    langfuse_secret_key: str = get_env("LANGFUSE_SECRET_KEY")
+    langfuse_public_key: str = get_env("LANGFUSE_PUBLIC_KEY")
+    langfuse_host: str = get_env("LANGFUSE_HOST")
 
     @override
     async def on_response_message(
@@ -75,9 +78,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             start_time=self.start_time or datetime.now(),
             end_time=self.end_time or datetime.now(),
             user_id=self.user_email,
-            langfuse_secret_key=self.config.langfuse.secret_key,
-            langfuse_public_key=self.config.langfuse.public_key,
-            langfuse_host=self.config.langfuse.host,
+            langfuse_secret_key=self.langfuse_secret_key,
+            langfuse_public_key=self.langfuse_public_key,
+            langfuse_host=self.langfuse_host,
             metadata={
                 "model": self.request_model,
                 "deployment_id": self.request_deployment_id,

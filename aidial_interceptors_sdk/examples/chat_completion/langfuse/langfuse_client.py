@@ -1,7 +1,7 @@
 from typing import Optional
 from langfuse import Langfuse
 from datetime import datetime
-from pydantic import BaseModel
+from aidial_sdk.pydantic_v1 import BaseModel
 
 
 class LangfuseClient(BaseModel):

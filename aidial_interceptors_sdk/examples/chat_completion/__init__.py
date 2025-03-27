@@ -22,3 +22,6 @@ from aidial_interceptors_sdk.examples.chat_completion.replicator import (
 from aidial_interceptors_sdk.examples.chat_completion.statistics_reporter import (
     StatisticsReporterInterceptor,
 )
+from aidial_interceptors_sdk.examples.chat_completion.langfuse import (
+    LangfuseInterceptor,
+)
