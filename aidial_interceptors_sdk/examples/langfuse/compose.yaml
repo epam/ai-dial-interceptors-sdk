@@ -1,9 +1,0 @@
-services:
-  app:
-    build: .
-    ports:
-      - '8081:8080'
-    env_file: '.env'
-    volumes:
-      - ./ai_dial_interceptors_langfuse:/app/ai_dial_interceptors_langfuse
-      - ./config.json:/app/config.json

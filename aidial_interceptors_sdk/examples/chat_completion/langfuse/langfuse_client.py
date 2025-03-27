@@ -31,7 +31,6 @@ class LangfuseClient(BaseModel):
         conn = self.connect()
         trace = conn.trace(
             name=self.model_name,
-            # id=self.response._response_id, # NOTICE: id can be useful for rate.
             session_id=self.session_id,
             tags=self.tags,
             input=self.request_messages,

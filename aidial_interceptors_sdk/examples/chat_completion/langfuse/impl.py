@@ -4,8 +4,6 @@ from typing_extensions import override
 from aidial_interceptors_sdk.chat_completion.base import ChatCompletionInterceptor
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.utils.not_given import NotGiven
-from .config import Config
-from .config_loader import ConfigLoader
 from .langfuse_client import LangfuseClient
 
 import uuid
@@ -21,7 +19,6 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     Save data to Langfuse
     """
 
-    config: Optional[Config]
     session_id: str = ""
     user_email: str = ""
     request_deployment_id: str = ""
@@ -62,12 +59,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_end(self) -> None:
-        self._get_model_info(self.dial_client.storage.api_key)
         self.end_time = datetime.now()
-        if self.config is None:
-            self.config = self._get_config()
-        if self.config.track_user_data:
-            self._get_user_email(self.dial_client.storage.api_key)
+        self._get_model_info(self.dial_client.storage.api_key)
+        self._get_user_email(self.dial_client.storage.api_key)
         LangfuseClient(
             session_id=self.session_id,
             tags=[
@@ -122,7 +116,6 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         return None
 
     def _get_session_id(self, messages: list[dict]) -> None:
-        # self.session_id = self.request.headers['x-conversation-id']
         messages = list(
             filter(
                 lambda msg: msg.get("custom_content")
@@ -168,13 +161,3 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     def _update_response_message(self, message: dict) -> None:
         if (content := message.get("content")) is not None:
             self.response_message["content"] += content
-
-    def _get_config(self) -> Config:
-        keywords = [self.request_deployment_id, self.request_model]
-        config_loader = ConfigLoader()
-        key = ""
-        for keyword in keywords:
-            if config_loader.is_present(keyword):
-                key = keyword
-                break
-        return config_loader.load(key)
