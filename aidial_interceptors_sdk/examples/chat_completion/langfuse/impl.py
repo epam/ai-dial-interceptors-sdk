@@ -1,13 +1,19 @@
 import uuid
-import requests
 from datetime import datetime
 from typing import Optional
+
+import requests
 from typing_extensions import override
-from aidial_interceptors_sdk.chat_completion.base import ChatCompletionInterceptor
+
+from aidial_interceptors_sdk.chat_completion.base import (
+    ChatCompletionInterceptor,
+)
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
-from aidial_interceptors_sdk.utils.not_given import NotGiven
+from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client import (
+    LangfuseClient,
+)
 from aidial_interceptors_sdk.utils._env import get_env
-from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client import LangfuseClient
+from aidial_interceptors_sdk.utils.not_given import NotGiven
 
 
 class State:
@@ -136,7 +142,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     def _set_session_id(self, message: dict) -> dict:
         if (
-            self.response_message["custom_content"]["state"][0][State.SESSION_ID_KEY]
+            self.response_message["custom_content"]["state"][0][
+                State.SESSION_ID_KEY
+            ]
             is None
         ):
             message["custom_content"] = {

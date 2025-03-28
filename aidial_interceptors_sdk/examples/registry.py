@@ -18,12 +18,12 @@ from aidial_interceptors_sdk.examples.chat_completion import (
 )
 from aidial_interceptors_sdk.examples.chat_completion import (
     ImageWatermarkInterceptor,
+    LangfuseInterceptor,
     PIIAnonymizerInterceptor,
     PirateInterceptor,
     RejectExternalLinksInterceptor,
     ReplicatorInterceptor,
     StatisticsReporterInterceptor,
-    LangfuseInterceptor,
 )
 from aidial_interceptors_sdk.examples.embeddings import (
     BlacklistedWordsInterceptor as EmbeddingsBlacklistedWordsInterceptor,

@@ -101,18 +101,18 @@ class StatisticsReporterInterceptor(ChatCompletionInterceptor):
         response_duration = self.response_end_time - self.response_start_time
         latency = self.response_start_time - self.request_end_time
 
-        metrics.add_rows(["Latency, sec", f"{latency:.2f}"])
-        metrics.add_rows(["Stream duration, sec", f"{response_duration:.2f}"])
+        metrics.add_rows(["Latency, sec", f"{latency: .2f}"])
+        metrics.add_rows(["Stream duration, sec", f"{response_duration: .2f}"])
 
         if response_duration > 0:
             metrics.add_rows(
                 [
                     "Chars/sec",
-                    f"{self.content_lengths[choice_idx] / response_duration:.2f}",
+                    f"{self.content_lengths[choice_idx] / response_duration: .2f}",
                 ],
                 [
                     "Tokens/sec",
-                    f"{self.completion_tokens / response_duration:.2f}",
+                    f"{self.completion_tokens / response_duration: .2f}",
                 ],
             )
 
