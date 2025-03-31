@@ -66,12 +66,14 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         self.model_info = self._get_model_info(self.dial_client.storage.api_key)
         self.user_email = self._get_user_email(self.dial_client.storage.api_key)
         self.is_model = bool(self.model_info)
+        tags = []
+        if self.request_model:
+            tags.append(self.request_model)
+        if self.request_deployment_id:
+            tags.append(self.request_deployment_id)
         LangfuseClient(
             session_id=self.session_id,
-            tags=[
-                str(self.request_model),
-                str(self.request_deployment_id),
-            ],
+            tags=tags,
             request_messages=self.request.messages,
             response_message=self.response_message,
             model_name=self.request_model,
@@ -135,7 +137,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             message["custom_content"] = {
                 "state": {SESSION_ID_KEY: self.session_id}
             }
-            self.response_message["custom_content"]["state"][SESSION_ID_KEY] = self.session_id
+            self.response_message["custom_content"]["state"][
+                SESSION_ID_KEY
+            ] = self.session_id
         return message
 
     def _remove_session_from_messages(self, messages: list[dict]) -> list[dict]:
