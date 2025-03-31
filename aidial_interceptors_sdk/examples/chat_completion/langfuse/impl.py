@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-import requests
+import httpx
 from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -63,8 +63,12 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     @override
     async def on_stream_end(self) -> None:
         self.end_time = datetime.now()
-        self.model_info = self._get_model_info(self.dial_client.storage.api_key)
-        self.user_email = self._get_user_email(self.dial_client.storage.api_key)
+        self.model_info = await self._get_model_info(
+            self.dial_client.storage.api_key
+        )
+        self.user_email = await self._get_user_email(
+            self.dial_client.storage.api_key
+        )
         self.is_model = bool(self.model_info)
         tags = []
         if self.request_model:
@@ -91,23 +95,24 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             is_model=self.is_model,
         ).transmit()
 
-    def _get_user_email(self, api_key) -> str:
-        url = f"{self.dial_client.dial_url}/v1/user/info"
-        headers = {"Api-Key": api_key}
-        response = requests.get(url, headers=headers)
-        response_json = response.json()
-        email = response_json.get("userClaims", {}).get("email", [""])[0]
-        return email
+    async def _get_user_email(self, api_key: str) -> str:
+        client = httpx.AsyncClient(
+            base_url=self.dial_client.dial_url, headers={"Api-Key": api_key}
+        )
+        response = await client.get("/v1/user/info")
+        response.raise_for_status()
+        return response.json().get("userClaims", {}).get("email", [""])[0]
 
-    def _get_model_info(self, api_key) -> dict | None:
-        url = f"{self.dial_client.dial_url}/openai/models"
-        headers = {"Api-Key": api_key}
-        response = requests.get(url, headers=headers)
-        response_json = response.json()
+    async def _get_model_info(self, api_key) -> dict | None:
+        client = httpx.AsyncClient(
+            base_url=self.dial_client.dial_url, headers={"Api-Key": api_key}
+        )
+        response = await client.get("/openai/models")
+        response.raise_for_status()
         model_info = next(
             (
                 item
-                for item in response_json.get("data", [])
+                for item in response.json().get("data", [])
                 if item["id"] == self.request_model
             ),
             None,
