@@ -2519,4 +2519,4 @@ examples = ["aiostream", "langfuse", "numpy", "pillow", "spacy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<4.0"
-content-hash = "8e47c9a5007e63a180dc05667c5497a78b9906892a22246b7d337eabd1cfee0f"
+content-hash = "13313c7c10287473ce16dba8505e816c541dfcb6f78e4a95affa41def8f633d3"
