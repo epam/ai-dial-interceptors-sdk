@@ -28,7 +28,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     request_model: str = ""
     response_message = {
         "content": "",
-        "custom_content": {"state": [{SESSION_ID_KEY: None}]},
+        "custom_content": {"state": {SESSION_ID_KEY: None}},
     }
     start_time: Optional[datetime]
     end_time: Optional[datetime]
@@ -117,29 +117,25 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             filter(
                 lambda msg: msg.get("custom_content")
                 and msg["custom_content"].get("state")
-                and SESSION_ID_KEY in msg["custom_content"]["state"][0],
+                and SESSION_ID_KEY in msg["custom_content"]["state"],
                 messages,
             )
         )
         if len(messages) > 0:
-            session_id = messages[0]["custom_content"]["state"][0][
-                SESSION_ID_KEY
-            ]
+            session_id = messages[0]["custom_content"]["state"][SESSION_ID_KEY]
         else:
             session_id = str(uuid.uuid4())
         return session_id
 
     def _set_session_id(self, message: dict) -> dict:
         if (
-            self.response_message["custom_content"]["state"][0][SESSION_ID_KEY]
+            self.response_message["custom_content"]["state"][SESSION_ID_KEY]
             is None
         ):
             message["custom_content"] = {
-                "state": [{SESSION_ID_KEY: self.session_id}]
+                "state": {SESSION_ID_KEY: self.session_id}
             }
-            self.response_message["custom_content"]["state"][0][
-                SESSION_ID_KEY
-            ] = self.session_id
+            self.response_message["custom_content"]["state"][SESSION_ID_KEY] = self.session_id
         return message
 
     def _remove_session_from_messages(self, messages: list[dict]) -> list[dict]:
@@ -147,11 +143,11 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         for message in messages:
             if (
                 message.get("custom_content", {})
-                .get("state", [{}])[0]
+                .get("state", {})
                 .get(SESSION_ID_KEY)
             ):
-                del message["custom_content"]["state"][0][SESSION_ID_KEY]
-            if message.get("custom_content", {}).get("state") == [{}]:
+                del message["custom_content"]["state"][SESSION_ID_KEY]
+            if message.get("custom_content", {}).get("state") == {}:
                 del message["custom_content"]
             new_messages.append(message)
         return new_messages
