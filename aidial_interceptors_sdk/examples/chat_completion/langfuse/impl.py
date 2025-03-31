@@ -34,7 +34,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     end_time: Optional[datetime]
     x_conversation_id: str = ""
     is_model: bool = False
-    model_info: dict = {}
+    model_info: Optional[dict]
 
     @override
     async def on_response_message(
@@ -65,8 +65,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         self.end_time = datetime.now()
         self.model_info = self._get_model_info(self.dial_client.storage.api_key)
         self.user_email = self._get_user_email(self.dial_client.storage.api_key)
-        if self.model_info:
-            self.is_model = True
+        self.is_model = bool(self.model_info)
         LangfuseClient(
             session_id=self.session_id,
             tags=[
@@ -98,7 +97,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         email = response_json.get("userClaims", {}).get("email", [""])[0]
         return email
 
-    def _get_model_info(self, api_key) -> dict:
+    def _get_model_info(self, api_key) -> dict | None:
         url = f"{self.dial_client.dial_url}/openai/models"
         headers = {"Api-Key": api_key}
         response = requests.get(url, headers=headers)
@@ -109,7 +108,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
                 for item in response_json.get("data", [])
                 if item["id"] == self.request_model
             ),
-            {},
+            None,
         )
         return model_info
 
@@ -132,9 +131,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     def _set_session_id(self, message: dict) -> dict:
         if (
-            self.response_message["custom_content"]["state"][0][
-                SESSION_ID_KEY
-            ]
+            self.response_message["custom_content"]["state"][0][SESSION_ID_KEY]
             is None
         ):
             message["custom_content"] = {
