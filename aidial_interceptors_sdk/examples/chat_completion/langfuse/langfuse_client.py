@@ -15,18 +15,11 @@ class LangfuseClient(BaseModel):
     start_time: datetime
     end_time: datetime
     user_id: Optional[str]
-    langfuse_secret_key: str
-    langfuse_public_key: str
-    langfuse_host: str
     metadata: dict = {}
     is_model: bool
 
     def connect(self):
-        return Langfuse(
-            secret_key=self.langfuse_secret_key,
-            public_key=self.langfuse_public_key,
-            host=self.langfuse_host,
-        )
+        return Langfuse()
 
     def transmit(self):
         conn = self.connect()
