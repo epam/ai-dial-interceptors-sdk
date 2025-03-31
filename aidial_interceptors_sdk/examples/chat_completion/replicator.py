@@ -65,7 +65,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
                 self.response._queue,
                 0,
                 self.stage_index_mapper((response_idx, -1)),
-                f"{response_idx + 1} | CONTENT",
+                f"{response_idx+1} | CONTENT",
             )
             stage.open()
             self.content_stages[response_idx] = stage
@@ -98,7 +98,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
         assert isinstance(path.response_ctx, int)
 
         if name := stage.get("name"):
-            stage["name"] = f"{path.response_ctx + 1} | {name}"
+            stage["name"] = f"{path.response_ctx+1} | {name}"
 
         stage["index"] = self.stage_index_mapper(
             (path.response_ctx, path.stage_idx)
