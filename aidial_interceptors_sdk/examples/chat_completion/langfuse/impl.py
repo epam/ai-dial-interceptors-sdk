@@ -50,7 +50,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         self.request_deployment_id = self.request.deployment_id or ""
         self.request_model = self.request.model or ""
         self.x_conversation_id = self.request.headers["x-conversation-id"]
-        self._get_session_id(messages=request["messages"])
+        self.session_id = self._get_session_id(messages=request["messages"])
         request["messages"] = self._remove_session_from_messages(
             messages=request["messages"]
         )
@@ -63,8 +63,10 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     @override
     async def on_stream_end(self) -> None:
         self.end_time = datetime.now()
-        self._get_model_info(self.dial_client.storage.api_key)
-        self._get_user_email(self.dial_client.storage.api_key)
+        self.model_info = self._get_model_info(self.dial_client.storage.api_key)
+        self.user_email = self._get_user_email(self.dial_client.storage.api_key)
+        if self.model_info:
+            self.is_model = True
         LangfuseClient(
             session_id=self.session_id,
             tags=[
@@ -88,16 +90,15 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             is_model=self.is_model,
         ).transmit()
 
-    def _get_user_email(self, api_key) -> None:
+    def _get_user_email(self, api_key) -> str:
         url = f"{self.dial_client.dial_url}/v1/user/info"
         headers = {"Api-Key": api_key}
         response = requests.get(url, headers=headers)
         response_json = response.json()
-        email = response_json.get("userClaims", {}).get("email", [None])[0]
-        self.user_email = email
-        return None
+        email = response_json.get("userClaims", {}).get("email", [""])[0]
+        return email
 
-    def _get_model_info(self, api_key) -> None:
+    def _get_model_info(self, api_key) -> dict:
         url = f"{self.dial_client.dial_url}/openai/models"
         headers = {"Api-Key": api_key}
         response = requests.get(url, headers=headers)
@@ -108,14 +109,11 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
                 for item in response_json.get("data", [])
                 if item["id"] == self.request_model
             ),
-            None,
+            {},
         )
-        if model_info:
-            self.is_model = True
-            self.model_info = model_info
-        return None
+        return model_info
 
-    def _get_session_id(self, messages: list[dict]) -> None:
+    def _get_session_id(self, messages: list[dict]) -> str:
         messages = list(
             filter(
                 lambda msg: msg.get("custom_content")
@@ -125,11 +123,12 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             )
         )
         if len(messages) > 0:
-            self.session_id = messages[0]["custom_content"]["state"][0][
+            session_id = messages[0]["custom_content"]["state"][0][
                 SESSION_ID_KEY
             ]
         else:
-            self.session_id = str(uuid.uuid4())
+            session_id = str(uuid.uuid4())
+        return session_id
 
     def _set_session_id(self, message: dict) -> dict:
         if (
