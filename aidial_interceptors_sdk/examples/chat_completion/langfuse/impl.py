@@ -15,9 +15,7 @@ from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client i
 from aidial_interceptors_sdk.utils._env import get_env
 from aidial_interceptors_sdk.utils.not_given import NotGiven
 
-
-class State:
-    SESSION_ID_KEY = "langfuse_session_id"
+SESSION_ID_KEY = "langfuse_session_id"
 
 
 class LangfuseInterceptor(ChatCompletionInterceptor):
@@ -31,7 +29,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     request_model: str = ""
     response_message = {
         "content": "",
-        "custom_content": {"state": [{State.SESSION_ID_KEY: None}]},
+        "custom_content": {"state": [{SESSION_ID_KEY: None}]},
     }
     start_time: Optional[datetime]
     end_time: Optional[datetime]
@@ -129,13 +127,13 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             filter(
                 lambda msg: msg.get("custom_content")
                 and msg["custom_content"].get("state")
-                and State.SESSION_ID_KEY in msg["custom_content"]["state"][0],
+                and SESSION_ID_KEY in msg["custom_content"]["state"][0],
                 messages,
             )
         )
         if len(messages) > 0:
             self.session_id = messages[0]["custom_content"]["state"][0][
-                State.SESSION_ID_KEY
+                SESSION_ID_KEY
             ]
         else:
             self.session_id = str(uuid.uuid4())
@@ -143,15 +141,15 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     def _set_session_id(self, message: dict) -> dict:
         if (
             self.response_message["custom_content"]["state"][0][
-                State.SESSION_ID_KEY
+                SESSION_ID_KEY
             ]
             is None
         ):
             message["custom_content"] = {
-                "state": [{State.SESSION_ID_KEY: self.session_id}]
+                "state": [{SESSION_ID_KEY: self.session_id}]
             }
             self.response_message["custom_content"]["state"][0][
-                State.SESSION_ID_KEY
+                SESSION_ID_KEY
             ] = self.session_id
         return message
 
@@ -161,9 +159,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             if (
                 message.get("custom_content", {})
                 .get("state", [{}])[0]
-                .get(State.SESSION_ID_KEY)
+                .get(SESSION_ID_KEY)
             ):
-                del message["custom_content"]["state"][0][State.SESSION_ID_KEY]
+                del message["custom_content"]["state"][0][SESSION_ID_KEY]
             if message.get("custom_content", {}).get("state") == [{}]:
                 del message["custom_content"]
             new_messages.append(message)
