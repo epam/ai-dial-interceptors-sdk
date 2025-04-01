@@ -1,0 +1,54 @@
+import uuid
+
+from aidial_sdk.pydantic_v1 import BaseModel
+
+SESSION_ID_KEY = "langfuse_session_id"
+
+
+class Session(BaseModel):
+    session_id: str = ""
+    flag_add_session_id_to_message: bool = False
+
+    def find_or_initialize(self, messages: list[dict]) -> str:
+        messages = list(
+            filter(
+                lambda msg: msg.get("custom_content")
+                and msg["custom_content"].get("state")
+                and SESSION_ID_KEY in msg["custom_content"]["state"],
+                messages,
+            )
+        )
+        if len(messages) > 0:
+            session_id = messages[0]["custom_content"]["state"][SESSION_ID_KEY]
+        else:
+            session_id = str(uuid.uuid4())
+        self.session_id = session_id
+        return session_id
+
+    def add_session_id_to_message(self, message: dict) -> dict:
+        if self.flag_add_session_id_to_message is False:
+            message.setdefault("custom_content", {}).setdefault("state", {})[
+                SESSION_ID_KEY
+            ] = self.session_id
+            self.flag_add_session_id_to_message = True
+        return message
+
+    def remove_session_id_from_message(self, message: dict) -> dict:
+        if (
+            message.get("custom_content", {})
+            .get("state", {})
+            .get(SESSION_ID_KEY)
+        ):
+            del message["custom_content"]["state"][SESSION_ID_KEY]
+        if message.get("custom_content", {}).get("state") == {}:
+            del message["custom_content"]
+        return message
+
+    def remove_session_id_from_messages(
+        self, messages: list[dict]
+    ) -> list[dict]:
+        new_messages = []
+        for message in messages:
+            message = self.remove_session_id_from_message(message=message)
+            new_messages.append(message)
+        return new_messages

@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 from typing import Optional
 
@@ -12,9 +11,10 @@ from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
 from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client import (
     LangfuseClient,
 )
+from aidial_interceptors_sdk.examples.chat_completion.langfuse.session import (
+    Session,
+)
 from aidial_interceptors_sdk.utils.not_given import NotGiven
-
-SESSION_ID_KEY = "langfuse_session_id"
 
 
 class LangfuseInterceptor(ChatCompletionInterceptor):
@@ -22,14 +22,12 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     Save data to Langfuse
     """
 
-    session_id: str = ""
+    session: Session = Session()
     user_email: str = ""
     request_deployment_id: str = ""
     request_model: str = ""
-    response_message = {
-        "content": "",
-        "custom_content": {"state": {SESSION_ID_KEY: None}},
-    }
+    response_content = ""
+    response_custom_content = {}
     start_time: Optional[datetime]
     end_time: Optional[datetime]
     x_conversation_id: str = ""
@@ -41,8 +39,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         self, path: ElementPath, message: dict | NotGiven | None
     ) -> dict | NotGiven | None:
         if message:
-            message = self._set_session_id(message)
-            self._update_response_message(message)
+            message = self.session.add_session_id_to_message(message)
+            self._update_response_content(message)
+            self._update_response_custom_content(message)
         return message
 
     @override
@@ -50,8 +49,8 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         self.request_deployment_id = self.request.deployment_id or ""
         self.request_model = self.request.model or ""
         self.x_conversation_id = self.request.headers["x-conversation-id"]
-        self.session_id = self._get_session_id(messages=request["messages"])
-        request["messages"] = self._remove_session_from_messages(
+        self.session.find_or_initialize(messages=request["messages"])
+        request["messages"] = self.session.remove_session_id_from_messages(
             messages=request["messages"]
         )
         return request
@@ -76,10 +75,13 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         if self.request_deployment_id:
             tags.append(self.request_deployment_id)
         LangfuseClient(
-            session_id=self.session_id,
+            session_id=self.session.session_id,
             tags=tags,
             request_messages=self.request.messages,
-            response_message=self.response_message,
+            response_message={
+                "content": self.response_content,
+                "custom_content": self.response_custom_content,
+            },
             model_name=self.request_model,
             deployment_id=self.request_deployment_id,
             start_time=self.start_time or datetime.now(),
@@ -119,48 +121,25 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         )
         return model_info
 
-    def _get_session_id(self, messages: list[dict]) -> str:
-        messages = list(
-            filter(
-                lambda msg: msg.get("custom_content")
-                and msg["custom_content"].get("state")
-                and SESSION_ID_KEY in msg["custom_content"]["state"],
-                messages,
-            )
-        )
-        if len(messages) > 0:
-            session_id = messages[0]["custom_content"]["state"][SESSION_ID_KEY]
-        else:
-            session_id = str(uuid.uuid4())
-        return session_id
-
-    def _set_session_id(self, message: dict) -> dict:
-        if (
-            self.response_message["custom_content"]["state"][SESSION_ID_KEY]
-            is None
-        ):
-            message["custom_content"] = {
-                "state": {SESSION_ID_KEY: self.session_id}
-            }
-            self.response_message["custom_content"]["state"][
-                SESSION_ID_KEY
-            ] = self.session_id
-        return message
-
-    def _remove_session_from_messages(self, messages: list[dict]) -> list[dict]:
-        new_messages = []
-        for message in messages:
-            if (
-                message.get("custom_content", {})
-                .get("state", {})
-                .get(SESSION_ID_KEY)
-            ):
-                del message["custom_content"]["state"][SESSION_ID_KEY]
-            if message.get("custom_content", {}).get("state") == {}:
-                del message["custom_content"]
-            new_messages.append(message)
-        return new_messages
-
-    def _update_response_message(self, message: dict) -> None:
+    def _update_response_content(self, message: dict) -> None:
         if (content := message.get("content")) is not None:
-            self.response_message["content"] += content
+            self.response_content += content
+
+    def _update_response_custom_content(self, message: dict) -> None:
+        if (custom_content := message.get("custom_content")) is not None:
+            self.response_custom_content = self._merge_dicts(
+                self.response_custom_content, custom_content
+            )
+
+    def _merge_dicts(self, dict1: dict, dict2: dict) -> dict:
+        merged = dict1.copy()
+        for key, value in dict2.items():
+            if (
+                key in merged
+                and isinstance(merged[key], dict)
+                and isinstance(value, dict)
+            ):
+                merged[key] = self._merge_dicts(merged[key], value)
+            else:
+                merged[key] = value
+        return merged
