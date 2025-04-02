@@ -7,7 +7,7 @@ SESSION_ID_KEY = "langfuse_session_id"
 
 class Session(BaseModel):
     session_id: str = ""
-    flag_add_session_id_to_message: bool = False
+    _added_session_id: bool = False
 
     def find_or_initialize(self, messages: list[dict]) -> str:
         messages = list(
@@ -26,11 +26,11 @@ class Session(BaseModel):
         return session_id
 
     def add_session_id_to_message(self, message: dict) -> dict:
-        if self.flag_add_session_id_to_message is False:
+        if self._added_session_id is False:
             message.setdefault("custom_content", {}).setdefault("state", {})[
                 SESSION_ID_KEY
             ] = self.session_id
-            self.flag_add_session_id_to_message = True
+            self._added_session_id = True
         return message
 
     def remove_session_id_from_message(self, message: dict) -> dict:
