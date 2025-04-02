@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 import httpx
+from aidial_sdk.utils.merge_chunks import merge
 from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -15,8 +16,6 @@ from aidial_interceptors_sdk.examples.chat_completion.langfuse.session import (
     Session,
 )
 from aidial_interceptors_sdk.utils.not_given import NotGiven
-
-from aidial_sdk.utils.merge_chunks import merge
 
 
 class LangfuseInterceptor(ChatCompletionInterceptor):
@@ -37,7 +36,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     ) -> dict | NotGiven | None:
         if message:
             message = self.session.add_session_id_to_message(message)
-            self.merged_response_message = merge(self.merged_response_message, message)
+            self.merged_response_message = merge(
+                self.merged_response_message, message
+            )
         return message
 
     @override
@@ -57,12 +58,8 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_end(self) -> None:
-        model_info = await self._get_model_info(
-            self.dial_client.storage.api_key
-        )
-        user_email = await self._get_user_email(
-            self.dial_client.storage.api_key
-        )
+        model_info = await self._get_model_info()
+        user_email = await self._get_user_email()
         is_model = bool(model_info)
         tags = []
         if self.request_model:
@@ -89,19 +86,13 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             is_model=is_model,
         ).transmit()
 
-    async def _get_user_email(self, api_key: str) -> str:
-        client = httpx.AsyncClient(
-            base_url=self.dial_client.dial_url, headers={"Api-Key": api_key}
-        )
-        response = await client.get("/v1/user/info")
+    async def _get_user_email(self) -> str:
+        response = await self._get_dial_client().get("/v1/user/info")
         response.raise_for_status()
         return response.json().get("userClaims", {}).get("email", [""])[0]
 
-    async def _get_model_info(self, api_key) -> dict | None:
-        client = httpx.AsyncClient(
-            base_url=self.dial_client.dial_url, headers={"Api-Key": api_key}
-        )
-        response = await client.get("/openai/models")
+    async def _get_model_info(self) -> dict | None:
+        response = await self._get_dial_client().get("/openai/models")
         response.raise_for_status()
         model_info = next(
             (
@@ -112,3 +103,9 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             None,
         )
         return model_info
+
+    def _get_dial_client(self) -> httpx.AsyncClient:
+        return httpx.AsyncClient(
+            base_url=self.dial_client.dial_url,
+            headers={"Api-Key": self.dial_client.storage.api_key},
+        )
