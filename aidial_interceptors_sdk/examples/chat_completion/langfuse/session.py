@@ -9,7 +9,7 @@ class Session(BaseModel):
     session_id: str = ""
     _added_session_id: bool = PrivateAttr(False)
 
-    def find_or_initialize(self, messages: list[dict]) -> str:
+    def create(self, messages: list[dict]) -> str:
         messages = list(
             filter(
                 lambda msg: msg.get("custom_content")
