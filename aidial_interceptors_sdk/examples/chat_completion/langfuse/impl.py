@@ -23,16 +23,12 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     """
 
     session: Session = Session()
-    user_email: str = ""
     request_deployment_id: str = ""
     request_model: str = ""
     response_content = ""
     response_custom_content = {}
     start_time: Optional[datetime]
-    end_time: Optional[datetime]
     x_conversation_id: str = ""
-    is_model: bool = False
-    model_info: Optional[dict]
 
     @override
     async def on_response_message(
@@ -61,14 +57,13 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_end(self) -> None:
-        self.end_time = datetime.now()
-        self.model_info = await self._get_model_info(
+        model_info = await self._get_model_info(
             self.dial_client.storage.api_key
         )
-        self.user_email = await self._get_user_email(
+        user_email = await self._get_user_email(
             self.dial_client.storage.api_key
         )
-        self.is_model = bool(self.model_info)
+        is_model = bool(model_info)
         tags = []
         if self.request_model:
             tags.append(self.request_model)
@@ -85,16 +80,16 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             model_name=self.request_model,
             deployment_id=self.request_deployment_id,
             start_time=self.start_time or datetime.now(),
-            end_time=self.end_time or datetime.now(),
-            user_id=self.user_email,
+            end_time=datetime.now(),
+            user_id=user_email,
             metadata={
                 "model": self.request_model,
                 "deployment_id": self.request_deployment_id,
                 "x_conversation_id": self.x_conversation_id,
-                "is_model": self.is_model,
-                "model_info": self.model_info,
+                "is_model": is_model,
+                "model_info": model_info,
             },
-            is_model=self.is_model,
+            is_model=is_model,
         ).transmit()
 
     async def _get_user_email(self, api_key: str) -> str:
