@@ -47,8 +47,4 @@ class Session(BaseModel):
     def remove_session_id_from_messages(
         self, messages: list[dict]
     ) -> list[dict]:
-        new_messages = []
-        for message in messages:
-            message = self.remove_session_id_from_message(message=message)
-            new_messages.append(message)
-        return new_messages
+        return [self.remove_session_id_from_message(msg) for msg in messages]
