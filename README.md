@@ -123,6 +123,7 @@ They are provided solely as examples to demonstrate basic use cases of intercept
 |image-watermark|Post|Stamps "EPAM DIAL" watermark on all image attachments in the response. Demonstrates how to work with files stored on DIAL File Storage.|
 |statistics-reporter|Post|Collects statistics on the response stream *(tokens/sec, finish reason, completion tokens etc)* and reports it in a new stage when response is finished|
 |pii-anonymizer|Generic|Anonymizes any PII in the request, calls the upstream, deanonymizes the response|
+|langfuse|Generic|Integration with Langfuse|
 |replicator:N|Generic|Calls the upstream N times and combines the N response into a single response. Could be useful for stabilization of model's output, since certain models aren't deterministic.|
 |cache|Generic|Caches incoming chat completion requests. **Not ready for production use. Use at your discretion**|
 |no-op|Generic|No-op interceptor - does not modify the request or the response, simply proxies the upstream|
@@ -143,6 +144,9 @@ Copy `.env.example` to `.env` and customize it for your environment:
 |Variable|Default|Description|
 |---|---|---|
 |PII_ANONYMIZER_LABELS_TO_REDACT|PERSON,ORG,GPE,PRODUCT|Comma-separated list of spaCy entity types to redact. Find the full list of entities [here](https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140).|
+|LANGFUSE_SECRET_KEY||Langfuse secret key|
+|LANGFUSE_PUBLIC_KEY||Langfuse public key|
+|LANGFUSE_HOST||Langfuse server host|
 
 ### Running interceptor as a DIAL service
 

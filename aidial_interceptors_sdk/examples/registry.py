@@ -18,6 +18,7 @@ from aidial_interceptors_sdk.examples.chat_completion import (
 )
 from aidial_interceptors_sdk.examples.chat_completion import (
     ImageWatermarkInterceptor,
+    LangfuseInterceptor,
     PIIAnonymizerInterceptor,
     PirateInterceptor,
     RejectExternalLinksInterceptor,
@@ -49,6 +50,7 @@ EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
         "reject-blacklisted-words": ChatBlacklistedWordsInterceptor,
         "cache": ChatCachingInterceptor,
         "no-op": ChatCompletionNoOpInterceptor,
+        "langfuse": LangfuseInterceptor,
     },
     embeddings={
         "reject-blacklisted-words": EmbeddingsBlacklistedWordsInterceptor,
