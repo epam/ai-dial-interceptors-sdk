@@ -16,6 +16,8 @@ from aidial_interceptors_sdk.examples.chat_completion.langfuse.session import (
 )
 from aidial_interceptors_sdk.utils.not_given import NotGiven
 
+from aidial_sdk.utils.merge_chunks import merge
+
 
 class LangfuseInterceptor(ChatCompletionInterceptor):
     """
@@ -25,8 +27,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     session: Session = Session()
     request_deployment_id: str = ""
     request_model: str = ""
-    response_content = ""
-    response_custom_content = {}
+    merged_response_message = {}
     start_time: Optional[datetime]
     x_conversation_id: str = ""
 
@@ -36,8 +37,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     ) -> dict | NotGiven | None:
         if message:
             message = self.session.add_session_id_to_message(message)
-            self._update_response_content(message)
-            self._update_response_custom_content(message)
+            self.merged_response_message = merge(self.merged_response_message, message)
         return message
 
     @override
@@ -73,10 +73,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             session_id=self.session.session_id,
             tags=tags,
             request_messages=self.request.messages,
-            response_message={
-                "content": self.response_content,
-                "custom_content": self.response_custom_content,
-            },
+            response_message=self.merged_response_message,
             model_name=self.request_model,
             deployment_id=self.request_deployment_id,
             start_time=self.start_time or datetime.now(),
@@ -115,26 +112,3 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             None,
         )
         return model_info
-
-    def _update_response_content(self, message: dict) -> None:
-        if content := message.get("content"):
-            self.response_content += content
-
-    def _update_response_custom_content(self, message: dict) -> None:
-        if custom_content := message.get("custom_content"):
-            self.response_custom_content = self._merge_dicts(
-                self.response_custom_content, custom_content
-            )
-
-    def _merge_dicts(self, dict1: dict, dict2: dict) -> dict:
-        merged = dict1.copy()
-        for key, value in dict2.items():
-            if (
-                key in merged
-                and isinstance(merged[key], dict)
-                and isinstance(value, dict)
-            ):
-                merged[key] = self._merge_dicts(merged[key], value)
-            else:
-                merged[key] = value
-        return merged
