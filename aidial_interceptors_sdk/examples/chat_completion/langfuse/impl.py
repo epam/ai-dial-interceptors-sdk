@@ -117,11 +117,11 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         return model_info
 
     def _update_response_content(self, message: dict) -> None:
-        if (content := message.get("content")) is not None:
+        if content := message.get("content"):
             self.response_content += content
 
     def _update_response_custom_content(self, message: dict) -> None:
-        if (custom_content := message.get("custom_content")) is not None:
+        if custom_content := message.get("custom_content"):
             self.response_custom_content = self._merge_dicts(
                 self.response_custom_content, custom_content
             )
