@@ -1,13 +1,13 @@
 import uuid
 
-from aidial_sdk.pydantic_v1 import BaseModel
+from aidial_sdk.pydantic_v1 import BaseModel, PrivateAttr
 
 SESSION_ID_KEY = "langfuse_session_id"
 
 
 class Session(BaseModel):
     session_id: str = ""
-    _added_session_id: bool = False
+    _added_session_id: bool = PrivateAttr(False)
 
     def find_or_initialize(self, messages: list[dict]) -> str:
         messages = list(
@@ -26,7 +26,7 @@ class Session(BaseModel):
         return session_id
 
     def add_session_id_to_message(self, message: dict) -> dict:
-        if self._added_session_id is False:
+        if not self._added_session_id:
             message.setdefault("custom_content", {}).setdefault("state", {})[
                 SESSION_ID_KEY
             ] = self.session_id
