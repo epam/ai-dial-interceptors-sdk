@@ -9,7 +9,8 @@ class Session(BaseModel):
     session_id: str = ""
     _added_session_id: bool = PrivateAttr(False)
 
-    def create(self, messages: list[dict]) -> str:
+    @classmethod
+    def create(cls, messages: list[dict]) -> "Session":
         messages = list(
             filter(
                 lambda msg: msg.get("custom_content")
@@ -18,12 +19,11 @@ class Session(BaseModel):
                 messages,
             )
         )
-        if len(messages) > 0:
+        if messages:
             session_id = messages[0]["custom_content"]["state"][SESSION_ID_KEY]
         else:
             session_id = str(uuid.uuid4())
-        self.session_id = session_id
-        return session_id
+        return cls(session_id=session_id)
 
     def add_session_id_to_message(self, message: dict) -> dict:
         if not self._added_session_id:

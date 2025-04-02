@@ -46,7 +46,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
         self.request_deployment_id = self.request.deployment_id or ""
         self.request_model = self.request.model or ""
         self.x_conversation_id = self.request.headers["x-conversation-id"]
-        self.session.create(messages=request["messages"])
+        self.session = Session.create(messages=request["messages"])
         request["messages"] = self.session.remove_session_id_from_messages(
             messages=request["messages"]
         )
