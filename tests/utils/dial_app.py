@@ -85,7 +85,12 @@ def create_recursive_app(endpoints: AppEndpoints) -> DIALApp:
         endpoints=endpoints,
     )
 
-    client_future.set_result(httpx.AsyncClient(app=app, base_url=dial_url))
+    client_future.set_result(
+        httpx.AsyncClient(
+            transport=httpx.ASGITransport(app),  # type: ignore
+            base_url=dial_url,
+        )
+    )
 
     return app
 
@@ -118,7 +123,7 @@ def create_httpx_client(
     deployment, *upstreams = upstreams
 
     return httpx.AsyncClient(
-        app=dial_app,
+        transport=httpx.ASGITransport(dial_app),  # type: ignore
         headers={"api-key": "-", _UPSTREAMS_HEADER: ",".join(upstreams)},
         params={"api-version": "2024-10-21"},
         base_url=f"{str(http_client.base_url)}/openai/deployments/{deployment}",
