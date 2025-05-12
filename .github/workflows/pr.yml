@@ -9,5 +9,5 @@ jobs:
     uses: epam/ai-dial-ci/.github/workflows/python_package_pr.yml@2.0.1
     secrets: inherit
     with:
-      python_version: 3.11
-      test_python_versions: '["3.11", "3.12"]'
+      python-version: 3.11
+      code-checks-python-versions: '["3.11", "3.12"]'
