@@ -34,3 +34,6 @@ resolutions:
     - message: ".*PyPI::jinja2:3\\.1\\.6.*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "BSD 3-Clause New or Revised License: https://github.com/pallets/jinja/blob/3.1.6/LICENSE.txt"
+    - message: ".*PyPI::packaging:24\\.2\\.*"
+      reason: "CANT_FIX_EXCEPTION"
+      comment: "Apache and BSD: https://github.com/pypa/packaging/blob/24.2/LICENSE"
