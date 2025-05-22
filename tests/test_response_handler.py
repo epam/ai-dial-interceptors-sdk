@@ -56,7 +56,7 @@ async def get_response(cls: type[ResponseHandler], **kwargs) -> dict:
         deployment_id="dummy",
         headers={},
         original_request=fastapi.Request(scope={"type": "http"}),
-        **kwargs
+        **kwargs,
     )
 
     response = Response(request=dummy_request)
