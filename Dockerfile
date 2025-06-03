@@ -1,5 +1,5 @@
 # Stage 1: Builder
-FROM python:3.11-slim-buster as builder
+FROM python:3.11-slim-buster AS builder
 
 # Update and install necessary build dependencies
 RUN apt-get update && apt-get upgrade -y \
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get upgrade -y \
     build-essential \
     python3-dev \
     && pip install --upgrade pip \
-    && pip install poetry==1.8.5 \
+    && pip install poetry==2.1.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -23,7 +23,7 @@ RUN poetry install --no-interaction --no-ansi --no-cache --with=main --extras=ex
 RUN poetry run codegen
 
 # Stage 2: Final image
-FROM python:3.11-slim-buster as server
+FROM python:3.11-slim-buster AS server
 
 # Update and upgrade system packages, including specific security fixes
 RUN apt-get update && apt-get upgrade -y \
@@ -31,7 +31,7 @@ RUN apt-get update && apt-get upgrade -y \
     build-essential \
     python3-dev \
     && pip install --upgrade pip \
-    && pip install poetry==1.8.5 \
+    && pip install poetry==2.1.1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -51,4 +51,4 @@ EXPOSE 5000
 USER appuser
 ENTRYPOINT ["/docker_entrypoint.sh"]
 
-CMD uvicorn aidial_interceptors_sdk.examples.app:app --host 0.0.0.0 --port 5000
+CMD ["uvicorn", "aidial_interceptors_sdk.examples.app:app", "--host", "0.0.0.0", "--port", "5000"]
