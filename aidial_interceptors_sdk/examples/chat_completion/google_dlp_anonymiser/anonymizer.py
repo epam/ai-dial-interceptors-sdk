@@ -14,10 +14,10 @@ class GoogleDLPAnonymizer(Anonymizer):
         self._client = DlpClient(project, config)
         self._config = config
 
-    def collect_replacements(
+    async def collect_replacements(
         self, text: str, *, replacements: Replacements | None = None
     ) -> Replacements:
-        anonymized = self._client.anonymize(text)
+        anonymized = await self._client.anonymize(text)
 
         replacements = replacements or Replacements()
         replacements = create_indexed_replacements(

@@ -62,7 +62,7 @@ class SpacyAnonymizer(BaseModel, Anonymizer):
             )
         )
 
-    def collect_replacements(
+    async def collect_replacements(
         self, text: str, *, replacements: Replacements | None = None
     ) -> Replacements:
         doc = _get_pipeline(_DEFAULT_MODEL)(text)

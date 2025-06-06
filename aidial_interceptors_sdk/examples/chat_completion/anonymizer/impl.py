@@ -41,7 +41,7 @@ class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
         # Collect replacement dictionary first across all messages
         anonymizer = self.get_anonymizer(self.interceptor_config)
         for message in messages:
-            anonymizer.collect_replacements(
+            await anonymizer.collect_replacements(
                 message.get("content") or "", replacements=self.replacements
             )
 

@@ -46,12 +46,14 @@ def anonymizer():
 
 
 @pytest.mark.parametrize("test_case", test_cases)
-def test_anonymize_deanonymize(test_case: TestCase, anonymizer: Anonymizer):
+async def test_google_dlp_anonymize_deanonymize(
+    test_case: TestCase, anonymizer: Anonymizer
+):
     text = test_case.original_text
     expected_replacements = test_case.replacements
     expected_anonymized = test_case.anonymized_text
 
-    anon = anonymizer.collect_replacements(text)
+    anon = await anonymizer.collect_replacements(text)
     anonymized = anon.anonymize(text)
     assert expected_anonymized == anonymized
 
@@ -68,10 +70,12 @@ def test_anonymize_deanonymize(test_case: TestCase, anonymizer: Anonymizer):
 
 
 @pytest.mark.parametrize("test_case", test_cases)
-def test_anonymize_idempotent(test_case: TestCase, anonymizer: Anonymizer):
+async def test_google_dlp_anonymize_idempotent(
+    test_case: TestCase, anonymizer: Anonymizer
+):
     text = test_case.original_text
 
-    anon = anonymizer.collect_replacements(text)
+    anon = await anonymizer.collect_replacements(text)
     anonymized1 = anon.anonymize(text)
     anonymized2 = anon.anonymize(anonymized1)
 
