@@ -122,8 +122,9 @@ They are provided solely as examples to demonstrate basic use cases of intercept
 |reject-blacklisted-words|Generic|Rejects the request if it contains any blacklisted words|
 |image-watermark|Post|Stamps "EPAM DIAL" watermark on all image attachments in the response. Demonstrates how to work with files stored on DIAL File Storage.|
 |statistics-reporter|Post|Collects statistics on the response stream *(tokens/sec, finish reason, completion tokens etc)* and reports it in a new stage when response is finished|
-|pii-anonymizer|Generic|Anonymizes any PII in the request, calls the upstream, deanonymizes the response|
-|langfuse|Generic|Integration with Langfuse|
+|spacy-anonymizer|Generic|Anonymizes PII in the request via [Spacy](https://spacy.io/models/en#en_core_web_sm) library, calls the upstream, deanonymizes the response. The list of anonymized entities is configurable via `SPACY_ANONYMIZER_LABELS_TO_REDACT` env variable|
+|google-dlp-anonymizer|Generic|Anonymizes PII in the request via [Google DLP API](https://cloud.google.com/sensitive-data-protection/docs/reference/rest/v2/projects.content/deidentify), calls the upstream, deanonymizes the response. The list of anonymized entities is could be specified in [the configuration field](#google-dlp-interceptor) in chat completion request|
+|langfuse|Generic|Integration with [Langfuse](https://langfuse.com/)|
 |replicator:N|Generic|Calls the upstream N times and combines the N response into a single response. Could be useful for stabilization of model's output, since certain models aren't deterministic.|
 |cache|Generic|Caches incoming chat completion requests. **Not ready for production use. Use at your discretion**|
 |no-op|Generic|No-op interceptor - does not modify the request or the response, simply proxies the upstream|
@@ -143,7 +144,8 @@ Copy `.env.example` to `.env` and customize it for your environment:
 
 |Variable|Default|Description|
 |---|---|---|
-|PII_ANONYMIZER_LABELS_TO_REDACT|PERSON,ORG,GPE,PRODUCT|Comma-separated list of spaCy entity types to redact. Find the full list of entities [here](https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140).|
+|SPACY_ANONYMIZER_LABELS_TO_REDACT|PERSON,ORG,GPE,PRODUCT|Comma-separated list of spaCy entity types to redact. Find the full list of entities [here](https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140).|
+|GCP_PROJECT_ID||GCP project ID used for `google-dlp-anonymizer` interceptor|
 |LANGFUSE_SECRET_KEY||Langfuse secret key|
 |LANGFUSE_PUBLIC_KEY||Langfuse public key|
 |LANGFUSE_HOST||Langfuse server host|
@@ -164,7 +166,7 @@ Don't forget to set the appropriate `DIAL_URL` in the `.env` file.
 
 The command will start the server on `http://localhost:5000` exposing endpoints for each of the interceptors like the following:
 
-- `http://localhost:5000/openai/deployments/pii-anonymizer/chat/completions`
+- `http://localhost:5000/openai/deployments/spacy-anonymizer/chat/completions`
 - `http://localhost:5000/openai/deployments/normalize-vector/embeddings`
 
 #### From sources
@@ -201,6 +203,9 @@ The interceptor endpoints are defined in the `interceptors` section of the DIAL 
         },
         "chat-statistics-reporter": {
             "endpoint": "${INTERCEPTOR_SERVICE_URL}/openai/deployments/statistics-reporter/chat/completions"
+        },
+        "chat-google-dlp-anonymizer": {
+            "endpoint": "${INTERCEPTOR_SERVICE_URL}/openai/deployments/google-dlp-anonymizer/chat/completions"
         }
     }
 }
@@ -244,3 +249,55 @@ Client
 ```
 
 **Every** request/response in the diagram above goes through the DIAL Core. This is hidden from the diagram for brevity.
+
+#### Per-deployment interceptor configuration
+
+Certain interceptors allow configuration via `custom_fields.configuration` field in the chat completion request.
+
+This configuration could be preset in the DIAL Core Config in the following way:
+
+```json
+{
+    "models": {
+        "anthropic.claude-v3-haiku": {
+            "type": "chat",
+            "iconUrl": "anthropic.svg",
+            "endpoint": "${BEDROCK_ADAPTER_SERVICE_URL}/openai/deployments/anthropic.claude-3-haiku-20240307-v1:0/chat/completions",
+            "defaults": {
+                "custom_fields": {
+                    "configuration": "$interceptor_configuration"
+                }
+            },
+            "interceptors": [
+                "chat-google-dlp-anonymizer"
+            ]
+        }
+    }
+}
+```
+
+Where `$interceptor_configuration` is a dictionary whose format is specific for a particular interceptor.
+
+##### Google DLP interceptor
+
+The interceptor allows to configure the entities in the text that are going to be identified and replaced with placeholders.
+
+Here is an example of `$interceptor_configuration` for the interceptor:
+
+```json
+{
+    "google_dlp_anonymizer": {
+        "deidentification_config": {
+            "info_types": [
+                "PHONE_NUMBER",
+                "FIRST_NAME",
+                "LAST_NAME"
+            ]
+        }
+    }
+}
+```
+
+The full list of targets for anonymization *(aka info-types)* could be found in the [Google DLP documentation](https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference).
+
+The default list of info-types is *PHONE_NUMBER*, *FIRST_NAME*, and *LAST_NAME*.

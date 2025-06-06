@@ -6,11 +6,13 @@ from spacy import load as load_model
 from spacy.cli.download import download as download_model
 from spacy.language import Language
 
-from aidial_interceptors_sdk.utils._env import get_env_list
+from aidial_interceptors_sdk.utils._env import get_env_list, get_envs
 
 from ..anonymizer.base import Anonymizer
 from ..anonymizer.replacement import Replacement
 from ..anonymizer.replacements import Replacements
+
+_log = logging.getLogger(__name__)
 
 # Find spaCy models here: https://spacy.io/models/
 # NOTE: Pinning the version of en_core_web_sm:
@@ -20,14 +22,12 @@ _DEFAULT_MODEL = "en_core_web_sm-3.7.1"
 
 # Find the full list of entities here:
 # https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140
-DEFAULT_LABELS_TO_REDACT = [
+_DEFAULT_LABELS_TO_REDACT = [
     "PERSON",
     "ORG",
     "GPE",  # Geo-political entity
     "PRODUCT",
 ]
-
-_log = logging.getLogger(__name__)
 
 
 @cache
@@ -47,9 +47,13 @@ def _get_pipeline(model: str) -> Language:
 # to avoid waiting during the first request.
 _get_pipeline(_DEFAULT_MODEL)
 
-
-_PII_ANONYMIZER_LABELS_TO_REDACT = get_env_list(
-    "PII_ANONYMIZER_LABELS_TO_REDACT", DEFAULT_LABELS_TO_REDACT
+_LABELS_TO_REDACT = get_envs(
+    [
+        "PII_ANONYMIZER_LABELS_TO_REDACT",
+        "SPACY_ANONYMIZER_LABELS_TO_REDACT",
+    ],
+    get_env_list,
+    _DEFAULT_LABELS_TO_REDACT,
 )
 
 
@@ -69,11 +73,8 @@ class SpacyAnonymizer(BaseModel, Anonymizer):
 
         replacements = replacements or Replacements()
         for ent in doc.ents:
-            if (
-                ent.label_ in _PII_ANONYMIZER_LABELS_TO_REDACT
-                and not self._is_replacement(
-                    doc.text, ent.start_char, ent.end_char
-                )
+            if ent.label_ in _LABELS_TO_REDACT and not self._is_replacement(
+                doc.text, ent.start_char, ent.end_char
             ):
                 replacements.get_replacement(ent.label_, ent.text)
 
