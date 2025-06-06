@@ -17,12 +17,13 @@ from aidial_interceptors_sdk.examples.chat_completion import (
     CachingInterceptor as ChatCachingInterceptor,
 )
 from aidial_interceptors_sdk.examples.chat_completion import (
+    GoogleDLPAnonymizerInterceptor,
     ImageWatermarkInterceptor,
     LangfuseInterceptor,
-    PIIAnonymizerInterceptor,
     PirateInterceptor,
     RejectExternalLinksInterceptor,
     ReplicatorInterceptor,
+    SpacyAnonymizerInterceptor,
     StatisticsReporterInterceptor,
 )
 from aidial_interceptors_sdk.examples.embeddings import (
@@ -45,12 +46,14 @@ EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
         "reject-external-links": RejectExternalLinksInterceptor,
         "image-watermark": ImageWatermarkInterceptor,
         "statistics-reporter": StatisticsReporterInterceptor,
-        "pii-anonymizer": PIIAnonymizerInterceptor,
+        "pii-anonymizer": SpacyAnonymizerInterceptor,
+        "spacy-anonymizer": SpacyAnonymizerInterceptor,
+        "google-dlp-anonymizer": GoogleDLPAnonymizerInterceptor,
         "replicator:{n:int}": ReplicatorInterceptor,
         "reject-blacklisted-words": ChatBlacklistedWordsInterceptor,
         "cache": ChatCachingInterceptor,
-        "no-op": ChatCompletionNoOpInterceptor,
         "langfuse": LangfuseInterceptor,
+        "no-op": ChatCompletionNoOpInterceptor,
     },
     embeddings={
         "reject-blacklisted-words": EmbeddingsBlacklistedWordsInterceptor,
