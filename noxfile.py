@@ -42,4 +42,9 @@ def test(session: nox.Session, pydantic: str, httpx: str) -> None:
     session.run("poetry", "install", "--all-extras", external=True)
     session.install(f"pydantic=={pydantic}")
     session.install(f"httpx=={httpx}")
-    session.run("pytest")
+    session.run("pytest", "tests/unit_tests/")
+
+
+@nox.session
+def integration_tests(session: nox.Session):
+    session.run("pytest", "tests/integration_tests/")
