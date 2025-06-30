@@ -31,8 +31,8 @@ examples = [
     "numpy (==1.26.4)",
     "spacy (==3.7.5)",
     "langfuse (==2.60.2)",
-    "protobuf (==4.24.4)",
-    "google-cloud-dlp (==3.30.0)"
+    "protobuf (==5.29.5)",
+    "google-cloud-dlp (==3.30.0)",
 ]
 
 [tool.poetry.group.test.dependencies]
