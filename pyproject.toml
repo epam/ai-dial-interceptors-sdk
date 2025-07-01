@@ -31,6 +31,8 @@ examples = [
     "numpy (==1.26.4)",
     "spacy (==3.7.5)",
     "langfuse (==2.60.2)",
+    "protobuf (==5.29.5)",
+    "google-cloud-dlp (==3.30.0)",
 ]
 
 [tool.poetry.group.test.dependencies]
@@ -54,10 +56,10 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-addopts = "--asyncio-mode=auto"
-testpaths = ["tests"]
-# muting warnings coming from opentelemetry package
+addopts = "--asyncio-mode=auto --doctest-modules"
+testpaths = ["tests", "aidial_interceptors_sdk.examples"]
 filterwarnings = [
+    # muting warnings coming from opentelemetry package
     "ignore::DeprecationWarning:opentelemetry.instrumentation.dependencies",
 ]
 

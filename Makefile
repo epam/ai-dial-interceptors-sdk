@@ -6,7 +6,7 @@ POETRY ?= $(VENV_DIR)/bin/poetry
 POETRY_VERSION ?= 2.1.1
 ARGS=
 
-.PHONY: all init_env install build clean lint format test examples_serve examples_docker_serve
+.PHONY: all init_env install build clean lint format test integration_tests examples_serve examples_docker_serve
 
 all: build
 
@@ -36,6 +36,9 @@ format: install
 
 test: install
 	$(POETRY) run nox -s test $(if $(PYTHON),--python=$(PYTHON),)
+
+integration_tests: install
+	$(POETRY) run nox -s integration_tests
 
 examples_serve: install
 	$(POETRY) run uvicorn "aidial_interceptors_sdk.examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env

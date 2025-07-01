@@ -37,3 +37,6 @@ resolutions:
     - message: ".*PyPI::packaging:24\\.2.*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "Apache and BSD: https://github.com/pypa/packaging/blob/24.2/LICENSE"
+    - message: ".*PyPI::setuptools:78\\.1\\.1.*"
+      reason: "CANT_FIX_EXCEPTION"
+      comment: "MIT License: https://github.com/pypa/setuptools/blob/v78.1.1/LICENSE"

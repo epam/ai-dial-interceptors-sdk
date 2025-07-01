@@ -4,6 +4,9 @@ from aidial_interceptors_sdk.examples.chat_completion.blacklisted_words import (
 from aidial_interceptors_sdk.examples.chat_completion.cache import (
     CachingInterceptor,
 )
+from aidial_interceptors_sdk.examples.chat_completion.google_dlp_anonymiser import (
+    GoogleDLPAnonymizerInterceptor,
+)
 from aidial_interceptors_sdk.examples.chat_completion.image_watermark import (
     ImageWatermarkInterceptor,
 )
@@ -11,7 +14,7 @@ from aidial_interceptors_sdk.examples.chat_completion.langfuse import (
     LangfuseInterceptor,
 )
 from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser import (
-    PIIAnonymizerInterceptor,
+    SpacyAnonymizerInterceptor,
 )
 from aidial_interceptors_sdk.examples.chat_completion.pirate import (
     PirateInterceptor,

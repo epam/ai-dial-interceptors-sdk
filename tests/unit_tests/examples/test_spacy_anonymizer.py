@@ -2,7 +2,7 @@ from typing import Dict, List, Tuple
 
 import pytest
 
-from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser.spacy_anonymizer import (
+from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser.anonymizer import (
     SpacyAnonymizer,
 )
 
@@ -30,11 +30,11 @@ test_cases: List[TestCase] = [
 
 
 @pytest.mark.parametrize("test_case", test_cases)
-def test_anonymize_deanonymize(test_case: TestCase):
+async def test_spacy_anonymize_deanonymize(test_case: TestCase):
     text = test_case[0]
     expected_replacements = test_case[1]
 
-    anon = SpacyAnonymizer()
+    anon = await SpacyAnonymizer().collect_replacements(text)
     anonymized = anon.anonymize(text)
     deanonymized = anon.deanonymize(anonymized)
 
@@ -49,10 +49,10 @@ def test_anonymize_deanonymize(test_case: TestCase):
 
 
 @pytest.mark.parametrize("test_case", test_cases)
-def test_anonymize_idempotent(test_case: TestCase):
+async def test_spacy_anonymize_idempotent(test_case: TestCase):
     text = test_case[0]
 
-    anon = SpacyAnonymizer()
+    anon = await SpacyAnonymizer().collect_replacements(text)
     anonymized1 = anon.anonymize(text)
     anonymized2 = anon.anonymize(anonymized1)
 
