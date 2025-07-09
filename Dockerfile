@@ -45,6 +45,11 @@ COPY --chown=appuser --from=builder /app .
 COPY ./scripts/docker_entrypoint.sh /docker_entrypoint.sh
 RUN chmod +x /docker_entrypoint.sh
 
+# Create directory for custom nlp model
+RUN mkdir -p /app/custom_trained_models \
+    && chown appuser:appuser /app/custom_trained_models \
+    && chmod 700 /app/custom_trained_models
+
 # Expose port 5000 and set user
 EXPOSE 5000
 

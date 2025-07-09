@@ -64,7 +64,7 @@ def create_indexed_replacements(
     anonymized: str,
 ) -> Replacements | None:
     anonymized_parsed = parse_anonymized_string(entities, anonymized)
-
+    _log.debug(f"anonymized_parsed : {str(anonymized_parsed)}\n")
     entity_indices = []
     regexp = ""
 
