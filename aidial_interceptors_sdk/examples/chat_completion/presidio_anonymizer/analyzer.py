@@ -94,16 +94,16 @@ def get_nlp_engine(models_per_lang: dict[str, str]) -> SpacyNlpEngine:
 
 
 def get_nlp_configuration(models_per_lang: dict[str, str]) -> dict:
-    formatted_models = {
-        "lang_code": list(models_per_lang.keys())[0],
-        "model_name": list(models_per_lang.values())[0]
-    }
+    formatted_models = [
+        {"lang_code": lang, "model_name": model}
+        for lang, model in models_per_lang.items()
+    ]
     _log.debug(
         f"formatted_models: {formatted_models}\n"
     )
     return {
         "nlp_engine_name": "spacy",
-        "models": [formatted_models]
+        "models": formatted_models
     }
 
 

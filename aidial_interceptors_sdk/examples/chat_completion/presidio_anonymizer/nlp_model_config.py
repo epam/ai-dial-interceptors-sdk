@@ -8,17 +8,24 @@ from aidial_interceptors_sdk.utils._env import get_env_or_default
 from .nlp_model_training import create_custom_trained_model
 from .nlp_model_training import get_custom_trained_model_name
 
-from spacy import load as load_model
-from spacy.cli.download import download as download_model
+from spacy import load as load_spacy_model
+from spacy.cli.download import download as download_spacy_model
 from spacy.language import Language
+from spacy_langdetect import LanguageDetector
 
 _PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL = get_env_or_default(
     "PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL",
     "false"
 )
-_PRESIDIO_DEFAULT_NLP_MODELS_PER_LANG = get_env_or_default(
-    "PRESIDIO_DEFAULT_NLP_MODELS_PER_LANG",
+
+_PRESIDIO_NLP_MODELS_PER_LANG = get_env_or_default(
+    "PRESIDIO_NLP_MODELS_PER_LANG",
     "{\"en\": \"en_core_web_sm\"}"
+)
+
+_PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION = get_env_or_default(
+    "PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION",
+    "en_core_web_sm"
 )
 
 
@@ -44,7 +51,7 @@ def get_models_per_lang() -> dict[str, str]:
 
 def load_models_per_lang() -> dict[str, str]:
     try:
-        models_per_lang = json.loads(_PRESIDIO_DEFAULT_NLP_MODELS_PER_LANG)
+        models_per_lang = json.loads(_PRESIDIO_NLP_MODELS_PER_LANG)
 
         if not isinstance(models_per_lang, dict) or not all(
                 isinstance(k, str) and isinstance(v, str) for k, v in models_per_lang.items()
@@ -58,15 +65,22 @@ def load_models_per_lang() -> dict[str, str]:
         raise ValueError(f"Invalid structure for NLP models per language: {e}") from e
 
 
+@Language.factory("language_detector")
+def create_language_detector(nlp, name):
+    return LanguageDetector()
+
+
 @cache
-def load_default_model(model_name: str) -> Language:
+def load_model(model_name: str) -> Language:
     try:
-        return load_model(model_name)
+        nlp = load_spacy_model(model_name)
+        nlp.add_pipe("language_detector", last=True)
+        return nlp
     except OSError as e:
         _log.warning(
             f"Failed to load spaCy model {model_name!r}: {str(e)}\nDownloading the model..."
         )
-        download_model(model_name)
+        download_spacy_model(model_name)
         _log.info(
             f"Model '{model_name}' has been successfully installed."
         )
@@ -76,9 +90,11 @@ def load_default_model(model_name: str) -> Language:
 def init_nlp_models():
     models_per_lang = load_models_per_lang()
     for lang, model_name in models_per_lang.items():
-        default_model = load_default_model(model_name)
+        base_model = load_model(model_name)
         if _PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL.lower() == "true":
-            create_custom_trained_model(default_model, lang)
+            create_custom_trained_model(base_model, lang)
+
+    load_model(_PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION)
 
 
 init_nlp_models()

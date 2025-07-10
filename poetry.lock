@@ -1069,6 +1069,21 @@ build = ["build", "twine"]
 test = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "langdetect"
+version = "1.0.7"
+description = "Language detection library ported from Google's language-detection."
+optional = true
+python-versions = "*"
+groups = ["main"]
+markers = "extra == \"examples\""
+files = [
+    {file = "langdetect-1.0.7.zip", hash = "sha256:91a170d5f0ade380db809b3ba67f08e95fe6c6c8641f96d67a51ff7e98a9bf30"},
+]
+
+[package.dependencies]
+six = "*"
+
+[[package]]
 name = "langfuse"
 version = "2.60.2"
 description = "A client library for accessing langfuse"
@@ -1095,21 +1110,6 @@ wrapt = ">=1.14,<2.0"
 langchain = ["langchain (>=0.0.309)"]
 llama-index = ["llama-index (>=0.10.12,<2.0.0)"]
 openai = ["openai (>=0.27.8)"]
-
-[[package]]
-name = "langid"
-version = "1.1.6"
-description = "langid.py is a standalone Language Identification (LangID) tool."
-optional = true
-python-versions = ">=3.8,<=3.11.13"
-groups = ["main"]
-markers = "extra == \"examples\""
-files = [
-    {file = "langid-1.1.6.tar.gz", hash = "sha256:044bcae1912dab85c33d8e98f2811b8f4ff1213e5e9a9e9510137b84da2cb293"},
-]
-
-[package.dependencies]
-numpy = "*"
 
 [[package]]
 name = "language-data"
@@ -2687,6 +2687,19 @@ files = [
 ]
 
 [[package]]
+name = "six"
+version = "1.17.0"
+description = "Python 2 and 3 compatibility utilities"
+optional = true
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+groups = ["main"]
+markers = "extra == \"examples\""
+files = [
+    {file = "six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"},
+    {file = "six-1.17.0.tar.gz", hash = "sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81"},
+]
+
+[[package]]
 name = "smart-open"
 version = "7.0.4"
 description = "Utils for streaming large files (S3, HDFS, GCS, Azure Blob Storage, gzip, bz2...)"
@@ -2813,6 +2826,22 @@ ko = ["natto-py (>=0.9.0)"]
 lookups = ["spacy-lookups-data (>=1.0.3,<1.1.0)"]
 th = ["pythainlp (>=2.0)"]
 transformers = ["spacy-transformers (>=1.1.2,<1.4.0)"]
+
+[[package]]
+name = "spacy-langdetect"
+version = "0.1.2"
+description = "Fully customizable language detection pipeline for spaCy"
+optional = true
+python-versions = "*"
+groups = ["main"]
+markers = "extra == \"examples\""
+files = [
+    {file = "spacy_langdetect-0.1.2-py3-none-any.whl", hash = "sha256:fb77878fb2445933cb6db836fc20a0d712fa685e1bd7e3b6a447d0556e54ebde"},
+]
+
+[package.dependencies]
+langdetect = "1.0.7"
+pytest = "*"
 
 [[package]]
 name = "spacy-legacy"
@@ -3271,4 +3300,4 @@ examples = ["aiostream", "google-cloud-dlp", "langfuse", "numpy", "pillow", "pro
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "98d4e89f039865f663a283ffff616c026ddda31ca11d69ca75dbcdac7a4e3cd5"
+content-hash = "df9e1167f91e68c1e1d24b552b6447812705bf3b212cb9122dca63c7e143e976"

@@ -1,5 +1,4 @@
 import logging
-import langid
 from typing import List
 
 from aidial_sdk.exceptions import InternalServerError
@@ -8,6 +7,8 @@ from ..anonymizer.base import Anonymizer
 from ..anonymizer.replacement import Replacements
 from ..anonymizer.replacement import create_indexed_replacements
 from .analyzer import PresidioAnalyzer
+from .nlp_model_config import load_model
+from .nlp_model_config import _PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION
 
 from aidial_interceptors_sdk.utils._env import get_env_or_default
 
@@ -20,7 +21,11 @@ _log = logging.getLogger(__name__)
 
 
 def detect_language(text: str) -> str:
-    detected_language, _ = langid.classify(text)
+    nlp = load_model(_PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION)
+    detected_language = nlp(text)._.language['language']
+    _log.debug(
+        f"detected_language is: {detected_language}\n"
+    )
     return detected_language
 
 
