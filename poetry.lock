@@ -1101,7 +1101,7 @@ name = "langid"
 version = "1.1.6"
 description = "langid.py is a standalone Language Identification (LangID) tool."
 optional = true
-python-versions = "*"
+python-versions = ">=3.8,<=3.11.13"
 groups = ["main"]
 markers = "extra == \"examples\""
 files = [
