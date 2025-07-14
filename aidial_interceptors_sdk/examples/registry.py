@@ -26,6 +26,9 @@ from aidial_interceptors_sdk.examples.chat_completion import (
     SpacyAnonymizerInterceptor,
     StatisticsReporterInterceptor,
 )
+from aidial_interceptors_sdk.examples.chat_completion.google_ma_anonymizer.impl import (
+    GoogleModelArmorAnonymizerInterceptor,
+)
 from aidial_interceptors_sdk.examples.embeddings import (
     BlacklistedWordsInterceptor as EmbeddingsBlacklistedWordsInterceptor,
 )
@@ -42,6 +45,7 @@ class Interceptors(BaseModel):
 
 EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
     chat_completions={
+        "google-ma-anonymizer": GoogleModelArmorAnonymizerInterceptor,
         "reply-as-pirate": PirateInterceptor,
         "reject-external-links": RejectExternalLinksInterceptor,
         "image-watermark": ImageWatermarkInterceptor,
