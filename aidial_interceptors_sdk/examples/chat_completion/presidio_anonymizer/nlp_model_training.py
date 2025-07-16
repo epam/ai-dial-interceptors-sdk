@@ -75,6 +75,3 @@ def get_training_data() -> List[dict]:
         raise ValueError(f"Training data is not valid Python literal format: {e}")
     except TypeError as e:
         raise ValueError(f"Training data structure is invalid: {e}")
-
-
-
