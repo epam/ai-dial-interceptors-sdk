@@ -3,6 +3,8 @@ import json
 
 from functools import cache
 
+from typing import Dict
+
 from aidial_interceptors_sdk.utils._env import get_env_or_default
 
 from .nlp_model_training import create_custom_trained_model
@@ -13,17 +15,17 @@ from spacy.cli.download import download as download_spacy_model
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
 
-_PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL = get_env_or_default(
+_PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL: str = get_env_or_default(
     "PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL",
     "false"
 )
 
-_PRESIDIO_NLP_MODELS_PER_LANG = get_env_or_default(
+_PRESIDIO_NLP_MODELS_PER_LANG: str = get_env_or_default(
     "PRESIDIO_NLP_MODELS_PER_LANG",
     "{\"en\": \"en_core_web_sm\"}"
 )
 
-_PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION = get_env_or_default(
+_PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION: str = get_env_or_default(
     "PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION",
     "en_core_web_sm"
 )
@@ -32,7 +34,7 @@ _PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION = get_env_or_default(
 _log = logging.getLogger(__name__)
 
 
-def get_models_per_lang() -> dict[str, str]:
+def get_models_per_lang() -> Dict[str, str]:
     models_per_lang = load_models_per_lang()
 
     if _PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL.lower() not in {"true", "false"}:
@@ -49,7 +51,7 @@ def get_models_per_lang() -> dict[str, str]:
     return models_per_lang
 
 
-def load_models_per_lang() -> dict[str, str]:
+def load_models_per_lang() -> Dict[str, str]:
     try:
         models_per_lang = json.loads(_PRESIDIO_NLP_MODELS_PER_LANG)
 

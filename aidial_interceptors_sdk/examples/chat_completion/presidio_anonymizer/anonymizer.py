@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from typing import List
 
@@ -15,7 +17,7 @@ from aidial_interceptors_sdk.utils._env import get_env_or_default
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
 
-_PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG = get_env_or_default("PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG", "false")
+_PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG: str = get_env_or_default("PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG", "false")
 
 _log = logging.getLogger(__name__)
 

@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Dict
 from typing import Optional
 import logging
 
 from presidio_analyzer import AnalyzerEngine
 from presidio_analyzer.nlp_engine import NlpEngineProvider
-from presidio_analyzer.nlp_engine import SpacyNlpEngine
+from presidio_analyzer.nlp_engine import NlpEngine
 from presidio_analyzer.context_aware_enhancers import LemmaContextAwareEnhancer
 from presidio_analyzer import RecognizerResult
 
@@ -13,10 +13,10 @@ from aidial_interceptors_sdk.utils._env import get_env_or_default
 from .recognizers_config import add_custom_recognizers
 from .nlp_model_config import get_models_per_lang
 
-_PRESIDIO_CONTEXT_SIMILARITY_FACTOR = get_env_or_default("PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35")
-_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY = get_env_or_default("PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3")
+_PRESIDIO_CONTEXT_SIMILARITY_FACTOR: str = get_env_or_default("PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35")
+_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY: str = get_env_or_default("PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3")
 _PRESIDIO_ALLOW_LIST = get_env_or_default("PRESIDIO_ALLOW_LIST")
-_PRESIDIO_CONFIDENCE_SCORE_THRESHOLD = get_env_or_default("PRESIDIO_CONFIDENCE_SCORE_THRESHOLD", "0.5")
+_PRESIDIO_CONFIDENCE_SCORE_THRESHOLD: str = get_env_or_default("PRESIDIO_CONFIDENCE_SCORE_THRESHOLD", "0.5")
 
 
 _log = logging.getLogger(__name__)
@@ -87,13 +87,13 @@ def get_pii_analyzer() -> AnalyzerEngine:
     return analyzer
 
 
-def get_nlp_engine(models_per_lang: dict[str, str]) -> SpacyNlpEngine:
+def get_nlp_engine(models_per_lang: Dict[str, str]) -> NlpEngine:
     nlp_configuration = get_nlp_configuration(models_per_lang)
     provider = NlpEngineProvider(nlp_configuration=nlp_configuration)
     return provider.create_engine()
 
 
-def get_nlp_configuration(models_per_lang: dict[str, str]) -> dict:
+def get_nlp_configuration(models_per_lang: Dict[str, str]) -> dict:
     formatted_models = [
         {"lang_code": lang, "model_name": model}
         for lang, model in models_per_lang.items()
