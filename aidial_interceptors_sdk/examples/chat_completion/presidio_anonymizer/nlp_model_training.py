@@ -4,17 +4,14 @@ import random
 from typing import List
 from pathlib import Path
 
-from aidial_interceptors_sdk.utils._env import get_env
+from aidial_interceptors_sdk.utils._env import get_env_optional
 
 from spacy.language import Language
 from spacy.training.example import Example
 
 _log = logging.getLogger(__name__)
 
-_PRESIDIO_NLP_MODEL_TRAINING_DATA = get_env(
-    "PRESIDIO_NLP_MODEL_TRAINING_DATA",
-    "Training data not provided in the environment variable 'PRESIDIO_NLP_MODEL_TRAINING_DATA'."
-)
+_PRESIDIO_NLP_MODEL_TRAINING_DATA = get_env_optional("PRESIDIO_NLP_MODEL_TRAINING_DATA")
 
 
 def create_custom_trained_model(default_nlp_model: Language, lang: str):
@@ -58,6 +55,9 @@ def add_examples(nlp: Language) -> List[Example]:
 
 
 def get_training_data() -> List[dict]:
+    if not _PRESIDIO_NLP_MODEL_TRAINING_DATA:
+        raise ValueError("Training data not provided in the environment variable 'PRESIDIO_NLP_MODEL_TRAINING_DATA'.")
+
     try:
         training_data = ast.literal_eval(_PRESIDIO_NLP_MODEL_TRAINING_DATA)
 

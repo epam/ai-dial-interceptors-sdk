@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import logging
 from typing import List
 
@@ -16,6 +14,7 @@ from aidial_interceptors_sdk.utils._env import get_env_or_default
 
 from presidio_anonymizer import AnonymizerEngine
 from presidio_anonymizer.entities import OperatorConfig
+from presidio_anonymizer.entities.engine.recognizer_result import RecognizerResult as AnonymizerRecognizerResult
 
 _PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG: str = get_env_or_default("PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG", "false")
 
@@ -47,6 +46,9 @@ def ignore_pii_detection(detected_language: str, supported_languages: List[str])
     return False
 
 
+def map_analyzer_results()
+
+
 class PresidioAnonymizer(Anonymizer):
     _analyzer: PresidioAnalyzer
     _anonymizer_engine: AnonymizerEngine
@@ -69,14 +71,22 @@ class PresidioAnonymizer(Anonymizer):
             f"analyzer_results: {analyzer_results}\n"
         )
 
+        analyzer_results_for_anonymizer = [
+            AnonymizerRecognizerResult(entity_type=result.entity_type,
+                                       start=result.start,
+                                       end=result.end,
+                                       score=result.score)
+            for result in analyzer_results
+        ]
+
         pii_entity_types = self._analyzer.get_supported_entities()
         operators = {entity_type: OperatorConfig("replace", {"new_value": f"[{entity_type}]"}) for entity_type in pii_entity_types}
 
         anonymized = self._anonymizer_engine.anonymize(
             text=text,
-            analyzer_results=analyzer_results,
+            analyzer_results=analyzer_results_for_anonymizer,
             operators=operators
-        )  # type: ignore
+        )
         _log.debug(
             f"Anonymized text: {str(anonymized.text)}\n"
         )
