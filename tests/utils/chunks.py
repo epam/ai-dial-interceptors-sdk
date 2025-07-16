@@ -1,7 +1,7 @@
 import json
 from typing import Any, Mapping
 
-from .json import Check, has_type, match_objects
+from tests.utils.json import Check, has_type, match_objects
 
 _DATA_PREFIX = "data: "
 
