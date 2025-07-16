@@ -5,11 +5,11 @@ import pytest
 from openai.types.chat.chat_completion import ChatCompletion
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
 
-from tests.utils.applications import EchoApplication
-from tests.utils.chunks import create_chunk_checker
-from tests.utils.dial_app import create_openai_client
-from tests.utils.interceptors import TracingInterceptor
-from tests.utils.json import has_type, match_objects, memorize
+from ...utils.applications import EchoApplication
+from ...utils.chunks import create_chunk_checker
+from ...utils.dial_app import create_openai_client
+from ...utils.interceptors import TracingInterceptor
+from ...utils.json import has_type, match_objects, memorize
 
 
 @pytest.mark.parametrize("stream", [False, True])

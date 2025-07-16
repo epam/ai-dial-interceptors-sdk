@@ -7,10 +7,10 @@ from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionNoOpInterceptor,
 )
 from aidial_interceptors_sdk.utils._exceptions import _parse_dial_exception
-from tests.utils.applications import create_broken_application
-from tests.utils.chunks import create_chunk_checker, create_sse_stream_checker
-from tests.utils.dial_app import create_httpx_client
-from tests.utils.json import has_type, match_objects
+from ..utils.applications import create_broken_application
+from ..utils.chunks import create_chunk_checker, create_sse_stream_checker
+from ..utils.dial_app import create_httpx_client
+from ..utils.json import has_type, match_objects
 
 _too_many_requests_error = _parse_dial_exception(
     status_code=http.HTTPStatus.TOO_MANY_REQUESTS,

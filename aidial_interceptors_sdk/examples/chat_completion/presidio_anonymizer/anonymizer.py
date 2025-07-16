@@ -62,7 +62,7 @@ class PresidioAnonymizer(Anonymizer):
         should_ignore_pii_detection = ignore_pii_detection(detected_language, self._analyzer.get_supported_languages())
 
         if should_ignore_pii_detection:
-            return replacements
+            return replacements or Replacements()
 
         analyzer_results = self._analyzer.analyze(content=text, language=detected_language)
         _log.debug(
@@ -76,7 +76,7 @@ class PresidioAnonymizer(Anonymizer):
             text=text,
             analyzer_results=analyzer_results,
             operators=operators
-        )
+        )  # type: ignore
         _log.debug(
             f"Anonymized text: {str(anonymized.text)}\n"
         )
