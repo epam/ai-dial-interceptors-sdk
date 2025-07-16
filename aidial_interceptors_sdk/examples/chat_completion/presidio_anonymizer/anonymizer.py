@@ -46,9 +46,6 @@ def ignore_pii_detection(detected_language: str, supported_languages: List[str])
     return False
 
 
-def map_analyzer_results()
-
-
 class PresidioAnonymizer(Anonymizer):
     _analyzer: PresidioAnalyzer
     _anonymizer_engine: AnonymizerEngine
