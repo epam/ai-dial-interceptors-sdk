@@ -3,7 +3,7 @@ from aidial_sdk.exceptions import HTTPException as DialException
 from fastapi.requests import Request as FastAPIRequest
 from fastapi.responses import StreamingResponse as FastAPIStreamingResponse
 
-from tests.utils.chunks import create_chunk, format_chunk
+from ..utils.chunks import create_chunk, format_chunk
 
 
 class EchoApplication(ChatCompletion):
