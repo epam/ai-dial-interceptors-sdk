@@ -1,18 +1,17 @@
-from typing import List, Dict
-from typing import Optional
 import logging
+from typing import Dict, List, Optional
 
-from presidio_analyzer import AnalyzerEngine
-from presidio_analyzer.nlp_engine import NlpEngineProvider
-from presidio_analyzer.nlp_engine import NlpEngine
+from presidio_analyzer import AnalyzerEngine, RecognizerResult
 from presidio_analyzer.context_aware_enhancers import LemmaContextAwareEnhancer
-from presidio_analyzer import RecognizerResult
+from presidio_analyzer.nlp_engine import NlpEngine, NlpEngineProvider
 
-from aidial_interceptors_sdk.utils._env import get_env_or_default
-from aidial_interceptors_sdk.utils._env import get_env_optional
+from aidial_interceptors_sdk.utils._env import (
+    get_env_optional,
+    get_env_or_default,
+)
 
-from .recognizers_config import add_custom_recognizers
 from .nlp_model_config import get_models_per_lang
+from .recognizers_config import add_custom_recognizers
 
 _PRESIDIO_CONTEXT_SIMILARITY_FACTOR = get_env_or_default("PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35")
 _PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY = get_env_or_default("PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3")

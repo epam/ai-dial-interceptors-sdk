@@ -1,13 +1,13 @@
 import ast
 import logging
 import random
-from typing import List
 from pathlib import Path
-
-from aidial_interceptors_sdk.utils._env import get_env_optional
+from typing import List
 
 from spacy.language import Language
 from spacy.training.example import Example
+
+from aidial_interceptors_sdk.utils._env import get_env_optional
 
 _log = logging.getLogger(__name__)
 

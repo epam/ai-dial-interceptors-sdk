@@ -2,21 +2,20 @@ import logging
 from typing import List
 
 from aidial_sdk.exceptions import InternalServerError
-
-from ..anonymizer.base import Anonymizer
-from ..anonymizer.replacement import Replacements
-from ..anonymizer.replacement import create_indexed_replacements
-from .analyzer import PresidioAnalyzer
-from .nlp_model_config import load_model
-from .nlp_model_config import _PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION
+from presidio_anonymizer import AnonymizerEngine
+from presidio_anonymizer.entities import OperatorConfig
+from presidio_anonymizer.entities.engine.recognizer_result import (
+    RecognizerResult as AnonymizerRecognizerResult,
+)
 
 from aidial_interceptors_sdk.utils._env import get_env_or_default
 
-from presidio_anonymizer import AnonymizerEngine
-from presidio_anonymizer.entities import OperatorConfig
-from presidio_anonymizer.entities.engine.recognizer_result import RecognizerResult as AnonymizerRecognizerResult
+from ..anonymizer.base import Anonymizer
+from ..anonymizer.replacement import Replacements, create_indexed_replacements
+from .analyzer import PresidioAnalyzer
+from .nlp_model_config import _PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION, load_model
 
-_PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG: str = get_env_or_default("PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG", "false")
+_PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG = get_env_or_default("PRESIDIO_IGNORE_PII_DETECTION_FOR_UNKNOWN_LANG", "false")
 
 _log = logging.getLogger(__name__)
 

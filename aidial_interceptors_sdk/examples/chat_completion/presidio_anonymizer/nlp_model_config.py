@@ -1,19 +1,19 @@
-import logging
 import json
-
+import logging
 from functools import cache
-
 from typing import Dict
-
-from aidial_interceptors_sdk.utils._env import get_env_or_default
-
-from .nlp_model_training import create_custom_trained_model
-from .nlp_model_training import get_custom_trained_model_name
 
 from spacy import load as load_spacy_model
 from spacy.cli.download import download as download_spacy_model
 from spacy.language import Language
 from spacy_langdetect import LanguageDetector
+
+from aidial_interceptors_sdk.utils._env import get_env_or_default
+
+from .nlp_model_training import (
+    create_custom_trained_model,
+    get_custom_trained_model_name,
+)
 
 _PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL: str = get_env_or_default(
     "PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL",

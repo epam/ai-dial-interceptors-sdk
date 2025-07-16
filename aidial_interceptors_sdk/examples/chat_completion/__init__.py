@@ -19,6 +19,9 @@ from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser import (
 from aidial_interceptors_sdk.examples.chat_completion.pirate import (
     PirateInterceptor,
 )
+from aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer import (
+    PresidioAnonymizerInterceptor,
+)
 from aidial_interceptors_sdk.examples.chat_completion.reject_external_links import (
     RejectExternalLinksInterceptor,
 )
@@ -27,7 +30,4 @@ from aidial_interceptors_sdk.examples.chat_completion.replicator import (
 )
 from aidial_interceptors_sdk.examples.chat_completion.statistics_reporter import (
     StatisticsReporterInterceptor,
-)
-from aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer import (
-    PresidioAnonymizerInterceptor,
 )

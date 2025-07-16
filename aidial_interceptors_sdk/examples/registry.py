@@ -21,11 +21,11 @@ from aidial_interceptors_sdk.examples.chat_completion import (
     ImageWatermarkInterceptor,
     LangfuseInterceptor,
     PirateInterceptor,
+    PresidioAnonymizerInterceptor,
     RejectExternalLinksInterceptor,
     ReplicatorInterceptor,
     SpacyAnonymizerInterceptor,
     StatisticsReporterInterceptor,
-    PresidioAnonymizerInterceptor,
 )
 from aidial_interceptors_sdk.examples.embeddings import (
     BlacklistedWordsInterceptor as EmbeddingsBlacklistedWordsInterceptor,
