@@ -14,10 +14,10 @@ from .nlp_model_config import get_models_per_lang
 from .recognizers_config import add_custom_recognizers
 
 _PRESIDIO_CONTEXT_SIMILARITY_FACTOR = get_env_or_default(
-    "PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35"
+    "PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.3"
 )
 _PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY = get_env_or_default(
-    "PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3"
+    "PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.35"
 )
 _PRESIDIO_ALLOW_LIST = get_env_optional("PRESIDIO_ALLOW_LIST")
 _PRESIDIO_CONFIDENCE_SCORE_THRESHOLD = get_env_or_default(
