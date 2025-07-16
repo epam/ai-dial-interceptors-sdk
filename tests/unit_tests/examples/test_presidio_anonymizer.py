@@ -11,9 +11,11 @@ from aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.anonym
     PresidioAnonymizer,
 )
 
-_INPUT_TEXT = ("My name is John. I live in Rome and work at Google. My employee id is GL-456698. In my spare time I play tennis. "
-               + "Kate is a friend of mine. She also works at Google, but she lives in Madrid and loves football. "
-               + "You can contact me by phone +380956784534 and Kate by katty@gmail.com.")
+_INPUT_TEXT = (
+    "My name is John. I live in Rome and work at Google. My employee id is GL-456698. In my spare time I play tennis. "
+    + "Kate is a friend of mine. She also works at Google, but she lives in Madrid and loves football. "
+    + "You can contact me by phone +380956784534 and Kate by katty@gmail.com."
+)
 
 
 @dataclass
@@ -29,11 +31,9 @@ class TestCase:
 test_cases: List[TestCase] = [
     TestCase(
         _INPUT_TEXT,
-
         "My name is [PERSON-1]. I live in [LOCATION-1] and work at Google. My employee id is GL-456698. In my spare time I play tennis. "
         + "[PERSON-2] is a friend of mine. She also works at Google, but she lives in [LOCATION-2] and loves football. "
         + "You can contact me by phone [PHONE_NUMBER-1] and [PERSON-2] by [EMAIL_ADDRESS-1].",
-
         {
             "John": "[PERSON-1]",
             "Rome": "[LOCATION-1]",
@@ -42,52 +42,36 @@ test_cases: List[TestCase] = [
             "+380956784534": "[PHONE_NUMBER-1]",
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
         env_vars={},
     ),
-
     TestCase(
         _INPUT_TEXT,
-
         "My name is [PERSON-1]. I live in Rome and work at Google. My employee id is GL-456698. In my spare time I play tennis. "
         + "[PERSON-2] is a friend of mine. She also works at Google, but she lives in Madrid and loves football. "
         + "You can contact me by phone [PHONE_NUMBER-1] and [PERSON-2] by [EMAIL_ADDRESS-1].",
-
         {
             "John": "[PERSON-1]",
             "Kate": "[PERSON-2]",
             "+380956784534": "[PHONE_NUMBER-1]",
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
-        env_vars={
-            "PRESIDIO_ALLOW_LIST": "Rome, Madrid"
-        },
+        env_vars={"PRESIDIO_ALLOW_LIST": "Rome, Madrid"},
     ),
-
     TestCase(
         _INPUT_TEXT,
-
         "My name is John. I live in Rome and work at Google. My employee id is GL-456698. In my spare time I play tennis. "
         + "Kate is a friend of mine. She also works at Google, but she lives in Madrid and loves football. "
         + "You can contact me by phone +380956784534 and Kate by [EMAIL_ADDRESS-1].",
-
         {
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
-        env_vars={
-            "PRESIDIO_CONFIDENCE_SCORE_THRESHOLD": "0.86"
-        },
+        env_vars={"PRESIDIO_CONFIDENCE_SCORE_THRESHOLD": "0.86"},
     ),
-
     TestCase(
         _INPUT_TEXT,
-
         "My name is [PERSON-1]. I live in [LOCATION-1] and work at Google. My employee id is [EMPLOYEE_ID-1]. In my spare time I play tennis. "
         + "[PERSON-2] is a friend of mine. She also works at Google, but she lives in [LOCATION-2] and loves football. "
         + "You can contact me by phone [PHONE_NUMBER-1] and [PERSON-2] by [EMAIL_ADDRESS-1].",
-
         {
             "John": "[PERSON-1]",
             "Rome": "[LOCATION-1]",
@@ -97,7 +81,6 @@ test_cases: List[TestCase] = [
             "+380956784534": "[PHONE_NUMBER-1]",
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
         env_vars={
             "PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG": """
             - name: "EmployeeIdRecognizer"
@@ -112,14 +95,11 @@ test_cases: List[TestCase] = [
             """
         },
     ),
-
     TestCase(
         _INPUT_TEXT,
-
         "My name is [PERSON-1]. I live in [LOCATION-1] and work at Google. My employee id is GL-456698. In my spare time I play tennis. "
         + "[PERSON-2] is a friend of mine. She also works at Google, but she lives in [LOCATION-2] and loves football. "
         + "You can contact me by phone [PHONE_NUMBER-1] and [PERSON-2] by [EMAIL_ADDRESS-1].",
-
         {
             "John": "[PERSON-1]",
             "Rome": "[LOCATION-1]",
@@ -128,7 +108,6 @@ test_cases: List[TestCase] = [
             "+380956784534": "[PHONE_NUMBER-1]",
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
         env_vars={
             "PRESIDIO_CONFIDENCE_SCORE_THRESHOLD": "0.6",
             "PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG": """
@@ -138,17 +117,14 @@ test_cases: List[TestCase] = [
                 - name: "EmployeeIdRegex"
                   regex: "GL-\\\\d{6}"
                   score: "0.5"
-            """
+            """,
         },
     ),
-
     TestCase(
         _INPUT_TEXT,
-
         "My name is [PERSON-1]. I live in [LOCATION-1] and work at Google. My employee id is [EMPLOYEE_ID-1]. In my spare time I play tennis. "
         + "[PERSON-2] is a friend of mine. She also works at Google, but she lives in [LOCATION-2] and loves football. "
         + "You can contact me by phone [PHONE_NUMBER-1] and [PERSON-2] by [EMAIL_ADDRESS-1].",
-
         {
             "John": "[PERSON-1]",
             "Rome": "[LOCATION-1]",
@@ -158,7 +134,6 @@ test_cases: List[TestCase] = [
             "+380956784534": "[PHONE_NUMBER-1]",
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
         env_vars={
             "PRESIDIO_CONFIDENCE_SCORE_THRESHOLD": "0.4",
             "PRESIDIO_CONTEXT_SIMILARITY_FACTOR": "0.15",
@@ -173,17 +148,14 @@ test_cases: List[TestCase] = [
               context:
                 - "employee"
                 - "id"
-            """
+            """,
         },
     ),
-
     TestCase(
         _INPUT_TEXT,
-
         "My name is [PERSON-1]. I live in [LOCATION-1] and work at Google. My employee id is [EMPLOYEE_ID-1]. In my spare time I play tennis. "
         + "[PERSON-2] is a friend of mine. She also works at Google, but she lives in [LOCATION-2] and loves football. "
         + "You can contact me by phone [PHONE_NUMBER-1] and [PERSON-2] by [EMAIL_ADDRESS-1].",
-
         {
             "John": "[PERSON-1]",
             "Rome": "[LOCATION-1]",
@@ -193,7 +165,6 @@ test_cases: List[TestCase] = [
             "+380956784534": "[PHONE_NUMBER-1]",
             "katty@gmail.com": "[EMAIL_ADDRESS-1]",
         },
-
         env_vars={
             "PRESIDIO_CONFIDENCE_SCORE_THRESHOLD": "0.55",
             "PRESIDIO_CONTEXT_SIMILARITY_FACTOR": "0.15",
@@ -208,7 +179,7 @@ test_cases: List[TestCase] = [
               context:
                 - "employee"
                 - "id"
-            """
+            """,
         },
     ),
 ]
@@ -222,10 +193,16 @@ def set_env_vars(monkeypatch, test_case):
         monkeypatch.setenv(key, value)
 
     import aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.analyzer
-    importlib.reload(aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.analyzer)
+
+    importlib.reload(
+        aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.analyzer
+    )
 
     import aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.recognizers_config
-    importlib.reload(aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.recognizers_config)
+
+    importlib.reload(
+        aidial_interceptors_sdk.examples.chat_completion.presidio_anonymizer.recognizers_config
+    )
 
 
 @pytest.fixture
@@ -235,7 +212,7 @@ def anonymizer():
 
 @pytest.mark.parametrize("test_case", test_cases)
 async def test_presidio_anonymize_deanonymize(
-        test_case: TestCase, set_env_vars, anonymizer: Anonymizer
+    test_case: TestCase, set_env_vars, anonymizer: Anonymizer
 ):
     text = test_case.original_text
     expected_replacements = test_case.replacements

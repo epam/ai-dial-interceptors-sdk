@@ -16,18 +16,15 @@ from .nlp_model_training import (
 )
 
 _PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL: str = get_env_or_default(
-    "PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL",
-    "false"
+    "PRESIDIO_USE_CUSTOM_TRAINED_NLP_MODEL", "false"
 )
 
 _PRESIDIO_NLP_MODELS_PER_LANG: str = get_env_or_default(
-    "PRESIDIO_NLP_MODELS_PER_LANG",
-    "{\"en\": \"en_core_web_sm\"}"
+    "PRESIDIO_NLP_MODELS_PER_LANG", '{"en": "en_core_web_sm"}'
 )
 
 _PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION: str = get_env_or_default(
-    "PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION",
-    "en_core_web_sm"
+    "PRESIDIO_NLP_MODEL_FOR_LANG_DETECTION", "en_core_web_sm"
 )
 
 
@@ -56,15 +53,20 @@ def load_models_per_lang() -> Dict[str, str]:
         models_per_lang = json.loads(_PRESIDIO_NLP_MODELS_PER_LANG)
 
         if not isinstance(models_per_lang, dict) or not all(
-                isinstance(k, str) and isinstance(v, str) for k, v in models_per_lang.items()
+            isinstance(k, str) and isinstance(v, str)
+            for k, v in models_per_lang.items()
         ):
             raise TypeError("The parsed data must be a dictionary of strings.")
 
         return models_per_lang
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON format for NLP models per language: {e}") from e
+        raise ValueError(
+            f"Invalid JSON format for NLP models per language: {e}"
+        ) from e
     except TypeError as e:
-        raise ValueError(f"Invalid structure for NLP models per language: {e}") from e
+        raise ValueError(
+            f"Invalid structure for NLP models per language: {e}"
+        ) from e
 
 
 @Language.factory("language_detector")
@@ -83,9 +85,7 @@ def load_model(model_name: str) -> Language:
             f"Failed to load spaCy model {model_name!r}: {str(e)}\nDownloading the model..."
         )
         download_spacy_model(model_name)
-        _log.info(
-            f"Model '{model_name}' has been successfully installed."
-        )
+        _log.info(f"Model '{model_name}' has been successfully installed.")
         return load_model(model_name)
 
 

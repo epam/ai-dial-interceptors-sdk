@@ -13,10 +13,16 @@ from aidial_interceptors_sdk.utils._env import (
 from .nlp_model_config import get_models_per_lang
 from .recognizers_config import add_custom_recognizers
 
-_PRESIDIO_CONTEXT_SIMILARITY_FACTOR = get_env_or_default("PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35")
-_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY = get_env_or_default("PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3")
+_PRESIDIO_CONTEXT_SIMILARITY_FACTOR = get_env_or_default(
+    "PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35"
+)
+_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY = get_env_or_default(
+    "PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3"
+)
 _PRESIDIO_ALLOW_LIST = get_env_optional("PRESIDIO_ALLOW_LIST")
-_PRESIDIO_CONFIDENCE_SCORE_THRESHOLD = get_env_or_default("PRESIDIO_CONFIDENCE_SCORE_THRESHOLD", "0.5")
+_PRESIDIO_CONFIDENCE_SCORE_THRESHOLD = get_env_or_default(
+    "PRESIDIO_CONFIDENCE_SCORE_THRESHOLD", "0.5"
+)
 
 
 _log = logging.getLogger(__name__)
@@ -40,7 +46,9 @@ def get_context_similarity_factor() -> float:
 
 def get_min_score_with_context_similarity() -> float:
     try:
-        min_score_with_context_similarity = float(_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY)
+        min_score_with_context_similarity = float(
+            _PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY
+        )
 
         if not (0.0 <= min_score_with_context_similarity <= 1.0):
             raise ValueError(
@@ -78,7 +86,7 @@ def get_pii_analyzer() -> AnalyzerEngine:
         supported_languages=list(models.keys()),
         context_aware_enhancer=LemmaContextAwareEnhancer(
             context_similarity_factor=get_context_similarity_factor(),
-            min_score_with_context_similarity=get_min_score_with_context_similarity()
+            min_score_with_context_similarity=get_min_score_with_context_similarity(),
         ),
     )
 
@@ -98,13 +106,8 @@ def get_nlp_configuration(models_per_lang: Dict[str, str]) -> dict:
         {"lang_code": lang, "model_name": model}
         for lang, model in models_per_lang.items()
     ]
-    _log.debug(
-        f"formatted_models: {formatted_models}\n"
-    )
-    return {
-        "nlp_engine_name": "spacy",
-        "models": formatted_models
-    }
+    _log.debug(f"formatted_models: {formatted_models}\n")
+    return {"nlp_engine_name": "spacy", "models": formatted_models}
 
 
 def get_allow_list() -> Optional[List[str]]:
@@ -115,7 +118,9 @@ def get_allow_list() -> Optional[List[str]]:
     allow_list = [item.strip() for item in allow_list.split(",")]
 
     if not all(isinstance(item, str) and item for item in allow_list):
-        raise ValueError("PRESIDIO_ALLOW_LIST must be a comma-separated list of non-empty strings.")
+        raise ValueError(
+            "PRESIDIO_ALLOW_LIST must be a comma-separated list of non-empty strings."
+        )
 
     return allow_list
 
@@ -132,7 +137,10 @@ class PresidioAnalyzer:
 
     def analyze(self, content: str, language: str) -> List[RecognizerResult]:
         return self._analyzer_engine.analyze(
-            text=content, language=language, score_threshold=self._confidence_score_threshold, allow_list=self._allow_list
+            text=content,
+            language=language,
+            score_threshold=self._confidence_score_threshold,
+            allow_list=self._allow_list,
         )
 
     def get_supported_entities(self) -> List[str]:

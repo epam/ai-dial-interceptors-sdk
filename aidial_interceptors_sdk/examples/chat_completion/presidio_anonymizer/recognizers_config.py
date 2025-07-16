@@ -11,7 +11,9 @@ from presidio_analyzer import (
 
 from aidial_interceptors_sdk.utils._env import get_env_optional
 
-_PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG = get_env_optional("PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG")
+_PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG = get_env_optional(
+    "PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG"
+)
 
 _log = logging.getLogger(__name__)
 
@@ -25,7 +27,9 @@ def add_custom_recognizers(recognizer_registry: RecognizerRegistry):
         if not custom_recognizers:
             return
         if not isinstance(custom_recognizers, list):
-            raise TypeError("Custom recognizers configuration must be a list of dictionaries.")
+            raise TypeError(
+                "Custom recognizers configuration must be a list of dictionaries."
+            )
 
         _log.debug(
             f"CUSTOM_RECOGNIZERS_CONFIG: '{custom_recognizers}' has been parsed."
@@ -43,27 +47,43 @@ def add_custom_recognizers(recognizer_registry: RecognizerRegistry):
                 pattern_name = patterns_config.get("name")
                 pattern_regex = patterns_config.get("regex")
                 pattern_score = patterns_config.get("score")
-                patterns.append(create_pattern(pattern_name, pattern_regex, float(pattern_score)))
+                patterns.append(
+                    create_pattern(
+                        pattern_name, pattern_regex, float(pattern_score)
+                    )
+                )
 
             recognizer = create_recognizer(
-                name=name, supported_entity=supported_entity, patterns=patterns, context=context_words
+                name=name,
+                supported_entity=supported_entity,
+                patterns=patterns,
+                context=context_words,
             )
             recognizer_registry.add_recognizer(recognizer)
 
     except yaml.YAMLError as e:
-        raise ValueError(f"Invalid YAML format in PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG: {e}")
+        raise ValueError(
+            f"Invalid YAML format in PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG: {e}"
+        )
     except Exception as e:
-        raise RuntimeError(f"An error occurred while adding custom recognizers: {e}")
+        raise RuntimeError(
+            f"An error occurred while adding custom recognizers: {e}"
+        )
 
 
 def create_pattern(name: str, regex: str, score: float) -> Pattern:
     return Pattern(name=name, regex=regex, score=score)
 
 
-def create_recognizer(name: str, supported_entity: str, patterns: List[Pattern], context: List[str]) -> EntityRecognizer:
+def create_recognizer(
+    name: str,
+    supported_entity: str,
+    patterns: List[Pattern],
+    context: List[str],
+) -> EntityRecognizer:
     return PatternRecognizer(
         name=name,
         supported_entity=supported_entity,
         patterns=patterns,
-        context=context
+        context=context,
     )
