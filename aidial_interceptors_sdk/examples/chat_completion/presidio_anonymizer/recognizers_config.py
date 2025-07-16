@@ -2,14 +2,14 @@ from typing import List
 import yaml
 import logging
 
-from aidial_interceptors_sdk.utils._env import get_env_or_default
+from aidial_interceptors_sdk.utils._env import get_env_optional
 
 from presidio_analyzer import PatternRecognizer
 from presidio_analyzer import EntityRecognizer
 from presidio_analyzer import RecognizerRegistry
 from presidio_analyzer import Pattern
 
-_PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG = get_env_or_default("PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG", None)
+_PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG = get_env_optional("PRESIDIO_CUSTOM_RECOGNIZERS_CONFIG")
 
 _log = logging.getLogger(__name__)
 

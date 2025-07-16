@@ -9,14 +9,15 @@ from presidio_analyzer.context_aware_enhancers import LemmaContextAwareEnhancer
 from presidio_analyzer import RecognizerResult
 
 from aidial_interceptors_sdk.utils._env import get_env_or_default
+from aidial_interceptors_sdk.utils._env import get_env_optional
 
 from .recognizers_config import add_custom_recognizers
 from .nlp_model_config import get_models_per_lang
 
-_PRESIDIO_CONTEXT_SIMILARITY_FACTOR: str = get_env_or_default("PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35")
-_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY: str = get_env_or_default("PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3")
-_PRESIDIO_ALLOW_LIST = get_env_or_default("PRESIDIO_ALLOW_LIST")
-_PRESIDIO_CONFIDENCE_SCORE_THRESHOLD: str = get_env_or_default("PRESIDIO_CONFIDENCE_SCORE_THRESHOLD", "0.5")
+_PRESIDIO_CONTEXT_SIMILARITY_FACTOR = get_env_or_default("PRESIDIO_CONTEXT_SIMILARITY_FACTOR", "0.35")
+_PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY = get_env_or_default("PRESIDIO_MIN_SCORE_WITH_CONTEXT_SIMILARITY", "0.3")
+_PRESIDIO_ALLOW_LIST = get_env_optional("PRESIDIO_ALLOW_LIST")
+_PRESIDIO_CONFIDENCE_SCORE_THRESHOLD = get_env_or_default("PRESIDIO_CONFIDENCE_SCORE_THRESHOLD", "0.5")
 
 
 _log = logging.getLogger(__name__)
@@ -108,7 +109,7 @@ def get_nlp_configuration(models_per_lang: Dict[str, str]) -> dict:
 
 
 def get_allow_list() -> Optional[List[str]]:
-    allow_list = get_env_or_default("PRESIDIO_ALLOW_LIST")
+    allow_list = _PRESIDIO_ALLOW_LIST
     if allow_list is None:
         return None
 

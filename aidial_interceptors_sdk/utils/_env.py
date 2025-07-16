@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 from typing import Callable, List, TypeVar
@@ -12,7 +14,11 @@ def get_env(name: str, err_msg: str | None = None) -> str:
     raise Exception(err_msg or f"{name} env variable is not set")
 
 
-def get_env_or_default(name: str, default: str | None = None) -> str | None:
+def get_env_optional(name: str) -> str | None:
+    return os.getenv(name)
+
+
+def get_env_or_default(name: str, default: str) -> str:
     return os.getenv(name, default)
 
 
