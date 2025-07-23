@@ -40,3 +40,6 @@ resolutions:
     - message: ".*PyPI::setuptools:78\\.1\\.1.*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "MIT License: https://github.com/pypa/setuptools/blob/v78.1.1/LICENSE"
+    - message: ".*PyPI::typing-extensions:4\\.14\\.1.*"
+      reason: "CANT_FIX_EXCEPTION"
+      comment: "Same as CPython: https://github.com/python/typing_extensions/blob/4.14.1/LICENSE"
