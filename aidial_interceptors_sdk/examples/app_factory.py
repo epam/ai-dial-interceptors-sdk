@@ -22,6 +22,7 @@ def create_app(
         telemetry_config=TelemetryConfig(),
         add_healthcheck=True,
         propagate_auth_headers=True,
+        allow_extra_request_fields=True,
     )
 
     configure_loggers()
