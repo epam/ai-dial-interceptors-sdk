@@ -234,7 +234,7 @@ The declared interceptors could be then attached to particular models and applic
 
 Make sure that
 
-1. chat completion interceptors are only used in chat models or application,
+1. chat completion interceptors are only used in chat models or applications,
 2. embeddings interceptors are only used in embeddings models.
 
 The stack of interceptors in DIAL works similarly to a stack of middlewares in Express.js or Django:

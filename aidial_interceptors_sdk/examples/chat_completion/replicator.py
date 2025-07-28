@@ -45,7 +45,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
     content_stages: Dict[int, Stage] = {}
     stage_index_mapper: IndexMapper[Tuple[int, int]] = IndexMapper()
 
-    total_usage: UsageChunk = UsageChunk(0, 0)
+    total_usage: UsageChunk = UsageChunk(0, 0, None)
     finish_reasons: Dict[int, str] = {}
     role_sent: bool = False
     chunk_template: dict = {}
