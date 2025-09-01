@@ -28,20 +28,13 @@ class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
     replacements: Replacements = Replacements()
 
     @abstractmethod
-    def get_anonymizer(self, config: dict) -> Anonymizer:
-        pass
-
-    @abstractmethod
-    def get_anonymizer_config_field_name(self) -> str | None:
+    def get_anonymizer(self) -> Anonymizer:
         pass
 
     @override
     async def on_request_messages(self, messages: List[dict]) -> List[dict]:
-        request = await self.request.original_request.json()
-        config = self._get_interceptor_configuration(request, clean_up=False)
-
         # Collect replacement dictionary first across all messages
-        anonymizer = self.get_anonymizer(config)
+        anonymizer = self.get_anonymizer()
         for message in messages:
             await anonymizer.collect_replacements(
                 message.get("content") or "", replacements=self.replacements
@@ -73,29 +66,9 @@ class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
 
         return messages
 
-    def _get_interceptor_configuration(
-        self, request: dict, *, clean_up: bool
-    ) -> dict:
-        field_name = self.get_anonymizer_config_field_name()
-
-        if (
-            field_name
-            and (cc := request.get("custom_fields"))
-            and (config := cc.get("configuration"))
-            and (conf := config.get(field_name))
-        ):
-            if clean_up:
-                # Remove interceptor's configuration from the request.
-                # It must not reach the upstream, it won't understand it.
-                del config[field_name]
-            return conf
-
-        return {}
-
     @override
     async def on_request(self, request: dict) -> dict:
         self.request_n = request.get("n") or 1
-        self._get_interceptor_configuration(request, clean_up=True)
         return request
 
     @override

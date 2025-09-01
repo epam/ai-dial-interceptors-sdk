@@ -22,6 +22,9 @@ from aidial_interceptors_sdk.chat_completion.base import (
 from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.error import EarlyStreamExit
 from aidial_interceptors_sdk.utils._debug import debug_logging
+from aidial_interceptors_sdk.utils._dial_sdk import (
+    parse_interceptor_configuration,
+)
 from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
@@ -54,10 +57,16 @@ def interceptor_to_chat_completion(
                 client_factory=client_factory,
             )
 
+            configuration_schema = await cls.configuration_schema()
+            configuration = parse_interceptor_configuration(
+                request, configuration_schema
+            )
+
             interceptor = cls(
                 dial_client=dial_client,
                 request=request,
                 response=response,
+                configuration=configuration,
                 **request.original_request.path_params,
             )
 

@@ -1,6 +1,7 @@
-from typing import AsyncIterator, Awaitable, Callable
+from typing import AsyncIterator, Awaitable, Callable, Type, TypeVar
 
 from aidial_sdk.exceptions import HTTPException as DialException
+from pydantic import BaseModel
 
 from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedException,
@@ -18,9 +19,27 @@ from aidial_interceptors_sdk.utils.streaming import annotate_stream
 
 RequestDict = dict
 
+_T = TypeVar("_T", bound=BaseModel)
+
 
 class ChatCompletionInterceptor(RequestHandler, ResponseHandler):
     dial_client: DialClient
+    configuration: BaseModel | None
+
+    @classmethod
+    async def configuration_schema(cls) -> Type[BaseModel] | None:
+        return None
+
+    def get_configuration(self, cls: Type[_T]) -> _T:
+        if self.configuration is None:
+            raise ValueError("Can't find interceptor configuration")
+
+        if not isinstance(self.configuration, cls):
+            raise TypeError(
+                f"The interceptor configuration is of type {type(self.configuration).__name__!r}, but expected to be of type {cls.__name__!r}"
+            )
+
+        return self.configuration
 
     async def call_upstreams(
         self,
