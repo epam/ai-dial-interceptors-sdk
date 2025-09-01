@@ -13,6 +13,8 @@ from aidial_sdk.chat_completion.chunks import ArbitraryChunk, BaseChunk
 from aidial_sdk.exceptions import RequestValidationError
 from pydantic import BaseModel
 
+from aidial_interceptors_sdk.utils._string import decapitalize
+
 _log = logging.getLogger(__name__)
 
 
@@ -48,7 +50,7 @@ def parse_interceptor_configuration(
             return None
         case (None, _):
             raise RequestValidationError(
-                "The interceptor doesn't have configuration, but it was provided in the chat completion request"
+                f"The interceptor doesn't have configuration, but it was provided in the chat completion request. Path: 'custom_fields.{_conf_key}'"
             )
         case (_, _):
             try:
@@ -57,6 +59,6 @@ def parse_interceptor_configuration(
             except pydantic.ValidationError as e:
                 error = e.errors()[0]
                 path = ".".join(map(str, error["loc"]))
-                msg = f"Invalid request. Path: 'custom_fields.{_conf_key}.{path}', error: {error['msg']}"
+                msg = f"Invalid request. Path: 'custom_fields.{_conf_key}.{path}', error: {decapitalize(error['msg'])}"
 
                 raise RequestValidationError(msg)

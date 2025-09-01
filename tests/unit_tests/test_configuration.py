@@ -1,3 +1,4 @@
+import json
 from typing import Type
 
 import httpx
@@ -39,7 +40,7 @@ def create_configurable_interceptor(
             if conf_cls is None:
                 config = "null"
             else:
-                config = self.get_configuration(conf_cls).json()
+                config = json.dumps(self.get_configuration(conf_cls).dict())
             raise ValueError(config)
 
     return _Impl
@@ -65,7 +66,7 @@ def test_configuration_and_no_schema(stream: bool):
     assert exc.value.response.json() == {
         "error": {
             "code": "422",
-            "message": "The interceptor doesn't have configuration, but it was provided in the chat completion request",
+            "message": "The interceptor doesn't have configuration, but it was provided in the chat completion request. Path: 'custom_fields.interceptor_configuration'",
             "type": "invalid_request_error",
         }
     }
@@ -110,7 +111,7 @@ def test_no_configuration_and_optional_schema(stream: bool):
 
     assert exc.value.response.json() == {
         "error": {
-            "message": OptionalConf().json(),
+            "message": json.dumps(OptionalConf().dict()),
             "type": "internal_server_error",
             "code": "500",
         }
