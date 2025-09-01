@@ -6,6 +6,7 @@ from aidial_sdk.chat_completion import ChatCompletion as DialChatCompletion
 from aidial_sdk.chat_completion import Request as DialRequest
 from aidial_sdk.chat_completion import Response as DialResponse
 from aidial_sdk.chat_completion.chunks import DefaultChunk
+from aidial_sdk.deployment.configuration import ConfigurationRequest
 from aidial_sdk.exceptions import HTTPException as DialException
 from openai import AsyncStream
 from openai.types.chat.chat_completion import ChatCompletion
@@ -44,6 +45,12 @@ def interceptor_to_chat_completion(
     client_factory: HTTPClientFactory,
 ) -> DialChatCompletion:
     class Impl(DialChatCompletion):
+        @dial_exception_decorator
+        async def configuration(self, request: ConfigurationRequest) -> dict:
+            if (schema := await cls.configuration_schema()) is None:
+                raise NotImplementedError()
+            return schema.schema()
+
         @dial_exception_decorator
         async def chat_completion(
             self, request: DialRequest, response: DialResponse
