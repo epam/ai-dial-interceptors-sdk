@@ -8,6 +8,7 @@ from aidial_sdk.chat_completion import Response as DialResponse
 from aidial_sdk.chat_completion.chunks import DefaultChunk
 from aidial_sdk.deployment.configuration import ConfigurationRequest
 from aidial_sdk.exceptions import HTTPException as DialException
+from aidial_sdk.exceptions import ResourceNotFoundError
 from openai import AsyncStream
 from openai.types.chat.chat_completion import ChatCompletion
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
@@ -48,7 +49,9 @@ def interceptor_to_chat_completion(
         @dial_exception_decorator
         async def configuration(self, request: ConfigurationRequest) -> dict:
             if (schema := await cls.configuration_schema()) is None:
-                raise NotImplementedError()
+                raise ResourceNotFoundError(
+                    "Configuration endpoint isn't implemented"
+                )
             return schema.schema()
 
         @dial_exception_decorator

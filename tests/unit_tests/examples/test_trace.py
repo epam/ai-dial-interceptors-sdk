@@ -40,7 +40,7 @@ def test_trace_interceptor(stream: bool):
         match_objects(
             response.to_dict(),
             checker(
-                delta={
+                {
                     "role": "assistant",
                     "content": "1.enter\n2.enter\nhello\n2.exit\n1.exit",
                 },

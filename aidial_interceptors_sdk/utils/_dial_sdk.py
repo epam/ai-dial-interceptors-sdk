@@ -34,10 +34,11 @@ _T = TypeVar("_T", bound=BaseModel)
 def parse_interceptor_configuration(
     request: Request, cls: Type[_T] | None
 ) -> _T | None:
+    _conf_key = "interceptor_configuration"
 
     config: dict | None = None
     if cf := request.custom_fields:
-        config = cf.dict().get("interceptor_configuration")
+        config = cf.dict().get(_conf_key)
 
     if config is not None:
         _log.debug(f"interceptor configuration: {json.dumps(config)}")
@@ -56,6 +57,6 @@ def parse_interceptor_configuration(
             except pydantic.ValidationError as e:
                 error = e.errors()[0]
                 path = ".".join(map(str, error["loc"]))
-                msg = f"Invalid request. Path: 'custom_field.configuration.{path}', error: {error['msg']}"
+                msg = f"Invalid request. Path: 'custom_fields.{_conf_key}.{path}', error: {error['msg']}"
 
                 raise RequestValidationError(msg)
