@@ -123,7 +123,7 @@ They are provided solely as examples to demonstrate basic use cases of intercept
 |image-watermark|Post|Stamps "EPAM DIAL" watermark on all image attachments in the response. Demonstrates how to work with files stored on DIAL File Storage.|
 |statistics-reporter|Post|Collects statistics on the response stream *(tokens/sec, finish reason, completion tokens etc)* and reports it in a new stage when response is finished|
 |spacy-anonymizer|Generic|Anonymizes PII in the request via [Spacy](https://spacy.io/models/en#en_core_web_sm) library, calls the upstream, deanonymizes the response. The list of anonymized entities is configurable via `SPACY_ANONYMIZER_LABELS_TO_REDACT` env variable|
-|google-dlp-anonymizer|Generic|Anonymizes PII in the request via [Google DLP API](https://cloud.google.com/sensitive-data-protection/docs/reference/rest/v2/projects.content/deidentify), calls the upstream, deanonymizes the response. The list of anonymized entities is could be specified in [the configuration field](#google-dlp-interceptor) in chat completion request|
+|google-dlp-anonymizer|Generic|Anonymizes PII in the request via [Google DLP API](https://cloud.google.com/sensitive-data-protection/docs/reference/rest/v2/projects.content/deidentify), calls the upstream, deanonymizes the response. The list of anonymized entities could be specified in [the interceptor configuration](#google-dlp-interceptor)|
 |langfuse|Generic|Integration with [Langfuse](https://langfuse.com/)|
 |replicator:N|Generic|Calls the upstream N times and combines the N response into a single response. Could be useful for stabilization of model's output, since certain models aren't deterministic.|
 |cache|Generic|Caches incoming chat completion requests. **Not ready for production use. Use at your discretion**|
@@ -251,24 +251,32 @@ Client
 
 **Every** request/response in the diagram above goes through the DIAL Core. This is hidden from the diagram for brevity.
 
-#### Per-deployment interceptor configuration
+#### Interceptor configuration
 
-Certain interceptors allow configuration via `custom_fields.configuration` field in the chat completion request.
+If an interceptor support configuration, it must expose `/configuration` endpoint which must return [JSON schema](https://json-schema.org/) of the configuration. This configuration endpoint must be specified under `feature.configurationEndpoint` fields in the DIAL Core configuration.
 
-This configuration could be preset in the DIAL Core Config in the following way:
+The interceptor configuration could be preset on the per-interceptor basis in DIAL Core configuration via the `defaults` field:
 
 ```json
 {
+    "interceptors": {
+        "chat-google-dlp-anonymizer": {
+            "endpoint": "${INTERCEPTOR_ORIGIN}/openai/deployments/google-dlp-anonymizer/chat/completions",
+            "features": {
+                "configurationEndpoint": "${INTERCEPTOR_ORIGIN}/openai/deployments/google-dlp-anonymizer/configuration",
+            },
+            "defaults": {
+                "custom_fields": {
+                    "interceptor_configuration": "$interceptor_configuration"
+                }
+            }
+        }
+    },
     "models": {
         "anthropic.claude-v3-haiku": {
             "type": "chat",
             "iconUrl": "anthropic.svg",
             "endpoint": "${BEDROCK_ADAPTER_SERVICE_URL}/openai/deployments/anthropic.claude-3-haiku-20240307-v1:0/chat/completions",
-            "defaults": {
-                "custom_fields": {
-                    "configuration": "$interceptor_configuration"
-                }
-            },
             "interceptors": [
                 "chat-google-dlp-anonymizer"
             ]
@@ -277,7 +285,7 @@ This configuration could be preset in the DIAL Core Config in the following way:
 }
 ```
 
-Where `$interceptor_configuration` is a dictionary whose format is specific for a particular interceptor.
+The given `defaults` field means that DIAL Core will enrich chat completion request sent to the interceptor with `custom_fields.interceptor_configuration` field equal to `$interceptor_configuration`. This JSON value must follow the JSON schema exposed by the `/configuration` endpoint.
 
 ##### Google DLP interceptor
 
@@ -287,14 +295,12 @@ Here is an example of `$interceptor_configuration` for the interceptor:
 
 ```json
 {
-    "google_dlp_anonymizer": {
-        "deidentification_config": {
-            "info_types": [
-                "PHONE_NUMBER",
-                "FIRST_NAME",
-                "LAST_NAME"
-            ]
-        }
+    "deidentification_config": {
+        "info_types": [
+            "PHONE_NUMBER",
+            "FIRST_NAME",
+            "LAST_NAME"
+        ]
     }
 }
 ```

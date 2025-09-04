@@ -6,7 +6,9 @@ from aidial_sdk.chat_completion import ChatCompletion as DialChatCompletion
 from aidial_sdk.chat_completion import Request as DialRequest
 from aidial_sdk.chat_completion import Response as DialResponse
 from aidial_sdk.chat_completion.chunks import DefaultChunk
+from aidial_sdk.deployment.configuration import ConfigurationRequest
 from aidial_sdk.exceptions import HTTPException as DialException
+from aidial_sdk.exceptions import ResourceNotFoundError
 from openai import AsyncStream
 from openai.types.chat.chat_completion import ChatCompletion
 from openai.types.chat.chat_completion_chunk import ChatCompletionChunk
@@ -22,6 +24,9 @@ from aidial_interceptors_sdk.chat_completion.base import (
 from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.error import EarlyStreamExit
 from aidial_interceptors_sdk.utils._debug import debug_logging
+from aidial_interceptors_sdk.utils._dial_sdk import (
+    parse_interceptor_configuration,
+)
 from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
@@ -42,6 +47,14 @@ def interceptor_to_chat_completion(
 ) -> DialChatCompletion:
     class Impl(DialChatCompletion):
         @dial_exception_decorator
+        async def configuration(self, request: ConfigurationRequest) -> dict:
+            if (schema := await cls.configuration_schema()) is None:
+                raise ResourceNotFoundError(
+                    "Configuration endpoint isn't implemented"
+                )
+            return schema.schema()
+
+        @dial_exception_decorator
         async def chat_completion(
             self, request: DialRequest, response: DialResponse
         ) -> None:
@@ -54,10 +67,16 @@ def interceptor_to_chat_completion(
                 client_factory=client_factory,
             )
 
+            configuration_schema = await cls.configuration_schema()
+            configuration = parse_interceptor_configuration(
+                request, configuration_schema
+            )
+
             interceptor = cls(
                 dial_client=dial_client,
                 request=request,
                 response=response,
+                configuration=configuration,
                 **request.original_request.path_params,
             )
 
