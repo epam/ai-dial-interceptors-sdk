@@ -25,6 +25,7 @@ from aidial_interceptors_sdk.dial_client import DialClient
 from aidial_interceptors_sdk.error import EarlyStreamExit
 from aidial_interceptors_sdk.utils._debug import debug_logging
 from aidial_interceptors_sdk.utils._dial_sdk import (
+    cleanup_interceptor_configuration,
     parse_interceptor_configuration,
 )
 from aidial_interceptors_sdk.utils._exceptions import dial_exception_decorator
@@ -84,6 +85,7 @@ def interceptor_to_chat_completion(
             request_body = await debug_logging("request")(
                 interceptor.traverse_request
             )(request_body)
+            request_body = cleanup_interceptor_configuration(request_body)
 
             try:
                 await interceptor.on_stream_start()
