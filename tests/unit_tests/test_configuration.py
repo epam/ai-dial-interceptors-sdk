@@ -4,12 +4,16 @@ from typing import Type
 import httpx
 import openai
 import pytest
+from aidial_sdk.exceptions import InvalidRequestError
 from pydantic import BaseModel
 
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
-from tests.utils.applications import EchoApplication
+from tests.utils.applications import (
+    EchoApplication,
+    RequestValidationApplication,
+)
 from tests.utils.dial_app import create_openai_client
 
 
@@ -44,6 +48,44 @@ def create_configurable_interceptor(
             raise ValueError(config)
 
     return _Impl
+
+
+def test_interceptor_configuration_cleanup(stream: bool):
+    class _NoopInterceptor(ChatCompletionInterceptor):
+        @classmethod
+        async def configuration_schema(cls):
+            return RequiredConf
+
+    def _checker(request):
+        if request.get("custom_fields") is not None:
+            raise InvalidRequestError("custom_fields should be removed")
+
+    echo = RequestValidationApplication(on_request_body=_checker)
+
+    openai_client = create_openai_client(
+        [("echo", echo), ("intr", _NoopInterceptor)],
+        ["intr", "echo"],
+    )
+
+    response = openai_client.chat.completions.create(
+        model=None,  # type: ignore
+        stream=stream,
+        messages=[{"role": "user", "content": "hello"}],
+        extra_body={
+            "custom_fields": {
+                "interceptor_configuration": {"name": "xyz", "count": 11}
+            }
+        },
+    )
+
+    if isinstance(response, openai.Stream):
+        content = "".join(
+            chunk.choices[0].delta.content or "" for chunk in response
+        )
+    else:
+        content = response.choices[0].message.content
+
+    assert content == "hello"
 
 
 def test_configuration_and_no_schema(stream: bool):
