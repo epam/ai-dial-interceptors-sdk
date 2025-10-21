@@ -30,17 +30,30 @@ def send_chunk_to_response(response: Response, chunk: BaseChunk | dict):
         response._queue.put_nowait(chunk)
 
 
+_CONFIGURATION_KEY = "interceptor_configuration"
+
+
+def cleanup_interceptor_configuration(request_body: dict) -> dict:
+    """Leave no traces of the interceptor configuration in the request to the upstream."""
+
+    if (cf := request_body.get("custom_fields")) is not None:
+        cf.pop(_CONFIGURATION_KEY, None)
+        if not cf:
+            request_body.pop("custom_fields")
+
+    return request_body
+
+
 _T = TypeVar("_T", bound=BaseModel)
 
 
 def parse_interceptor_configuration(
     request: Request, cls: Type[_T] | None
 ) -> _T | None:
-    _conf_key = "interceptor_configuration"
 
     config: dict | None = None
     if cf := request.custom_fields:
-        config = cf.dict().get(_conf_key)
+        config = cf.dict().get(_CONFIGURATION_KEY)
 
     if config is not None:
         _log.debug(f"interceptor configuration: {json.dumps(config)}")
@@ -50,7 +63,7 @@ def parse_interceptor_configuration(
             return None
         case (None, _):
             raise RequestValidationError(
-                f"The interceptor doesn't have configuration, but it was provided in the chat completion request. Path: 'custom_fields.{_conf_key}'"
+                f"The interceptor doesn't have configuration, but it was provided in the chat completion request. Path: 'custom_fields.{_CONFIGURATION_KEY}'"
             )
         case (_, _):
             try:
@@ -59,6 +72,6 @@ def parse_interceptor_configuration(
             except pydantic.ValidationError as e:
                 error = e.errors()[0]
                 path = ".".join(map(str, error["loc"]))
-                msg = f"Invalid request. Path: 'custom_fields.{_conf_key}.{path}', error: {decapitalize(error['msg'])}"
+                msg = f"Invalid request. Path: 'custom_fields.{_CONFIGURATION_KEY}.{path}', error: {decapitalize(error['msg'])}"
 
                 raise RequestValidationError(msg)
