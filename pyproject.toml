@@ -9,7 +9,7 @@ keywords = ["ai"]
 classifiers = ["Topic :: Software Development :: Libraries :: Python Modules"]
 requires-python = ">=3.11,<3.13"
 dependencies = [
-    "fastapi (>=0.51,<1.0)",
+    "fastapi (==0.120.2)",
     "httpx (>=0.25.0,<1.0)",
     "openai (>=1.32.0,<2.0)",
     "aidial-sdk[telemetry] (>=0.21.0)",
