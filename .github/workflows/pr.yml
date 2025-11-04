@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [development, release-*]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   run_tests:
     uses: epam/ai-dial-ci/.github/workflows/python_package_pr.yml@2.7.0
@@ -11,3 +15,4 @@ jobs:
     with:
       python-version: 3.11
       code-checks-python-versions: '["3.11", "3.12"]'
+
