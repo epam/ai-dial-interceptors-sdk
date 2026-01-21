@@ -16,6 +16,18 @@ class EchoApplication(ChatCompletion):
             choice.append_content(request.messages[-1].text())
 
 
+class WhitespaceEchoApplication(ChatCompletion):
+    async def chat_completion(
+        self, request: Request, response: Response
+    ) -> None:
+        with response.create_single_choice() as choice:
+            for _ in range(10):
+                choice.append_content(" ")
+            choice.append_content(request.messages[-1].text())
+            for _ in range(10):
+                choice.append_content(" ")
+
+
 class RequestValidationApplication(ChatCompletion):
     _on_request_body: Callable[[dict], None]
 
