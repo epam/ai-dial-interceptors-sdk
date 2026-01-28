@@ -32,10 +32,6 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
         self.cur_chunk = None
         self.cur_chunks = 0
 
-    def flush_if_needed(self) -> None:
-        if self.cur_chunk:
-            self.flush()
-
     def need_flush(self, content: str) -> bool:
         passed = time.perf_counter() - self.last_send
         return content and not content.isspace() or (passed > self.timeout_sec)
