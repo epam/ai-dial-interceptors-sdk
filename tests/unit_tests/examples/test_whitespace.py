@@ -146,6 +146,10 @@ tests = [
         [extra(" "), wrap(" "), wrap(" "), extra(" ")],
         [start(), extra(" "), wrap("  "), extra(" "), end()],
     ),
+    (
+        [wrap(" "), wrap("\t"), wrap(" ", extra="\n"), wrap(" "), wrap(" ")],
+        [start(), wrap(" \t "), extra("\n"), wrap("  "), end()],
+    ),
 ]
 
 

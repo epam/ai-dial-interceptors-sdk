@@ -34,7 +34,7 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
         if self.cur_chunk:
             self.flush()
 
-    def need_flush(self, content: str | None) -> bool:
+    def need_flush(self, content: str) -> bool:
         passed = time.perf_counter() - self.last_send
         return content and not content.isspace() or (passed > self.timeout_sec)
 
@@ -47,7 +47,7 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
 
     @staticmethod
     def parse_content_only_chunk(chunk: dict) -> str | None:
-        if not ("choices" in chunk.keys()):
+        if (choices := chunk.get("choices")) is None:
             return None
 
         choices = chunk.get("choices")
@@ -62,8 +62,7 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
         }:
             return None
 
-        finish_reason = choice["finish_reason"]
-        if finish_reason:
+        if choice["finish_reason"]:
             return None
 
         index = choice["index"]
