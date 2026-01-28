@@ -1,6 +1,6 @@
 from typing import Callable
 
-from aidial_sdk.chat_completion import ChatCompletion, Request, Response
+from aidial_sdk.chat_completion import ChatCompletion, Choice, Request, Response
 from aidial_sdk.exceptions import HTTPException as DialException
 from fastapi.requests import Request as FastAPIRequest
 from fastapi.responses import StreamingResponse as FastAPIStreamingResponse
@@ -14,6 +14,19 @@ class EchoApplication(ChatCompletion):
     ) -> None:
         with response.create_single_choice() as choice:
             choice.append_content(request.messages[-1].text())
+
+
+class WhitespaceEchoApplication(ChatCompletion):
+    def __init__(
+        self, on_chat_completion: Callable[[Request, Response, Choice], None]
+    ) -> None:
+        self._on_chat_completion = on_chat_completion
+
+    async def chat_completion(
+        self, request: Request, response: Response
+    ) -> None:
+        with response.create_single_choice() as choice:
+            self._on_chat_completion(request, response, choice)
 
 
 class RequestValidationApplication(ChatCompletion):
