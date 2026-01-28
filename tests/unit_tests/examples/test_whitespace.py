@@ -16,55 +16,70 @@ from tests.utils.json import has_type, match_objects, memorize
 
 
 def wrap(
-    content: str | None = None, finish: bool = False, extra: bool = False
+    content: str | None = None,
+    extra: str | None = None,
+    role: str | None = None,
+    finish: str | None = None,
 ) -> dict:
     output: dict = {}
     if content is not None:
         output["content"] = content
-    if finish:
-        output["finish_reason"] = True
-    if extra:
-        output["as_attachment"] = True
+    if extra is not None:
+        output["extra_content"] = extra
+    if role is not None:
+        output["role"] = role
+    if finish is not None:
+        output["finish_reason"] = finish
     return output
 
 
-def extra(content: str | None = None, finish: bool = False) -> dict:
-    return wrap(content=content, finish=finish, extra=True)
+def extra(
+    content: str | None = None,
+    role: str | None = None,
+    finish: str | None = None,
+) -> dict:
+    return wrap(extra=content, role=role, finish=finish)
 
 
-def has_content(chunk: dict) -> bool:
-    return chunk.get("content") is not None
+def start() -> dict:
+    return wrap(role="assistant")
 
 
-def has_extra(chunk: dict) -> bool:
-    return chunk.get("as_attachment") is True
+def end() -> dict:
+    return wrap(finish="stop")
 
 
-def has_finish(chunk: dict) -> bool:
-    return chunk.get("finish_reason") is True
-
-
-def extract_content(chunk: dict) -> str | None:
+def get_content(chunk: dict) -> str | None:
     return chunk.get("content")
+
+
+def get_extra_content(chunk: dict) -> str | None:
+    return chunk.get("extra_content")
+
+
+def get_role(chunk: dict) -> str | None:
+    return chunk.get("role")
+
+
+def get_finish_reason(chunk: dict) -> str | None:
+    return chunk.get("finish_reason")
 
 
 def check_nonstream(interceptor_output: list[dict]) -> dict:
     buffer: list[str] = []
     extra_buffer: list[str] = []
     for output in interceptor_output:
-        content = extract_content(output)
-        if not content:
-            continue
-        if has_extra(output):
-            extra_buffer.append(content)
-        else:
+        if content := get_content(output):
             buffer.append(content)
+        if extra_content := get_extra_content(output):
+            extra_buffer.append(extra_content)
 
     content = "".join(buffer)
     result: dict = {
         "role": "assistant",
-        "content": content,
     }
+    if buffer:
+        result["content"] = content
     if extra_buffer:
         result["custom_content"] = {
             "attachments": [{"data": data} for data in extra_buffer]
@@ -75,23 +90,20 @@ def check_nonstream(interceptor_output: list[dict]) -> dict:
 def check_stream(checker, interceptor_output: list[dict]) -> list:
     checkers: list = []
     cur_extra_idx = 0
-    first = True
     for output in interceptor_output:
         data: dict = {}
-        finish_reason: str | None = None
-        content = extract_content(output)
-        if has_finish(output):
-            finish_reason = "stop"
-        if has_extra(output):
+
+        if content := get_content(output):
+            data["content"] = content
+        if extra_content := get_extra_content(output):
             data["custom_content"] = {
-                "attachments": [{"index": cur_extra_idx, "data": content}]
+                "attachments": [{"index": cur_extra_idx, "data": extra_content}]
             }
             cur_extra_idx += 1
-        elif content is not None:
-            data["content"] = content
-        if first:
-            data["role"] = "assistant"
-            first = False
+        if role := get_role(output):
+            data["role"] = role
+        finish_reason = get_finish_reason(output)
+
         checkers.append(checker(data, finish_reason=finish_reason))
 
     return checkers
@@ -100,57 +112,54 @@ def check_stream(checker, interceptor_output: list[dict]) -> list:
 tests = [
     (
         [wrap("")],
-        [wrap(""), wrap(finish=True)],
+        [start(), end()],
     ),
     (
         [wrap(" ")],
-        [wrap(" "), wrap(finish=True)],
+        [start(), wrap(" "), end()],
     ),
     (
         [wrap(" "), wrap(" ")],
-        [wrap("  "), wrap(finish=True)],
+        [start(), wrap("  "), end()],
     ),
     (
         [wrap(" "), wrap(" "), wrap("a")],
-        [wrap("  a"), wrap(finish=True)],
+        [start(), wrap("  a"), end()],
     ),
     (
         [wrap("a"), wrap(" "), wrap(" ")],
-        [wrap("a"), wrap("  "), wrap(finish=True)],
+        [start(), wrap("a"), wrap("  "), end()],
     ),
     (
         [wrap("a"), wrap(" "), wrap(" "), wrap("b"), extra("t")],
-        [wrap("a"), wrap("  b"), extra("t"), wrap(finish=True)],
+        [start(), wrap("a"), wrap("  b"), extra("t"), end()],
     ),
     (
         [wrap("a"), wrap(" "), wrap(" "), wrap("b"), wrap(" ")],
-        [wrap("a"), wrap("  b"), wrap(" "), wrap(finish=True)],
+        [start(), wrap("a"), wrap("  b"), wrap(" "), end()],
     ),
     (
         [extra(" "), wrap(" "), extra(" ")],
-        [wrap(""), extra(" "), wrap(" "), extra(" "), wrap(finish=True)],
+        [start(), extra(" "), wrap(" "), extra(" "), end()],
     ),
     (
-        [extra(" "), wrap(" "), wrap(" ")],
-        [wrap(""), extra(" "), wrap("  "), wrap(finish=True)],
+        [extra(" "), wrap(" "), wrap(" "), extra(" ")],
+        [start(), extra(" "), wrap("  "), extra(" "), end()],
     ),
 ]
 
 
-@pytest.mark.parametrize("stream", [True])
+@pytest.mark.parametrize("stream", [False, True])
 @pytest.mark.parametrize("model_output, interceptor_output", tests)
 def test_whitespace_accumulator_interceptor(
     stream: bool, model_output: list[dict], interceptor_output: list[dict]
 ):
     def callback(request: Request, response: Response, choice: Choice):
         for chunk in model_output:
-            content = extract_content(chunk)
-            if not content:
-                continue
-            if has_extra(chunk):
-                choice.add_attachment(data=content)
-            else:
+            if content := get_content(chunk):
                 choice.append_content(content)
+            if extra_content := get_extra_content(chunk):
+                choice.add_attachment(data=extra_content)
 
     openai_client = create_openai_client(
         [
@@ -194,6 +203,4 @@ def test_whitespace_accumulator_interceptor(
         for actual, expected in itertools.zip_longest(
             response, expected_chunks
         ):
-            print(f"\nexpected {expected}")
-            print(f"actual   {actual.to_dict()}")
             match_objects(actual.to_dict(), expected)

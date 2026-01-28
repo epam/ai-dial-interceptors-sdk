@@ -19,11 +19,6 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
     timeout_sec: float = _FLUSH_TIMEOUT
     buffer: list[str] = []
 
-    def save_to_cache(self, chunk: dict):
-        self.cur_chunk = chunk
-        if content := self.get_content(chunk):
-            self.buffer.append(content)
-
     def flush(self) -> None:
         assert self.cur_chunk is not None
         _log.info(f"flushed {self.cur_chunks} chunks")
@@ -43,52 +38,49 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
         passed = time.perf_counter() - self.last_send
         return content and not content.isspace() or (passed > self.timeout_sec)
 
-    def get_content(self, chunk: dict) -> str | None:
-        try:
-            return chunk["choices"][0]["delta"].get("content")
-        except (KeyError, IndexError, TypeError):
-            return None
-
-    def set_content(self, chunk: dict, content: str):
+    @staticmethod
+    def set_content(chunk: dict, content: str):
         try:
             chunk["choices"][0]["delta"]["content"] = content
         except (KeyError, IndexError, TypeError):
             return None
 
-    def set_chunk_if_needed(self, chunk: dict):
-        if not self.cur_chunk:
-            self.cur_chunk = chunk
-
-    def match_cache_structure(self, chunk: dict) -> bool:
+    @staticmethod
+    def parse_content_only_chunk(chunk: dict) -> str | None:
         if not ("choices" in chunk.keys()):
-            return False
+            return None
 
         choices = chunk.get("choices")
         if not isinstance(choices, list) or len(choices) != 1:
-            return False
+            return None
 
         choice = choices[0]
         if not isinstance(choice, dict) or set(choice.keys()) != {
-            "delta",
-            "index",
             "finish_reason",
+            "index",
+            "delta",
         }:
-            return False
-
-        delta = choice["delta"]
-        if not isinstance(delta, dict) or not set(delta.keys()).issubset(
-            {
-                "content",
-                "role",
-            }
-        ):
-            return False
+            return None
 
         finish_reason = choice["finish_reason"]
         if finish_reason:
-            return False
+            return None
 
-        return True
+        index = choice["index"]
+        if not isinstance(index, int) or index != 0:
+            return None
+
+        delta = choice["delta"]
+        if not isinstance(delta, dict) or set(delta.keys()) != {
+            "content",
+        }:
+            return None
+
+        content = delta["content"]
+        if not isinstance(content, str):
+            return None
+
+        return content
 
     @override
     async def on_stream_start(self) -> None:
@@ -96,11 +88,9 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_chunk(self, chunk: dict) -> None:
-        if self.match_cache_structure(chunk):
-            self.set_chunk_if_needed(chunk)
-            content = self.get_content(chunk)
-            if content:
-                self.buffer.append(content)
+        if content := self.parse_content_only_chunk(chunk):
+            self.cur_chunk = self.cur_chunk or chunk
+            self.buffer.append(content)
             if self.need_flush(content):
                 self.flush()
             else:
