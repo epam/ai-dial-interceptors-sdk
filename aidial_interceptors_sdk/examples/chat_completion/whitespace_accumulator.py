@@ -20,8 +20,10 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
     buffer: list[str] = []
 
     def flush(self) -> None:
-        assert self.cur_chunk is not None
-        _log.info(f"flushed {self.cur_chunks} chunks")
+        if self.cur_chunk is None:
+            return
+        if self.cur_chunks > 1:
+            _log.info(f"flushed {self.cur_chunks} chunks")
         self.last_send = time.perf_counter()
         content = "".join(self.buffer)
         self.set_content(self.cur_chunk, content)
@@ -50,7 +52,6 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
         if (choices := chunk.get("choices")) is None:
             return None
 
-        choices = chunk.get("choices")
         if not isinstance(choices, list) or len(choices) != 1:
             return None
 
@@ -95,9 +96,9 @@ class WhitespaceAccumulatorInterceptor(ChatCompletionInterceptor):
             else:
                 self.cur_chunks += 1
         else:
-            self.flush_if_needed()
+            self.flush()
             self.send_chunk(chunk)
 
     @override
     async def on_stream_end(self) -> None:
-        self.flush_if_needed()
+        self.flush()
