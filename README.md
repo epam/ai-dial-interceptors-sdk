@@ -128,6 +128,7 @@ They are provided solely as examples to demonstrate basic use cases of intercept
 |replicator:N|Generic|Calls the upstream N times and combines the N response into a single response. Could be useful for stabilization of model's output, since certain models aren't deterministic.|
 |cache|Generic|Caches incoming chat completion requests. **Not ready for production use. Use at your discretion**|
 |no-op|Generic|No-op interceptor - does not modify the request or the response, simply proxies the upstream|
+|whitespace-accumulator|Generic|Buffers whitespace-only stream chunks and flushes them together when non-whitespace content arrives or a timeout is reached to reduce streaming noise. Works only for the first response choice.|
 
 ### Embeddings interceptors
 

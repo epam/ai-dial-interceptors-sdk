@@ -25,6 +25,7 @@ from aidial_interceptors_sdk.examples.chat_completion import (
     ReplicatorInterceptor,
     SpacyAnonymizerInterceptor,
     StatisticsReporterInterceptor,
+    WhitespaceAccumulatorInterceptor,
 )
 from aidial_interceptors_sdk.examples.embeddings import (
     BlacklistedWordsInterceptor as EmbeddingsBlacklistedWordsInterceptor,
@@ -54,6 +55,7 @@ EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
         "cache": ChatCachingInterceptor,
         "langfuse": LangfuseInterceptor,
         "no-op": ChatCompletionNoOpInterceptor,
+        "whitespace-accumulator": WhitespaceAccumulatorInterceptor,
     },
     embeddings={
         "reject-blacklisted-words": EmbeddingsBlacklistedWordsInterceptor,
