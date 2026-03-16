@@ -17,7 +17,7 @@ def debug_logging(
     Callable[[_A], Awaitable[_B]],
 ]:
     def decorator(
-        func: Callable[[_A], Awaitable[_B]]
+        func: Callable[[_A], Awaitable[_B]],
     ) -> Callable[[_A], Awaitable[_B]]:
         if not _log.isEnabledFor(logging.DEBUG):
             return func

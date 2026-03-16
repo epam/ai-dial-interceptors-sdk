@@ -8,7 +8,7 @@ SRC = "."
 def format_with_args(session: nox.Session, *args):
     session.run("autoflake", *args)
     session.run("isort", *args)
-    session.run("black", *args)
+    session.run("black", "--fast", *args)
 
 
 @nox.session
