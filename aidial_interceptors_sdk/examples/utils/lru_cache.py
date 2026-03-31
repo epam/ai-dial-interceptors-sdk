@@ -1,5 +1,6 @@
 from collections import OrderedDict
-from typing import Generic, Hashable, Optional, TypeVar
+from collections.abc import Hashable
+from typing import Generic, TypeVar
 
 _K = TypeVar("_K", bound=Hashable)
 _V = TypeVar("_V")
@@ -10,7 +11,7 @@ class LRUCache(Generic[_K, _V]):
         self.cache: OrderedDict[_K, _V] = OrderedDict()
         self.maxsize: int = maxsize
 
-    def lookup(self, key: _K) -> Optional[_V]:
+    def lookup(self, key: _K) -> _V | None:
         if key in self.cache:
             self.cache.move_to_end(key)
             return self.cache[key]

@@ -1,5 +1,3 @@
-from typing import Type
-
 from aidial_sdk.embeddings import Embeddings
 from aidial_sdk.embeddings.request import Request
 from aidial_sdk.embeddings.response import Response
@@ -14,11 +12,10 @@ from aidial_interceptors_sdk.utils._reflection import call_with_extra_body
 
 
 def interceptor_to_embeddings(
-    cls: Type[EmbeddingsInterceptor],
+    cls: type[EmbeddingsInterceptor],
     dial_url: str,
     client_factory: HTTPClientFactory,
 ) -> Embeddings:
-
     class Impl(Embeddings):
         @dial_exception_decorator
         async def embeddings(self, request: Request) -> Response:

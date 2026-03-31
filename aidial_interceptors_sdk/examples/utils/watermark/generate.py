@@ -47,7 +47,6 @@ def _create_watermark_texture(
     font_size: int = 60,
     angle: int = 45,
 ) -> ImageObject:
-
     padded_size = int(size * math.sqrt(2))
     image_size = (padded_size, padded_size)
     background_color = (255, 255, 255, 0)

@@ -1,5 +1,3 @@
-from typing import List
-
 from aidial_sdk.exceptions import InvalidRequestError
 from typing_extensions import override
 
@@ -26,7 +24,7 @@ class BlacklistedWordsInterceptor(ChatCompletionInterceptor):
                 )
 
     @override
-    async def on_request_message(self, path, message: dict) -> List[dict]:
+    async def on_request_message(self, path, message: dict) -> list[dict]:
         content = message.get("content") or ""
         self._validate_content_in("request", content)
         return [message]

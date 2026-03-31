@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from aidial_sdk.chat_completion import ChatCompletion, Choice, Request, Response
 from aidial_sdk.exceptions import HTTPException as DialException

@@ -1,10 +1,5 @@
+from collections.abc import AsyncIterator, Awaitable, Callable
 from typing import (
-    AsyncIterator,
-    Awaitable,
-    Callable,
-    Dict,
-    List,
-    Tuple,
     TypeVar,
 )
 
@@ -42,15 +37,15 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
     n: int
 
     # Response data
-    content_stages: Dict[int, Stage] = {}
-    stage_index_mapper: IndexMapper[Tuple[int, int]] = IndexMapper()
+    content_stages: dict[int, Stage] = {}
+    stage_index_mapper: IndexMapper[tuple[int, int]] = IndexMapper()
 
     total_usage: UsageChunk = UsageChunk(0, 0, None)
-    finish_reasons: Dict[int, str] = {}
+    finish_reasons: dict[int, str] = {}
     role_sent: bool = False
     chunk_template: dict = {}
 
-    def _accumulate_usage(self, usage: Dict) -> None:
+    def _accumulate_usage(self, usage: dict) -> None:
         self.total_usage.prompt_tokens += usage.get("prompt_tokens") or 0
         self.total_usage.completion_tokens += (
             usage.get("completion_tokens") or 0
@@ -65,7 +60,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
                 self.response._queue,
                 0,
                 self.stage_index_mapper((response_idx, -1)),
-                f"{response_idx+1} | CONTENT",
+                f"{response_idx + 1} | CONTENT",
             )
             stage.open()
             self.content_stages[response_idx] = stage
@@ -93,12 +88,12 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
     @override
     async def on_response_stage(
         self, path: ElementPath, stage: dict
-    ) -> List[dict] | dict:
+    ) -> list[dict] | dict:
         assert path.stage_idx is not None
         assert isinstance(path.response_ctx, int)
 
         if name := stage.get("name"):
-            stage["name"] = f"{path.response_ctx+1} | {name}"
+            stage["name"] = f"{path.response_ctx + 1} | {name}"
 
         stage["index"] = self.stage_index_mapper(
             (path.response_ctx, path.stage_idx)
@@ -123,13 +118,12 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
                 self._get_content_stage(path).append_content(content)
                 message["content"] = ""
 
-            if cc := message.get("custom_content"):
-                if attachments := cc.get("attachments"):
-                    for attachment in attachments:
-                        self._get_content_stage(path).add_attachment(
-                            **attachment
-                        )
-                    del cc["attachments"]
+            if (cc := message.get("custom_content")) and (
+                attachments := cc.get("attachments")
+            ):
+                for attachment in attachments:
+                    self._get_content_stage(path).add_attachment(**attachment)
+                del cc["attachments"]
 
         return message
 
@@ -146,9 +140,8 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_response_usage(
-        self, usage: Dict | NotGiven | None
-    ) -> Dict | NotGiven | None:
-
+        self, usage: dict | NotGiven | None
+    ) -> dict | NotGiven | None:
         # TODO: combine statistics.usage_per_model
         if usage:
             self._accumulate_usage(usage)
@@ -197,7 +190,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
 _T = TypeVar("_T")
 
 
-async def _join_iterators(iters: List[AsyncIterator[_T]]) -> AsyncIterator[_T]:
+async def _join_iterators(iters: list[AsyncIterator[_T]]) -> AsyncIterator[_T]:
     async with aiostream.stream.merge(*iters).stream() as combine:
         async for item in combine:
             yield item

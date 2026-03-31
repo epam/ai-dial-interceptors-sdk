@@ -1,6 +1,6 @@
+import contextlib
 import functools
 import logging
-from typing import Dict
 
 from aidial_sdk.exceptions import HTTPException as DialException
 from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError
@@ -11,7 +11,7 @@ _log = logging.getLogger(__name__)
 def _parse_dial_exception(
     status_code: int,
     content: dict | str,
-    headers: Dict[str, str] | None = None,
+    headers: dict[str, str] | None = None,
 ):
     if (
         isinstance(content, dict)
@@ -76,10 +76,8 @@ def to_dial_exception(exc: Exception) -> DialException:
         # Streaming errors reported by `openai` library via this exception
         status_code: int = 500
         if exc.code:
-            try:
+            with contextlib.suppress(Exception):
                 status_code = int(exc.code)
-            except Exception:
-                pass
 
         return _parse_dial_exception(
             status_code=status_code,

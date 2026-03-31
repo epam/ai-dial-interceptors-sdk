@@ -1,5 +1,6 @@
 import logging
-from typing import Any, AsyncIterator, Callable, Optional, TypeVar
+from collections.abc import AsyncIterator, Callable
+from typing import Any, TypeVar
 
 from aidial_sdk.exceptions import HTTPException as DialException
 
@@ -20,13 +21,13 @@ _V = TypeVar("_V")
 async def materialize_streaming_errors(
     stream: AsyncIterator[dict],
 ) -> AsyncIterator[dict | DialException]:
-
     try:
         async for chunk in stream:
             yield chunk
     except Exception as e:
         _log.exception(
-            f"caught exception while streaming: {type(e).__module__}.{type(e).__name__}"
+            "caught exception while streaming: "
+            f"{type(e).__module__}.{type(e).__name__}"
         )
 
         yield to_dial_exception(e)
@@ -70,7 +71,7 @@ def block_response_to_streaming_chunk(response: dict) -> dict:
 
 
 async def map_stream(
-    func: Callable[[_T], Optional[_V]], iterator: AsyncIterator[_T]
+    func: Callable[[_T], _V | None], iterator: AsyncIterator[_T]
 ) -> AsyncIterator[_V]:
     async for item in iterator:
         new_item = func(item)

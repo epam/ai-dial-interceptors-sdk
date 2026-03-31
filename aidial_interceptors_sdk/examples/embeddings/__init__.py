@@ -7,3 +7,9 @@ from aidial_interceptors_sdk.examples.embeddings.normalize_vector import (
 from aidial_interceptors_sdk.examples.embeddings.project_vector import (
     ProjectVectorInterceptor,
 )
+
+__all__ = [
+    "BlacklistedWordsInterceptor",
+    "NormalizeVectorInterceptor",
+    "ProjectVectorInterceptor",
+]

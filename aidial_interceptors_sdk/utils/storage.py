@@ -1,6 +1,6 @@
 import io
 import logging
-from typing import Mapping
+from collections.abc import Mapping
 from urllib.parse import urljoin
 
 import httpx

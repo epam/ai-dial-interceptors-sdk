@@ -1,4 +1,5 @@
-from typing import Awaitable, Callable, List, TypeVar, overload
+from collections.abc import Awaitable, Callable
+from typing import TypeVar, overload
 
 from aidial_interceptors_sdk.utils.not_given import NOT_GIVEN, NotGiven
 
@@ -115,7 +116,7 @@ async def traverse_required_dict_value(
 async def traverse_list(
     create_elem_path: Callable[[int], P],
     lst: NotGiven,
-    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
+    on_elem: Callable[[P, T], Awaitable[list[T] | T]],
 ) -> NotGiven: ...
 
 
@@ -123,27 +124,27 @@ async def traverse_list(
 async def traverse_list(
     create_elem_path: Callable[[int], P],
     lst: None,
-    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
+    on_elem: Callable[[P, T], Awaitable[list[T] | T]],
 ) -> None: ...
 
 
 @overload
 async def traverse_list(
     create_elem_path: Callable[[int], P],
-    lst: List[T],
-    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
-) -> List[T]: ...
+    lst: list[T],
+    on_elem: Callable[[P, T], Awaitable[list[T] | T]],
+) -> list[T]: ...
 
 
 async def traverse_list(
     create_elem_path: Callable[[int], P],
-    lst: List[T] | NotGiven | None,
-    on_elem: Callable[[P, T], Awaitable[List[T] | T]],
-) -> List[T] | NotGiven | None:
+    lst: list[T] | NotGiven | None,
+    on_elem: Callable[[P, T], Awaitable[list[T] | T]],
+) -> list[T] | NotGiven | None:
     if lst is None or isinstance(lst, NotGiven):
         return lst
 
-    ret: List[T] = []
+    ret: list[T] = []
     for idx, elem in enumerate(lst):
         idx = elem.get("index", idx) if isinstance(elem, dict) else idx
         elem = await on_elem(create_elem_path(idx), elem)

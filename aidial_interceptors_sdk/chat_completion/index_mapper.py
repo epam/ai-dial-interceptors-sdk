@@ -1,4 +1,5 @@
-from typing import Dict, Generic, Hashable, Set, TypeVar
+from collections.abc import Hashable
+from typing import Generic, TypeVar
 
 from aidial_sdk.pydantic_v1 import BaseModel
 
@@ -10,8 +11,8 @@ class IndexMapper(BaseModel, Generic[_Index]):
     Used to maintain consistent mapping between indexed values in the incoming and outgoing streams, given that outgoing stream may include additional elements at fixed indices.
     """
 
-    migrated: Dict[_Index, int] = {}
-    used_indices: Set[int] = set()
+    migrated: dict[_Index, int] = {}
+    used_indices: set[int] = set()
 
     fresh_index: int = 0
 

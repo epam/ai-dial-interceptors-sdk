@@ -1,5 +1,5 @@
 import itertools
-from typing import Iterable
+from collections.abc import Iterable
 
 import pytest
 from openai.types.chat.chat_completion import ChatCompletion

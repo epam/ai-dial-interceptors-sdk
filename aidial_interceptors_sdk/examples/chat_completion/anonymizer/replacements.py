@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Dict
 
 from pydantic import BaseModel
 
@@ -7,12 +6,12 @@ from aidial_interceptors_sdk.examples.utils.markdown import MarkdownTable
 
 
 class Replacements(BaseModel):
-    replacements: Dict[str, str] = {}
+    replacements: dict[str, str] = {}
     """
     Map from an original value to its anonymized replacement in a text
     """
 
-    indices: Dict[str, int] = defaultdict(int)
+    indices: dict[str, int] = defaultdict(int)
 
     def get_replacement(self, entity: str, original_text: str) -> str:
         if original_text not in self.replacements:

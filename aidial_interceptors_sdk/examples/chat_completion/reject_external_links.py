@@ -1,4 +1,3 @@
-from typing import List
 from urllib.parse import urljoin
 
 from aidial_sdk.exceptions import InvalidRequestError
@@ -11,7 +10,7 @@ from aidial_interceptors_sdk.chat_completion.base import (
 
 class RejectExternalLinksInterceptor(ChatCompletionInterceptor):
     @override
-    async def on_request_attachment(self, path, attachment: dict) -> List[dict]:
+    async def on_request_attachment(self, path, attachment: dict) -> list[dict]:
         url = attachment.get("url")
         if url is None:
             return [attachment]

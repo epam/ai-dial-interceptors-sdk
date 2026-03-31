@@ -1,5 +1,3 @@
-from typing import List
-
 from aidial_sdk.chat_completion import Request
 
 from aidial_interceptors_sdk.chat_completion.element_path import ElementPath
@@ -17,10 +15,10 @@ class RequestHandler(RequestMessageHandler):
 
     async def on_request_message(
         self, path: ElementPath, message: dict
-    ) -> List[dict]:
+    ) -> list[dict]:
         return [message]
 
-    async def on_request_messages(self, messages: List[dict]) -> List[dict]:
+    async def on_request_messages(self, messages: list[dict]) -> list[dict]:
         return messages
 
     async def on_request(self, request: dict) -> dict:
@@ -29,13 +27,13 @@ class RequestHandler(RequestMessageHandler):
     async def traverse_request(self, r: dict) -> dict:
         async def traverse_message(
             path: ElementPath, message: dict
-        ) -> List[dict]:
+        ) -> list[dict]:
             message = await self.traverse_request_message(path, message)
             return await self.on_request_message(path, message)
 
         async def traverse_messages(
-            path: ElementPath, messages: List[dict]
-        ) -> List[dict]:
+            path: ElementPath, messages: list[dict]
+        ) -> list[dict]:
             messages = await traverse_list(
                 path.with_message_idx, messages, traverse_message
             )
