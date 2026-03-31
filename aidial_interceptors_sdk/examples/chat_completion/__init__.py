@@ -31,3 +31,17 @@ from aidial_interceptors_sdk.examples.chat_completion.statistics_reporter import
 from aidial_interceptors_sdk.examples.chat_completion.whitespace_accumulator import (
     WhitespaceAccumulatorInterceptor,
 )
+
+__all__ = [
+    "BlacklistedWordsInterceptor",
+    "CachingInterceptor",
+    "GoogleDLPAnonymizerInterceptor",
+    "ImageWatermarkInterceptor",
+    "LangfuseInterceptor",
+    "SpacyAnonymizerInterceptor",
+    "PirateInterceptor",
+    "RejectExternalLinksInterceptor",
+    "ReplicatorInterceptor",
+    "StatisticsReporterInterceptor",
+    "WhitespaceAccumulatorInterceptor",
+]

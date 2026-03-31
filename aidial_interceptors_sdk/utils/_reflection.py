@@ -1,5 +1,6 @@
 import inspect
-from typing import Any, Awaitable, Callable, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import Any, TypeVar
 
 from aidial_sdk.exceptions import InvalidRequestError
 
@@ -34,7 +35,8 @@ async def call_with_extra_body(
 
 def _has_kwargs_argument(func: Callable[..., Awaitable[Any]]) -> bool:
     """
-    Determines if the given function accepts a variable keyword argument (**kwargs).
+    Determines if the given function accepts
+    a variable keyword argument (**kwargs).
     """
     signature = inspect.signature(func)
     for param in signature.parameters.values():

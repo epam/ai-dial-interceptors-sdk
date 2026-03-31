@@ -1,5 +1,3 @@
-from typing import List
-
 from typing_extensions import override
 
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
@@ -9,7 +7,7 @@ from aidial_interceptors_sdk.examples.utils.embedding_encoding import (
 )
 
 
-def project(vec: List[float], dim: int) -> List[float]:
+def project(vec: list[float], dim: int) -> list[float]:
     diff = dim - len(vec)
     if diff == 0:
         return vec
@@ -24,8 +22,8 @@ class ProjectVectorInterceptor(EmbeddingsInterceptor):
 
     @override
     async def modify_embedding(
-        self, embedding: str | List[float]
-    ) -> str | List[float]:
+        self, embedding: str | list[float]
+    ) -> str | list[float]:
         if isinstance(embedding, str):
             vec = base64_to_vector(embedding)
             vec = project(vec, self.dim)

@@ -1,5 +1,5 @@
 import itertools
-from typing import Iterable
+from collections.abc import Iterable
 
 import pytest
 from aidial_sdk.chat_completion import Choice, Request, Response

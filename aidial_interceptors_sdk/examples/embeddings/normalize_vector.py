@@ -1,5 +1,3 @@
-from typing import List
-
 from typing_extensions import override
 
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
@@ -9,7 +7,7 @@ from aidial_interceptors_sdk.examples.utils.embedding_encoding import (
 )
 
 
-def normalize(vec: List[float]) -> List[float]:
+def normalize(vec: list[float]) -> list[float]:
     norm = sum(x**2 for x in vec) ** 0.5
     return [x / norm for x in vec]
 
@@ -17,8 +15,8 @@ def normalize(vec: List[float]) -> List[float]:
 class NormalizeVectorInterceptor(EmbeddingsInterceptor):
     @override
     async def modify_embedding(
-        self, embedding: str | List[float]
-    ) -> str | List[float]:
+        self, embedding: str | list[float]
+    ) -> str | list[float]:
         if isinstance(embedding, str):
             vec = base64_to_vector(embedding)
             vec = normalize(vec)

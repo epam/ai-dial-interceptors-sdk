@@ -5,7 +5,7 @@ to be moved eventually to the SDK itself.
 
 import json
 import logging
-from typing import Type, TypeVar
+from typing import TypeVar
 
 import pydantic
 from aidial_sdk.chat_completion import Request, Response
@@ -48,9 +48,8 @@ _T = TypeVar("_T", bound=BaseModel)
 
 
 def parse_interceptor_configuration(
-    request: Request, cls: Type[_T] | None
+    request: Request, cls: type[_T] | None
 ) -> _T | None:
-
     config: dict | None = None
     if cf := request.custom_fields:
         config = cf.dict().get(_CONFIGURATION_KEY)
@@ -74,4 +73,4 @@ def parse_interceptor_configuration(
                 path = ".".join(map(str, error["loc"]))
                 msg = f"Invalid request. Path: 'custom_fields.{_CONFIGURATION_KEY}.{path}', error: {decapitalize(error['msg'])}"
 
-                raise RequestValidationError(msg)
+                raise RequestValidationError(msg) from None

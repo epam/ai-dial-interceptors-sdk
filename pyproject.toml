@@ -42,11 +42,7 @@ pytest-dotenv = "0.5.2"
 python-dotenv = "1.0.0"
 
 [tool.poetry.group.lint.dependencies]
-pyright = "1.1.324"
-black = "26.3.1"
-isort = "5.12.0"
-autoflake = "2.2.0"
-flake8 = "6.0.0"
+ruff = "0.12.11"
 
 [tool.poetry.group.dev.dependencies]
 nox = "2023.4.22"
@@ -67,27 +63,34 @@ filterwarnings = [
 typeCheckingMode = "basic"
 reportUnusedVariable = "error"
 reportIncompatibleMethodOverride = "error"
-exclude = [".git", ".venv", ".nox", "**/__pycache__"]
 
-[tool.black]
+[tool.ruff]
+target-version = "py311"
 line-length = 80
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | \.nox
-  | \.__pycache__
-)/
-'''
 
-[tool.isort]
-line_length = 80
-profile = "black"
+[tool.ruff.lint]
+select = [
+    "ERA",  # flake8-eradicate
+    "B",    # flake8-builtins
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "B9",   # flake8-bugbear
+    "E",    # pycodestyle
+    "W",    # pycodestyle
+    "F",    # pyflakes
+    "I",    # flake8-isort
+    "S",    # flake8-bandit
+    "FURB", # refurb
+    "UP",   #  pyupgrade
+]
+ignore = [
+    "E501", # string literal is too long
+    "S101", # Use of `assert` detected
+]
 
-[tool.autoflake]
-ignore_init_module_imports = true
-remove_all_unused_imports = true
-in_place = true
-recursive = true
-quiet = true
-exclude = ["\\.venv", "\\.nox"]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "B011", # Do not `assert False`
+    "B006", # Do not use mutable data structures for argument defaults
+    "B008", # Do not perform function call in argument defaults
+]

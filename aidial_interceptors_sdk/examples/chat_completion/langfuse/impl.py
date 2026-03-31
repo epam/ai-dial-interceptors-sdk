@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 import httpx
 from aidial_sdk.utils.merge_chunks import merge
@@ -27,7 +26,7 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     request_deployment_id: str = ""
     request_model: str = ""
     merged_response_message = {}
-    start_time: Optional[datetime]
+    start_time: datetime | None
     x_conversation_id: str = ""
 
     @override

@@ -1,7 +1,8 @@
 import functools
 import json
 import logging
-from typing import Awaitable, Callable, TypeVar
+from collections.abc import Awaitable, Callable
+from typing import TypeVar
 
 _log = logging.getLogger(__name__)
 

@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from aidial_sdk.pydantic_v1 import BaseModel
 from langfuse import Langfuse
@@ -14,7 +13,7 @@ class LangfuseClient(BaseModel):
     deployment_id: str = ""
     start_time: datetime
     end_time: datetime
-    user_id: Optional[str]
+    user_id: str | None
     metadata: dict = {}
     is_model: bool
 

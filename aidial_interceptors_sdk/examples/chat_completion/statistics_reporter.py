@@ -1,6 +1,5 @@
 import time
 from collections import defaultdict
-from typing import Dict, List
 
 from aidial_sdk.chat_completion import Stage
 from aidial_sdk.pydantic_v1 import BaseModel
@@ -40,12 +39,12 @@ class StatisticsReporterInterceptor(ChatCompletionInterceptor):
     prompt_tokens: int = 0
     completion_tokens: int = 0
 
-    usage_per_model: List[UsagePerModel] = []
+    usage_per_model: list[UsagePerModel] = []
 
     # Per-choice response data
-    finish_reasons: Dict[int, str] = {}
-    statistics_stages: Dict[int, Stage] = {}
-    content_lengths: Dict[int, int] = defaultdict(int)
+    finish_reasons: dict[int, str] = {}
+    statistics_stages: dict[int, Stage] = {}
+    content_lengths: dict[int, int] = defaultdict(int)
 
     @override
     async def on_response_usage(
@@ -73,10 +72,10 @@ class StatisticsReporterInterceptor(ChatCompletionInterceptor):
             and path.choice_idx is not None
             and (stage := self.statistics_stages.get(path.choice_idx))
             is not None
+            and (content := message.get("content")) is not None
         ):
-            if (content := message.get("content")) is not None:
-                stage.append_content(f"`{content or '∅'}`║")
-                self.content_lengths[path.choice_idx] += len(content)
+            stage.append_content(f"`{content or '∅'}`║")
+            self.content_lengths[path.choice_idx] += len(content)
         return message
 
     def _collect_data_points(self, chunk: dict) -> None:

@@ -1,5 +1,4 @@
 import json
-from typing import Type
 
 import httpx
 import openai
@@ -33,8 +32,8 @@ def stream(request):
 
 
 def create_configurable_interceptor(
-    conf_cls: Type[BaseModel] | None,
-) -> Type[ChatCompletionInterceptor]:
+    conf_cls: type[BaseModel] | None,
+) -> type[ChatCompletionInterceptor]:
     class _Impl(ChatCompletionInterceptor):
         @classmethod
         async def configuration_schema(cls):

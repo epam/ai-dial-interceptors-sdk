@@ -1,15 +1,13 @@
-from typing import Dict, List, Tuple
-
 import pytest
 
 from aidial_interceptors_sdk.examples.chat_completion.pii_anonymiser.anonymizer import (
     SpacyAnonymizer,
 )
 
-Replacements = Dict[str, str]
-TestCase = Tuple[str, Replacements]
+Replacements = dict[str, str]
+TestCase = tuple[str, Replacements]
 
-test_cases: List[TestCase] = [
+test_cases: list[TestCase] = [
     (
         "My name is Adam. Paul is your name. My friend's name is Paul too.",
         {"Adam": "[PERSON-1]", "Paul": "[PERSON-2]"},

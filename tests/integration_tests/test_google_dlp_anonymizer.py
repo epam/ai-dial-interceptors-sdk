@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, List
 
 import pytest
 
@@ -21,10 +20,10 @@ class TestCase:
 
     original_text: str
     anonymized_text: str
-    replacements: Dict[str, str]
+    replacements: dict[str, str]
 
 
-test_cases: List[TestCase] = [
+test_cases: list[TestCase] = [
     TestCase(
         "My name is Adam. Paul is your name. My friend's name is Paul too. My lastname is Smith",
         "My name is [FIRST_NAME-1]. [FIRST_NAME-2] is your name. My friend's name is [FIRST_NAME-2] too. My lastname is [LAST_NAME-1]",

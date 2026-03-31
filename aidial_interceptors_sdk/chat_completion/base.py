@@ -1,4 +1,5 @@
-from typing import AsyncIterator, Awaitable, Callable, Type, TypeVar
+from collections.abc import AsyncIterator, Awaitable, Callable
+from typing import TypeVar
 
 from aidial_sdk.exceptions import HTTPException as DialException
 from pydantic import BaseModel
@@ -27,10 +28,10 @@ class ChatCompletionInterceptor(RequestHandler, ResponseHandler):
     configuration: BaseModel | None
 
     @classmethod
-    async def configuration_schema(cls) -> Type[BaseModel] | None:
+    async def configuration_schema(cls) -> type[BaseModel] | None:
         return None
 
-    def get_configuration(self, cls: Type[_T]) -> _T:
+    def get_configuration(self, cls: type[_T]) -> _T:
         if self.configuration is None:
             raise ValueError("Can't find interceptor configuration")
 

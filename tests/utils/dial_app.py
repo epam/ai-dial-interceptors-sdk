@@ -1,5 +1,6 @@
 import asyncio
-from typing import Any, Callable, List, Literal, Tuple, Type, assert_never
+from collections.abc import Callable
+from typing import Any, Literal, assert_never
 
 import httpx
 import openai
@@ -21,19 +22,19 @@ from aidial_interceptors_sdk.examples.app_factory import create_app
 from aidial_interceptors_sdk.examples.registry import Interceptors
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 
-CustomEndpoint = Tuple[
+CustomEndpoint = tuple[
     Literal["embeddings", "chat/completions"], Callable[..., Any]
 ]
 
 AppEndpoint = (
-    Type[ChatCompletionInterceptor]
-    | Type[EmbeddingsInterceptor]
+    type[ChatCompletionInterceptor]
+    | type[EmbeddingsInterceptor]
     | ChatCompletion
     | Embeddings
     | CustomEndpoint
 )
 
-AppEndpoints = List[Tuple[str, AppEndpoint]]
+AppEndpoints = list[tuple[str, AppEndpoint]]
 
 
 def add_endpoints(
@@ -96,7 +97,7 @@ def create_recursive_app(endpoints: AppEndpoints) -> DIALApp:
 
 
 def create_openai_client(
-    endpoints: AppEndpoints, upstreams: List[str]
+    endpoints: AppEndpoints, upstreams: list[str]
 ) -> openai.AzureOpenAI:
     dial_app = create_recursive_app(endpoints)
     http_client = TestClient(dial_app)
@@ -115,7 +116,7 @@ def create_openai_client(
 
 
 def create_httpx_client(
-    endpoints: AppEndpoints, upstreams: List[str]
+    endpoints: AppEndpoints, upstreams: list[str]
 ) -> httpx.AsyncClient:
     dial_app = create_recursive_app(endpoints)
     http_client = TestClient(dial_app)

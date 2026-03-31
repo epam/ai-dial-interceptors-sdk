@@ -1,6 +1,7 @@
-from typing import Any, Callable, List, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
-Path = List[str | int]
+Path = list[str | int]
 PathLike = Path | str
 
 
@@ -150,7 +151,7 @@ def get_at_path(obj: Any, path: PathLike) -> Any:
     return None if values == [] else values[-1]
 
 
-def collect_at_path(obj: Any, path: PathLike) -> List[Any]:
+def collect_at_path(obj: Any, path: PathLike) -> list[Any]:
     ret = []
 
     def fn(path, value):

@@ -12,7 +12,6 @@ from aidial_interceptors_sdk.examples.utils.watermark.stamp import (
 
 
 class ImageWatermarkInterceptor(ChatCompletionInterceptor):
-
     @override
     async def on_response_attachment(self, path, attachment: dict) -> dict:
         ty = attachment.get("type")
@@ -43,7 +42,7 @@ class ImageWatermarkInterceptor(ChatCompletionInterceptor):
             except Exception:
                 raise InvalidRequestError(
                     "Attachment data isn't base64 encoded",
-                )
+                ) from None
 
             bytes = stamp_watermark(bytes, format)
             attachment = {

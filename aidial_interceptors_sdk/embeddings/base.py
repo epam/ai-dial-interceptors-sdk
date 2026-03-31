@@ -1,6 +1,5 @@
 import logging
 from abc import ABC
-from typing import List
 
 from aidial_sdk.pydantic_v1 import BaseModel
 
@@ -19,8 +18,8 @@ class EmbeddingsInterceptor(ABC, BaseModel):
         return input
 
     async def modify_embedding(
-        self, embedding: str | List[float]
-    ) -> str | List[float]:
+        self, embedding: str | list[float]
+    ) -> str | list[float]:
         return embedding
 
     async def modify_request(self, request: dict) -> dict:

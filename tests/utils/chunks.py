@@ -1,5 +1,6 @@
 import json
-from typing import Any, Mapping
+from collections.abc import Mapping
+from typing import Any
 
 from tests.utils.json import Check, has_type, match_objects
 
@@ -43,9 +44,9 @@ def create_chunk_checker(
 def _data_prefix_checker(expected):
     def _check(path: str, string: Any):
         assert isinstance(string, str)
-        assert string.startswith(
-            "data: "
-        ), f"Invalid data entry in SSE stream: {string!r}"
+        assert string.startswith("data: "), (
+            f"Invalid data entry in SSE stream: {string!r}"
+        )
         string = string.removeprefix("data: ")
 
         if string == "[DONE]":
@@ -54,9 +55,9 @@ def _data_prefix_checker(expected):
             try:
                 actual = json.loads(string)
             except Exception:
-                assert (
-                    False
-                ), f"The data entry in SSE stream isn't a valid JSON: {string!r}"
+                assert False, (
+                    f"The data entry in SSE stream isn't a valid JSON: {string!r}"
+                )
 
         match_objects(actual, expected, path)
 

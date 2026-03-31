@@ -1,4 +1,5 @@
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 Check = Callable[[str, Any], None]
 
@@ -9,9 +10,9 @@ def _print_type(ty: type) -> str:
 
 def has_type(ty: type) -> Check:
     def _check(path: str, value: Any):
-        assert isinstance(
-            value, ty
-        ), f"The value is not of the {_print_type(ty)!r} type: {value!r}"
+        assert isinstance(value, ty), (
+            f"The value is not of the {_print_type(ty)!r} type: {value!r}"
+        )
 
     return _check
 
@@ -28,9 +29,9 @@ def memorize(check: Check) -> Check:
             first_value = value
             first_path = path
         else:
-            assert (
-                first_value == value
-            ), f"The first value and the given value isn't the same: {first_value!r} @ {first_path!r} != {value!r} @ {path!r}"
+            assert first_value == value, (
+                f"The first value and the given value isn't the same: {first_value!r} @ {first_path!r} != {value!r} @ {path!r}"
+            )
 
     return _check
 
@@ -51,41 +52,41 @@ class MatchingException(Exception):
 def _match_objects(path: str, actual: Any, expected: Any) -> None:
     try:
         if isinstance(expected, dict):
-            assert isinstance(
-                actual, dict
-            ), f"The actual value is not a dict: {_print_type(type(actual))!r}"
+            assert isinstance(actual, dict), (
+                f"The actual value is not a dict: {_print_type(type(actual))!r}"
+            )
 
             a_keys = set(actual.keys())
             e_keys = set(expected.keys())
             a_only_keys = a_keys - e_keys
             e_only_keys = e_keys - a_keys
 
-            assert (
-                not a_only_keys and not e_only_keys
-            ), f"The keys present only in the actual value: {a_only_keys}. The keys present only in the expected value: {e_only_keys}."
+            assert not a_only_keys and not e_only_keys, (
+                f"The keys present only in the actual value: {a_only_keys}. The keys present only in the expected value: {e_only_keys}."
+            )
 
             for k, v in expected.items():
                 _match_objects(f"{path}.{k}", actual[k], v)
 
         elif isinstance(expected, tuple):
-            assert isinstance(
-                actual, tuple
-            ), f"The actual value is not a tuple: {_print_type(type(actual))}"
-            assert (e_len := len(expected)) == (
-                a_len := len(actual)
-            ), f"The expected length is not matching with actual length: {e_len} != {a_len}"
+            assert isinstance(actual, tuple), (
+                f"The actual value is not a tuple: {_print_type(type(actual))}"
+            )
+            assert (e_len := len(expected)) == (a_len := len(actual)), (
+                f"The expected length is not matching with actual length: {e_len} != {a_len}"
+            )
 
             for i in range(len(expected)):
                 _match_objects(f"{path}[{i}]", actual[i], expected[i])
 
         elif isinstance(expected, list):
-            assert isinstance(
-                actual, list
-            ), f"The actual value is not a list: {_print_type(type(actual))}"
+            assert isinstance(actual, list), (
+                f"The actual value is not a list: {_print_type(type(actual))}"
+            )
 
-            assert (e_len := len(expected)) == (
-                a_len := len(actual)
-            ), f"The expected length is not matching with actual length: {e_len} != {a_len}"
+            assert (e_len := len(expected)) == (a_len := len(actual)), (
+                f"The expected length is not matching with actual length: {e_len} != {a_len}"
+            )
 
             for i in range(len(expected)):
                 _match_objects(f"{path}[{i}]", actual[i], expected[i])
@@ -94,9 +95,9 @@ def _match_objects(path: str, actual: Any, expected: Any) -> None:
             expected(path, actual)
 
         else:
-            assert (
-                expected == actual
-            ), f"The expected value is mismatching the actual value: {actual!r} != {expected!r}"
+            assert expected == actual, (
+                f"The expected value is mismatching the actual value: {actual!r} != {expected!r}"
+            )
 
     except AssertionError as e:
         raise MatchingException(path=path, msg=str(e)) from e

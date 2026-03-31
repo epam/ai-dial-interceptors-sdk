@@ -1,5 +1,3 @@
-from typing import Type
-
 from aidial_sdk.pydantic_v1 import BaseModel
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -37,8 +35,8 @@ from aidial_interceptors_sdk.examples.embeddings import (
 
 
 class Interceptors(BaseModel):
-    chat_completions: dict[str, Type[ChatCompletionInterceptor]] = {}
-    embeddings: dict[str, Type[EmbeddingsInterceptor]] = {}
+    chat_completions: dict[str, type[ChatCompletionInterceptor]] = {}
+    embeddings: dict[str, type[EmbeddingsInterceptor]] = {}
 
 
 EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(

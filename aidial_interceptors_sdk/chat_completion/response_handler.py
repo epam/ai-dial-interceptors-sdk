@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from aidial_sdk.chat_completion import Response
 from aidial_sdk.chat_completion.chunks import BaseChunk
 from aidial_sdk.pydantic_v1 import PrivateAttr
@@ -52,7 +50,7 @@ class ResponseHandler(ResponseMessageHandler):
     # NOTE: `_stage_indices = {}` isn't going to work, since
     # the underscored field `_stage_indices` will be shared across
     # all instances of the class.
-    _stage_indices: Dict[int, IndexMapper[int]] = PrivateAttr({})
+    _stage_indices: dict[int, IndexMapper[int]] = PrivateAttr({})
 
     def _get_stage_index_mapper(self, choice_idx: int) -> IndexMapper[int]:
         if choice_idx not in self._stage_indices:
@@ -77,12 +75,12 @@ class ResponseHandler(ResponseMessageHandler):
 
     async def on_response_choice(
         self, path: ElementPath, choice: dict
-    ) -> List[dict] | dict:
+    ) -> list[dict] | dict:
         return choice
 
     async def on_response_choices(
-        self, choices: List[dict] | NotGiven | None
-    ) -> List[dict] | NotGiven | None:
+        self, choices: list[dict] | NotGiven | None
+    ) -> list[dict] | NotGiven | None:
         return choices
 
     # TODO: add path to the signature and to the rest of similar methods
@@ -106,7 +104,7 @@ class ResponseHandler(ResponseMessageHandler):
 
         async def traverse_choice(
             path: ElementPath, choice: dict
-        ) -> List[dict] | dict:
+        ) -> list[dict] | dict:
             choice = await traverse_dict_value(
                 path, choice, "finish_reason", self.on_response_finish_reason
             )
@@ -116,8 +114,8 @@ class ResponseHandler(ResponseMessageHandler):
             return await self.on_response_choice(path, choice)
 
         async def traverse_choices(
-            path: ElementPath, choices: List[dict] | NotGiven | None
-        ) -> List[dict] | NotGiven | None:
+            path: ElementPath, choices: list[dict] | NotGiven | None
+        ) -> list[dict] | NotGiven | None:
             def with_choice_ctx(choice_idx: int) -> ElementPath:
                 return path.with_choice_ctx(
                     ChoiceContext(

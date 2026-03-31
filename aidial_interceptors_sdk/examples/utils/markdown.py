@@ -1,22 +1,22 @@
 import re
-from typing import Any, List
+from typing import Any
 
 from aidial_sdk.pydantic_v1 import BaseModel
 
 
 class MarkdownTable(BaseModel):
     title: str | None = None
-    headers: List[Any]
-    rows: List[List[Any]] = []
+    headers: list[Any]
+    rows: list[list[Any]] = []
 
-    def add_row(self, row: List[Any]) -> None:
+    def add_row(self, row: list[Any]) -> None:
         if len(row) != len(self.headers):
             raise ValueError(
                 f"Number of headers ({len(self.headers)}) does not match number of cells in a row ({len(row)})"
             )
         self.rows.append(row)
 
-    def add_rows(self, *rows: List[Any]) -> None:
+    def add_rows(self, *rows: list[Any]) -> None:
         for row in rows:
             self.add_row(row)
 

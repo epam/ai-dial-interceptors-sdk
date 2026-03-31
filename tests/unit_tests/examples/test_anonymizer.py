@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Dict, List
 
 import pytest
 
@@ -15,9 +14,9 @@ from aidial_interceptors_sdk.examples.chat_completion.anonymizer.replacements im
 @dataclass
 class AnonTestCase:
     __test__ = False
-    entities: List[str]
+    entities: list[str]
     input: str
-    expected: List[str | int]
+    expected: list[str | int]
 
 
 @pytest.mark.parametrize(
@@ -42,10 +41,10 @@ def test_parse_anonymized_string(test: AnonTestCase):
 @dataclass
 class ReplTestCase:
     __test__ = False
-    entities: List[str]
+    entities: list[str]
     original: str
     anonymized: str
-    expected: Dict[str, str] | None
+    expected: dict[str, str] | None
 
 
 @pytest.mark.parametrize(

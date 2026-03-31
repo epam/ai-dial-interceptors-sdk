@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import List
 
 from aidial_sdk.pydantic_v1 import BaseModel
 
@@ -27,7 +26,7 @@ class Replacement(BaseModel):
         return None
 
 
-def parse_anonymized_string(entities: List[str], s: str) -> List[str | int]:
+def parse_anonymized_string(entities: list[str], s: str) -> list[str | int]:
     ret = []
 
     def _append(x: str | int):
@@ -59,7 +58,7 @@ def parse_anonymized_string(entities: List[str], s: str) -> List[str | int]:
 
 def create_indexed_replacements(
     replacements: Replacements,
-    entities: List[str],
+    entities: list[str],
     original: str,
     anonymized: str,
 ) -> Replacements | None:
@@ -88,7 +87,9 @@ def create_indexed_replacements(
         )
         return None
 
-    for original_text, entity_index in zip(groups, entity_indices):
+    for original_text, entity_index in zip(
+        groups, entity_indices, strict=False
+    ):
         replacements.get_replacement(entities[entity_index], original_text)
 
     return replacements

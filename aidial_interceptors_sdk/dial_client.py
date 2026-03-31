@@ -1,4 +1,4 @@
-from typing import Mapping
+from collections.abc import Mapping
 
 from aidial_sdk.exceptions import InvalidRequestError
 from aidial_sdk.pydantic_v1 import BaseModel

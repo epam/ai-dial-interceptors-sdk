@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, List
 
 from aidial_sdk.chat_completion import Stage
 from typing_extensions import override
@@ -16,14 +15,13 @@ from .replacements import Replacements
 
 
 class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
-
     # Request data
     request_n: int = 0
     anonymized_request: str = ""
 
     # Per-choice response data
-    original_response_stages: Dict[int, Stage] = {}
-    content_buffers: Dict[int, str] = defaultdict(str)
+    original_response_stages: dict[int, Stage] = {}
+    content_buffers: dict[int, str] = defaultdict(str)
 
     replacements: Replacements = Replacements()
 
@@ -32,7 +30,7 @@ class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
         pass
 
     @override
-    async def on_request_messages(self, messages: List[dict]) -> List[dict]:
+    async def on_request_messages(self, messages: list[dict]) -> list[dict]:
         # Collect replacement dictionary first across all messages
         anonymizer = self.get_anonymizer()
         for message in messages:
@@ -92,8 +90,8 @@ class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
 
     @override
     async def on_response_choice(
-        self, path: ElementPath, choice: Dict
-    ) -> List[Dict] | Dict:
+        self, path: ElementPath, choice: dict
+    ) -> list[dict] | dict:
         # NOTE: re-chunking invalidates streaming usage reported by the upstream model
         choice_idx = path.choice_idx
         assert choice_idx is not None

@@ -3,7 +3,6 @@ Callbacks to handle messages in the chat completion request.
 """
 
 from abc import ABC
-from typing import List
 
 from aidial_sdk.pydantic_v1 import BaseModel
 
@@ -21,17 +20,17 @@ class RequestMessageHandler(ABC, BaseModel):
 
     async def on_request_stage(
         self, path: ElementPath, stage: dict
-    ) -> List[dict] | dict:
+    ) -> list[dict] | dict:
         return stage
 
     async def on_request_stages(
-        self, path: ElementPath, stages: List[dict] | NotGiven | None
-    ) -> List[dict] | NotGiven | None:
+        self, path: ElementPath, stages: list[dict] | NotGiven | None
+    ) -> list[dict] | NotGiven | None:
         return stages
 
     async def on_request_attachment(
         self, path: ElementPath, attachment: dict
-    ) -> List[dict] | dict:
+    ) -> list[dict] | dict:
         """
         Applied to individual attachments: every message and stage attachment
         """
@@ -39,8 +38,8 @@ class RequestMessageHandler(ABC, BaseModel):
         return attachment
 
     async def on_request_attachments(
-        self, path: ElementPath, attachments: List[dict] | NotGiven | None
-    ) -> List[dict] | NotGiven | None:
+        self, path: ElementPath, attachments: list[dict] | NotGiven | None
+    ) -> list[dict] | NotGiven | None:
         """
         Applied to list of attachments: message attachments and stage attachments
         """
@@ -59,10 +58,9 @@ class RequestMessageHandler(ABC, BaseModel):
     async def traverse_request_message(
         self, path: ElementPath, message: dict
     ) -> dict:
-
         async def apply_on_attachments(
-            path: ElementPath, attachments: List[dict] | NotGiven | None
-        ) -> List[dict] | NotGiven | None:
+            path: ElementPath, attachments: list[dict] | NotGiven | None
+        ) -> list[dict] | NotGiven | None:
             attachments = await traverse_list(
                 path.with_attachment_idx,
                 attachments,
@@ -72,7 +70,7 @@ class RequestMessageHandler(ABC, BaseModel):
 
         async def apply_on_stage(
             path: ElementPath, stage: dict
-        ) -> List[dict] | dict:
+        ) -> list[dict] | dict:
             stage = await traverse_dict_value(
                 path, stage, "attachments", apply_on_attachments
             )
@@ -84,8 +82,8 @@ class RequestMessageHandler(ABC, BaseModel):
             return await self.on_request_stage(path, stage)
 
         async def apply_on_stages(
-            path: ElementPath, stages: List[dict] | NotGiven | None
-        ) -> List[dict] | NotGiven | None:
+            path: ElementPath, stages: list[dict] | NotGiven | None
+        ) -> list[dict] | NotGiven | None:
             stages = await traverse_list(
                 path.with_stage_idx, stages, apply_on_stage
             )

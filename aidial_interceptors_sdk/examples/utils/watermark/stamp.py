@@ -46,7 +46,6 @@ def _watermark_image() -> ImageObject:
 def stamp_watermark(
     image_bytes: bytes, output_format: Literal["JPEG", "PNG"]
 ) -> bytes:
-
     image = Image.open(io.BytesIO(image_bytes))
 
     watermarked_image = _stamp_watermark_image(image, _watermark_image())
