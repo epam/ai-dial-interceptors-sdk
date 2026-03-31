@@ -9,7 +9,15 @@ SRC = ["aidial_interceptors_sdk", "tests", "noxfile.py"]
 def lint(session: nox.Session):
     """Runs linters and fixers"""
     try:
-        session.run("poetry", "install", "--with", "lint", external=True)
+        session.run(
+            "poetry",
+            "install",
+            "--with",
+            "lint",
+            "--extras",
+            "examples",
+            external=True,
+        )
         session.run("poetry", "check", "--lock", "--strict", external=True)
         session.run("ruff", "check", *SRC)
         session.run("ruff", "format", "--check", *SRC)
