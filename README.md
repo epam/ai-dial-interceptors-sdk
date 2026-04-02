@@ -118,6 +118,17 @@ To remove the virtual environment and build artifacts:
 make clean
 ```
 
+### Git hooks
+
+You may optionally install Git hooks that will automatically run the linting step on Git push. You only need to do it once for the given repository.
+
+```sh
+make install_git_hooks
+```
+
+> [!IMPORTANT]
+> This command doesn't work if you have already installed Git hooks locally or globally.
+
 ## Examples
 
 The repository also provides examples of various DIAL Interceptors all packed into a DIAL service.
