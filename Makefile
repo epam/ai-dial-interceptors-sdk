@@ -42,6 +42,9 @@ test: install
 integration_tests: install
 	$(POETRY) run nox -s integration_tests
 
+install_git_hooks: install
+	$(VENV_DIR)/bin/pre-commit install
+
 examples_serve: install
 	$(POETRY) run uvicorn "aidial_interceptors_sdk.examples.app:app" --reload --host "0.0.0.0" --port $(PORT) --workers=1 --env-file ./.env
 
@@ -54,6 +57,7 @@ help:
 	@echo 'build                        - build the source and wheels archives'
 	@echo 'clean                        - clean virtual env and build artifacts'
 	@echo 'publish                      - publish the library to PyPi'
+	@echo 'install_git_hooks            - install the git hooks'
 	@echo '-- LINTING --'
 	@echo 'format                       - run code formatters'
 	@echo 'lint                         - run linters'
