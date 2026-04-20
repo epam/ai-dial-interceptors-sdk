@@ -21,8 +21,8 @@ class RequestHandler(RequestMessageHandler):
 
         Not to be confused with the following values:
 
-        1. self.request.deployment_id - the deployment ID for interceptor itself.
-            It's a deployment id path variable in the endpoint that interceptor service is exposing:
+        1. self.request.deployment_id - the deployment ID of the interceptor itself.
+            Populated from the `deployment_id` path variable in the endpoint that interceptor service is exposing:
             * POST /openai/deployments/{deployment_id}/chat/completions
             * POST /openai/deployments/{deployment_id}/embeddings
 
