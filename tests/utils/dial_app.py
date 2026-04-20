@@ -97,10 +97,13 @@ def create_recursive_app(endpoints: AppEndpoints) -> DIALApp:
 
 
 def create_openai_client(
-    endpoints: AppEndpoints, upstreams: list[str]
+    endpoints: AppEndpoints, upstreams: list[str] | None = None
 ) -> openai.AzureOpenAI:
     dial_app = create_recursive_app(endpoints)
     http_client = TestClient(dial_app)
+
+    upstreams = upstreams or [ep[0] for ep in endpoints]
+    final_deployment_id = upstreams[-1]
 
     deployment, *upstreams = upstreams
 
@@ -111,21 +114,31 @@ def create_openai_client(
         api_key="-",
         api_version="2024-10-21",
         max_retries=0,
-        default_headers={_UPSTREAMS_HEADER: ",".join(upstreams)},
+        default_headers={
+            _UPSTREAMS_HEADER: ",".join(upstreams),
+            "X-DIAL-DEPLOYMENT-ID": final_deployment_id,
+        },
     )
 
 
 def create_httpx_client(
-    endpoints: AppEndpoints, upstreams: list[str]
+    endpoints: AppEndpoints, upstreams: list[str] | None = None
 ) -> httpx.AsyncClient:
     dial_app = create_recursive_app(endpoints)
     http_client = TestClient(dial_app)
+
+    upstreams = upstreams or [ep[0] for ep in endpoints]
+    final_deployment_id = upstreams[-1]
 
     deployment, *upstreams = upstreams
 
     return httpx.AsyncClient(
         transport=httpx.ASGITransport(dial_app),  # type: ignore
-        headers={"api-key": "-", _UPSTREAMS_HEADER: ",".join(upstreams)},
+        headers={
+            "api-key": "-",
+            _UPSTREAMS_HEADER: ",".join(upstreams),
+            "X-DIAL-DEPLOYMENT-ID": final_deployment_id,
+        },
         params={"api-version": "2024-10-21"},
         base_url=f"{str(http_client.base_url)}/openai/deployments/{deployment}",
     )

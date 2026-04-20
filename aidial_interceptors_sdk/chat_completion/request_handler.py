@@ -13,6 +13,24 @@ from aidial_interceptors_sdk.chat_completion.request_message_handler import (
 class RequestHandler(RequestMessageHandler):
     request: Request
 
+    @property
+    def upstream_deployment_id(self) -> str | None:
+        """
+        Since ai-dial-core 0.43.0 returns ID of a DIAL deployment that
+        this interceptor is assigned to.
+
+        Not to be confused with the following values:
+
+        1. self.request.deployment_id - the deployment ID of the interceptor itself.
+            Populated from the `deployment_id` path variable in the endpoint that interceptor service is exposing:
+            * POST /openai/deployments/{deployment_id}/chat/completions
+            * POST /openai/deployments/{deployment_id}/embeddings
+
+        2. self.request.model - the `model` field of the incoming Chat Completions request.
+            There is no guarantee that it reflects an actual DIAL deployment ID.
+        """
+        return self.request.headers.get("X-DIAL-DEPLOYMENT-ID")
+
     async def on_request_message(
         self, path: ElementPath, message: dict
     ) -> list[dict]:
