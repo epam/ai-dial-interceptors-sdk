@@ -16,7 +16,8 @@ class RequestHandler(RequestMessageHandler):
     @property
     def upstream_deployment_id(self) -> str | None:
         """
-        Returns ID of a DIAL deployment that this interceptor is assigned to.
+        Since ai-dial-core 0.43.0 returns ID of a DIAL deployment that
+        this interceptor is assigned to.
 
         Not to be confused with the following values:
 
