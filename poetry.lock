@@ -2974,4 +2974,4 @@ examples = ["aiostream", "google-cloud-dlp", "langfuse", "numpy", "pillow", "pro
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "db846347b7cce1750858ef9353b638601080d5872d20bb196d81cc03495281f4"
+content-hash = "d125d216675100c151ab67b71f731ec4755a3278d73be5031d49d5be7b0fc14d"

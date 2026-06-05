@@ -1,7 +1,7 @@
 import fastapi
 from aidial_sdk.chat_completion import Request, Response
-from aidial_sdk.pydantic_v1 import SecretStr
 from aidial_sdk.utils.streaming import to_block_response
+from pydantic import SecretStr
 
 from aidial_interceptors_sdk.chat_completion.annotated_value import (
     AnnotatedChunk,
