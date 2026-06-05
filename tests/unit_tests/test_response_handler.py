@@ -52,7 +52,7 @@ async def get_response(cls: type[ResponseHandler], **kwargs) -> dict:
     dummy_request = Request(
         messages=[],
         stream=False,
-        api_key_secret=SecretStr("dummy"),
+        api_key_secret=SecretStr("dummy"),  # type: ignore
         deployment_id="dummy",
         headers={},
         original_request=fastapi.Request(scope={"type": "http"}),

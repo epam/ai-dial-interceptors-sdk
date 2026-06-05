@@ -37,6 +37,12 @@ def format(session: nox.Session):
     session.run("ruff", "format", *SRC)
 
 
+_PYDANTIC_DEPS: dict[str, tuple[str, str]] = {
+    "1.10.17": ("fastapi==0.125.0", "starlette==0.49.1"),
+    "2.8.2": ("fastapi==0.136.3", "starlette==1.0.1"),
+}
+
+
 @nox.session(python=["3.11", "3.12"])
 # Testing against earliest and latest supported versions of the dependencies
 @nox.parametrize("pydantic", ["1.10.17", "2.8.2"])
@@ -45,6 +51,7 @@ def test(session: nox.Session, pydantic: str, httpx: str) -> None:
     """Runs tests"""
     session.run("poetry", "install", "--all-extras", external=True)
     session.install(f"pydantic=={pydantic}")
+    session.install(*_PYDANTIC_DEPS[pydantic])
     session.install(f"httpx=={httpx}")
     session.run("pytest", "tests/unit_tests/")
 
