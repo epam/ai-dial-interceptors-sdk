@@ -46,6 +46,6 @@ resolutions:
     - message: ".*PyPI::typing-extensions:4\\.14\\.1.*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "Same as CPython: https://github.com/python/typing_extensions/blob/4.14.1/LICENSE"
-    - message: ".*PyPI::(opentelemetry|typing-extensions|grpcio|idna|fastapi|starlette).*"
+    - message: ".*PyPI::(opentelemetry|typing-extensions|grpcio|idna|fastapi|starlette|pydantic|typing-inspection).*"
       reason: "CANT_FIX_EXCEPTION"
       comment: "ORT cannot pick up license information"
