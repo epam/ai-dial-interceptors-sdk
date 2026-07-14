@@ -49,11 +49,23 @@ _PYDANTIC_DEPS: dict[str, tuple[str, str]] = {
 @nox.parametrize("httpx", ["0.25.0", "0.27.0"])
 def test(session: nox.Session, pydantic: str, httpx: str) -> None:
     """Runs tests"""
-    session.run("poetry", "install", "--all-extras", external=True)
+    # The example interceptors depend on spaCy, which requires pydantic v2.
+    # Under pydantic v1 we therefore skip the examples extras and their tests,
+    # while still exercising the core SDK against both pydantic v1 and v2.
+    is_pydantic_v1 = pydantic.startswith("1.")
+
+    if is_pydantic_v1:
+        session.run("poetry", "install", external=True)
+        extra_args = ["--ignore=tests/unit_tests/examples"]
+    else:
+        session.run("poetry", "install", "--all-extras", external=True)
+        extra_args = []
+
     session.install(f"pydantic=={pydantic}")
     session.install(*_PYDANTIC_DEPS[pydantic])
     session.install(f"httpx=={httpx}")
-    session.run("pytest", "tests/unit_tests/")
+
+    session.run("pytest", "tests/unit_tests/", *extra_args)
 
 
 @nox.session
