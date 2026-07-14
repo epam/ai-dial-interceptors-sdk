@@ -14,9 +14,6 @@ from aidial_interceptors_sdk.examples.utils.log_config import configure_loggers
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 
 
-# Defined here (rather than in the registry) so that the app can be built
-# without importing the example interceptor implementations, some of which
-# pull in heavy, pydantic-v2-only dependencies (e.g. spaCy).
 class Interceptors(BaseModel):
     chat_completions: dict[str, type[ChatCompletionInterceptor]] = {}
     embeddings: dict[str, type[EmbeddingsInterceptor]] = {}
