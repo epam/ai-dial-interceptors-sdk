@@ -7,7 +7,7 @@ license = "Apache-2.0"
 readme = "README.md"
 keywords = ["ai"]
 classifiers = ["Topic :: Software Development :: Libraries :: Python Modules"]
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.11,<3.14"
 dependencies = [
     "fastapi (>=0.51,<1.0)",
     "httpx (>=0.25.0,<1.0)",

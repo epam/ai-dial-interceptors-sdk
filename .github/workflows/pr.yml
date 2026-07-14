@@ -15,4 +15,4 @@ jobs:
     with:
       python-version: 3.11
       poetry-version: 2.1.1
-      code-checks-python-versions: '["3.11", "3.12"]'
+      code-checks-python-versions: '["3.11", "3.12", "3.13"]'
