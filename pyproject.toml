@@ -29,7 +29,7 @@ examples = [
     "aiostream (==0.6.2)",
     "pillow (==12.2.0)",
     "numpy (==1.26.4)",
-    "spacy (==3.7.5)",
+    "spacy (==3.8.14)",
     "langfuse (==2.60.2)",
     "protobuf (==6.33.5)",
     "google-cloud-dlp (==3.30.0)",

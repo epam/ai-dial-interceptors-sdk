@@ -168,7 +168,7 @@ Copy `.env.example` to `.env` and customize it for your environment:
 
 |Variable|Default|Description|
 |---|---|---|
-|SPACY_ANONYMIZER_LABELS_TO_REDACT|PERSON,ORG,GPE,PRODUCT|Comma-separated list of spaCy entity types to redact. Find the full list of entities [here](https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140).|
+|SPACY_ANONYMIZER_LABELS_TO_REDACT|PERSON,ORG,GPE,PRODUCT|Comma-separated list of spaCy entity types to redact. Find the full list of entities [here](https://github.com/explosion/spacy-models/blob/master/meta/en_core_web_sm-3.8.0.json#L121-L140).|
 |GOOGLE_DLP_ANONYMIZER_INFO_TYPES_TO_DE_IDENTIFY|PHONE_NUMBER,FIRST_NAME,LAST_NAME|Comma-separated list of Google info types to de-identify. The full list of InfoType's for anonymization could be found in the [Google DLP documentation](https://cloud.google.com/sensitive-data-protection/docs/infotypes-reference). Alternatively, info types could be configured on per-deployment basis in the [DAIL Core Config](#google-dlp-interceptor).|
 |GCP_PROJECT_ID||GCP project ID used by `google-dlp-anonymizer` interceptor. The required IAM Role to access the DLP de-identify API is [DLP User](https://cloud.google.com/sensitive-data-protection/docs/iam-roles#dlp.user).|
 |LANGFUSE_SECRET_KEY||Langfuse secret key|

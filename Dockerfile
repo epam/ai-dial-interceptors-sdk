@@ -1,15 +1,13 @@
 # Stage 1: Builder
-FROM python:3.11-slim-buster AS builder
+FROM python:3.11-alpine AS builder
 
-# Update and install necessary build dependencies
-RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends \
-    build-essential \
-    python3-dev \
-    && pip install --upgrade pip \
-    && pip install poetry==2.1.1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade --no-cache libcrypto3 libssl3
+RUN pip install poetry==2.1.1
+
+# Only install pre-built wheels. All dependencies ship musllinux wheels,
+# so no compilation is needed and no build toolchain (alpine-sdk) is required.
+# Fails fast if a package ever lacks a wheel instead of silently compiling.
+RUN poetry config installer.only-binary :all:
 
 WORKDIR /app
 
@@ -23,22 +21,22 @@ RUN poetry install --no-interaction --no-ansi --no-cache --with=main --extras=ex
 RUN poetry run codegen
 
 # Stage 2: Final image
-FROM python:3.11-slim-buster AS server
+FROM python:3.11-alpine AS server
 
-# Update and upgrade system packages, including specific security fixes
-RUN apt-get update && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends \
-    build-essential \
-    python3-dev \
-    && pip install --upgrade pip \
-    && pip install poetry==2.1.1 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk update && apk upgrade --no-cache libcrypto3 libssl3
+# fix CVE-2023-52425
+RUN apk upgrade --no-cache libexpat
+# fix CVE-2026-23949
+RUN pip install setuptools==80.10.2
+# fix CVE-2026-24049
+RUN pip install wheel==0.46.2
+# fix CVE-2025-6965 and CVE-2026-22184 and CVE-2026-40200
+RUN apk upgrade --no-cache sqlite-libs zlib musl musl-utils
 
 WORKDIR /app
 
 # Copy the application code and installed dependencies from the builder stage
-RUN useradd -m -u 1001 appuser
+RUN adduser -u 1001 --disabled-password --gecos "" appuser
 COPY --chown=appuser --from=builder /app .
 
 # Add and make the entrypoint script executable
@@ -50,5 +48,8 @@ EXPOSE 5000
 
 USER appuser
 ENTRYPOINT ["/docker_entrypoint.sh"]
+
+HEALTHCHECK  --interval=10s --timeout=5s --start-period=30s --retries=6 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1
 
 CMD ["uvicorn", "aidial_interceptors_sdk.examples.app:app", "--host", "0.0.0.0", "--port", "5000"]

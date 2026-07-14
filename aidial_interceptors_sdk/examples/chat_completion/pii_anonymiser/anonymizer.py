@@ -18,10 +18,10 @@ _log = logging.getLogger(__name__)
 # NOTE: Pinning the version of en_core_web_sm:
 # https://github.com/explosion/spaCy/issues/13690#issuecomment-2487873386
 # otherwise, there is a chance of running into 403 error in runtime.
-_DEFAULT_MODEL = "en_core_web_sm-3.7.1"
+_DEFAULT_MODEL = "en_core_web_sm-3.8.0"
 
 # Find the full list of entities here:
-# https://github.com/explosion/spacy-models/blob/e46017f5c8241096c1b30fae080f0e0709c8038c/meta/en_core_web_sm-3.7.0.json#L121-L140
+# https://github.com/explosion/spacy-models/blob/master/meta/en_core_web_sm-3.8.0.json
 _DEFAULT_LABELS_TO_REDACT = [
     "PERSON",
     "ORG",
