@@ -1,13 +1,10 @@
-from aidial_sdk.pydantic_v1 import BaseModel
-
 from aidial_interceptors_sdk.chat_completion.base import (
-    ChatCompletionInterceptor,
     ChatCompletionNoOpInterceptor,
 )
 from aidial_interceptors_sdk.embeddings.base import (
-    EmbeddingsInterceptor,
     EmbeddingsNoOpInterceptor,
 )
+from aidial_interceptors_sdk.examples.app_factory import Interceptors
 from aidial_interceptors_sdk.examples.chat_completion import (
     BlacklistedWordsInterceptor as ChatBlacklistedWordsInterceptor,
 )
@@ -32,12 +29,6 @@ from aidial_interceptors_sdk.examples.embeddings import (
     NormalizeVectorInterceptor,
     ProjectVectorInterceptor,
 )
-
-
-class Interceptors(BaseModel):
-    chat_completions: dict[str, type[ChatCompletionInterceptor]] = {}
-    embeddings: dict[str, type[EmbeddingsInterceptor]] = {}
-
 
 EXAMPLE_INTERCEPTORS: Interceptors = Interceptors(
     chat_completions={

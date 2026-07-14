@@ -1,13 +1,25 @@
 from aidial_sdk import DIALApp
+from aidial_sdk.pydantic_v1 import BaseModel
 from aidial_sdk.telemetry.types import TelemetryConfig
 
 from aidial_interceptors_sdk.chat_completion import (
     interceptor_to_chat_completion,
 )
+from aidial_interceptors_sdk.chat_completion.base import (
+    ChatCompletionInterceptor,
+)
 from aidial_interceptors_sdk.embeddings.adapter import interceptor_to_embeddings
-from aidial_interceptors_sdk.examples.registry import Interceptors
+from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
 from aidial_interceptors_sdk.examples.utils.log_config import configure_loggers
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
+
+
+# Defined here (rather than in the registry) so that the app can be built
+# without importing the example interceptor implementations, some of which
+# pull in heavy, pydantic-v2-only dependencies (e.g. spaCy).
+class Interceptors(BaseModel):
+    chat_completions: dict[str, type[ChatCompletionInterceptor]] = {}
+    embeddings: dict[str, type[EmbeddingsInterceptor]] = {}
 
 
 def create_app(

@@ -18,8 +18,10 @@ from aidial_interceptors_sdk.chat_completion.base import (
 from aidial_interceptors_sdk.dial_client import _UPSTREAMS_HEADER
 from aidial_interceptors_sdk.embeddings.adapter import interceptor_to_embeddings
 from aidial_interceptors_sdk.embeddings.base import EmbeddingsInterceptor
-from aidial_interceptors_sdk.examples.app_factory import create_app
-from aidial_interceptors_sdk.examples.registry import Interceptors
+from aidial_interceptors_sdk.examples.app_factory import (
+    Interceptors,
+    create_app,
+)
 from aidial_interceptors_sdk.utils._http_client import HTTPClientFactory
 
 CustomEndpoint = tuple[
