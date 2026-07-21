@@ -27,7 +27,7 @@ codegen = "scripts.codegen:main"
 [project.optional-dependencies]
 examples = [
     "aiostream (==0.6.2)",
-    "pillow (==12.2.0)",
+    "pillow (==12.3.0)",
     "numpy (==1.26.4)",
     "spacy (==3.8.14)",
     "langfuse (==2.60.2)",
