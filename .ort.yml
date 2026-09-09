@@ -1,4 +1,6 @@
 ---
+analyzer:
+  skip_excluded: true
 excludes:
   scopes:
     - pattern: "dev"
@@ -13,12 +15,3 @@ excludes:
     - pattern: "examples"
       reason: "TEST_DEPENDENCY_OF"
       comment: "Packages for examples only."
-license_choices:
-  repository_license_choices:
-    - given: FTL OR GPL-2.0-or-later
-      choice: FTL
-resolutions:
-  rule_violations:
-    - message: ".*PyPI::(opentelemetry|typing-extensions|grpcio|idna|fastapi|starlette|pydantic|typing-inspection|setuptools|packaging|jinja2|aiohappyeyeballs|httpx|aiostream|httpcore).*"
-      reason: "CANT_FIX_EXCEPTION"
-      comment: "ORT cannot pick up license information"
