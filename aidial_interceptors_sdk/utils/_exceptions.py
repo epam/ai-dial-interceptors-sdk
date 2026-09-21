@@ -20,9 +20,6 @@ _HOP_BY_HOP_HEADERS = frozenset(
     }
 )
 
-# Uvicorn adds its own "Server: uvicorn" response header.
-# Multiple "Server" headers are prohibited by RFC 9110 §5.3,
-# a strict HTTP parser may reject such an HTTP response.
 # Content-Length / Content-Encoding are stale after the JSON body is rebuilt.
 _PROXY_MANAGED_RESPONSE_HEADERS = frozenset(
     {
