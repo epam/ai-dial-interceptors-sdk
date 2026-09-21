@@ -41,11 +41,12 @@ def test_to_dial_exception_drops_hop_by_hop_headers():
         json=body,
         request=request,
     )
-    # Framing headers are hop-by-hop: they described the upstream body.
     response.headers["Content-Length"] = "99"
     response.headers["Content-Encoding"] = "gzip"
     response.headers["Transfer-Encoding"] = "chunked"
     response.headers["Connection"] = "keep-alive"
+    response.headers["Server"] = "vllm"
+    response.headers["Proxy-Authenticate"] = "Basic"
 
     dial = to_dial_exception(
         APIStatusError("Bad request", response=response, body=body)
@@ -58,6 +59,8 @@ def test_to_dial_exception_drops_hop_by_hop_headers():
     assert "content-length" not in names
     assert "content-encoding" not in names
     assert "connection" not in names
+    assert "server" not in names
+    assert "proxy-authenticate" not in names
     assert names["retry-after"] == "0"
     assert names["x-request-id"] == "abc"
 

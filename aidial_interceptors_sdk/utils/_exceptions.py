@@ -7,31 +7,33 @@ from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError
 
 _log = logging.getLogger(__name__)
 
-# Do not copy hop-by-hop / framing headers onto the FastAPI JSON error.
-# JSONResponse sets a new Content-Length; emitting that together with a
-# copied Transfer-Encoding violates RFC 9112 §6.2:
-#   "A sender MUST NOT send a Content-Length header field in any
-#    message that contains a Transfer-Encoding header field."
-# Connection / Keep-Alive / TE / Trailer / Upgrade / Transfer-Encoding
-# are hop-by-hop. RFC 9110 §7.6.1:
-#   "intermediaries SHOULD remove or replace fields that are known to
-#    require removal before forwarding ... This includes but is not
-#    limited to: ... Keep-Alive ... TE ... Transfer-Encoding ...
-#    Upgrade"
-# Content-Length / Content-Encoding are end-to-end but stale here
-# (new JSON body, not the upstream encoding); listed so they cannot
-# leak back via headers.raw after the dels below.
 _HOP_BY_HOP_HEADERS = frozenset(
     {
-        "content-length",
-        "content-encoding",
-        "transfer-encoding",
         "connection",
         "keep-alive",
+        "proxy-authenticate",
+        "proxy-authorization",
         "te",
         "trailer",
+        "transfer-encoding",
         "upgrade",
     }
+)
+
+# Uvicorn adds its own "Server: uvicorn" response header.
+# Multiple "Server" headers are prohibited by RFC 9110 §5.3,
+# a strict HTTP parser may reject such an HTTP response.
+# Content-Length / Content-Encoding are stale after the JSON body is rebuilt.
+_PROXY_MANAGED_RESPONSE_HEADERS = frozenset(
+    {
+        "server",
+        "content-length",
+        "content-encoding",
+    }
+)
+
+_STRIPPED_RESPONSE_HEADERS = (
+    _HOP_BY_HOP_HEADERS | _PROXY_MANAGED_RESPONSE_HEADERS
 )
 
 
@@ -72,24 +74,10 @@ def to_dial_exception(exc: Exception) -> DialException:
         r = exc.response
         headers = r.headers
 
-        # The original content length may have changed
-        # due to the response modification in the adapter.
-        if "Content-Length" in headers:
-            del headers["Content-Length"]
-
-        # httpx library (used by openai) automatically sets
-        # "Accept-Encoding:gzip,deflate" header in requests to the upstream.
-        # Therefore, we may receive from the upstream gzip-encoded
-        # response along with "Content-Encoding:gzip" header.
-        # We either need to encode the response, or
-        # remove the "Content-Encoding" header.
-        if "Content-Encoding" in headers:
-            del headers["Content-Encoding"]
-
         plain_headers = {
             key.decode(): value.decode()
             for key, value in headers.raw
-            if key.decode().lower() not in _HOP_BY_HOP_HEADERS
+            if key.decode().lower() not in _STRIPPED_RESPONSE_HEADERS
         }
 
         try:
