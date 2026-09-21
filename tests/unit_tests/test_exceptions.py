@@ -1,12 +1,17 @@
 import http
 import itertools
 
+import httpx
 import pytest
+from openai import APIStatusError
 
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionNoOpInterceptor,
 )
-from aidial_interceptors_sdk.utils._exceptions import _parse_dial_exception
+from aidial_interceptors_sdk.utils._exceptions import (
+    _parse_dial_exception,
+    to_dial_exception,
+)
 from tests.utils.applications import create_broken_application
 from tests.utils.chunks import create_chunk_checker, create_sse_stream_checker
 from tests.utils.dial_app import create_httpx_client
@@ -17,6 +22,47 @@ _too_many_requests_error = _parse_dial_exception(
     content={"error": {"message": "Too many requests"}},
     headers={"retry-after": "42"},
 )
+
+
+def test_to_dial_exception_drops_hop_by_hop_headers():
+    request = httpx.Request("POST", "http://upstream/chat/completions")
+    body = {
+        "error": {
+            "message": "maximum context length",
+            "code": "400",
+        }
+    }
+    response = httpx.Response(
+        400,
+        headers={
+            "Retry-After": "0",
+            "X-Request-ID": "abc",
+        },
+        json=body,
+        request=request,
+    )
+    response.headers["Content-Length"] = "99"
+    response.headers["Content-Encoding"] = "gzip"
+    response.headers["Transfer-Encoding"] = "chunked"
+    response.headers["Connection"] = "keep-alive"
+    response.headers["Server"] = "vllm"
+    response.headers["Proxy-Authenticate"] = "Basic"
+
+    dial = to_dial_exception(
+        APIStatusError("Bad request", response=response, body=body)
+    )
+
+    assert dial.status_code == 400
+    assert "maximum context length" in dial.message
+    names = {key.lower(): value for key, value in (dial.headers or {}).items()}
+    assert "transfer-encoding" not in names
+    assert "content-length" not in names
+    assert "content-encoding" not in names
+    assert "connection" not in names
+    assert "server" not in names
+    assert "proxy-authenticate" not in names
+    assert names["retry-after"] == "0"
+    assert names["x-request-id"] == "abc"
 
 
 @pytest.mark.parametrize("stream", [False, True])
