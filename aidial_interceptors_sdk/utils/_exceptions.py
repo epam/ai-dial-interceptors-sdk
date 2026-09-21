@@ -7,6 +7,23 @@ from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError
 
 _log = logging.getLogger(__name__)
 
+# Hop-by-hop / framing headers must not be copied onto the FastAPI JSON
+# error: JSONResponse sets a new Content-Length. Emitting both that and
+# Transfer-Encoding violates RFC 9112 §6.2; DIAL Core (Netty) then
+# rejects the interceptor 4xx.
+_HOP_BY_HOP_HEADERS = frozenset(
+    {
+        "content-length",
+        "content-encoding",
+        "transfer-encoding",
+        "connection",
+        "keep-alive",
+        "te",
+        "trailer",
+        "upgrade",
+    }
+)
+
 
 def _parse_dial_exception(
     status_code: int,
@@ -59,7 +76,11 @@ def to_dial_exception(exc: Exception) -> DialException:
         if "Content-Encoding" in headers:
             del headers["Content-Encoding"]
 
-        plain_headers = {k.decode(): v.decode() for k, v in headers.raw}
+        plain_headers = {
+            key.decode(): value.decode()
+            for key, value in headers.raw
+            if key.decode().lower() not in _HOP_BY_HOP_HEADERS
+        }
 
         try:
             content = r.json()
