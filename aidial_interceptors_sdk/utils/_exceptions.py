@@ -7,10 +7,20 @@ from openai import APIConnectionError, APIError, APIStatusError, APITimeoutError
 
 _log = logging.getLogger(__name__)
 
-# Hop-by-hop / framing headers must not be copied onto the FastAPI JSON
-# error: JSONResponse sets a new Content-Length. Emitting both that and
-# Transfer-Encoding violates RFC 9112 §6.2; DIAL Core (Netty) then
-# rejects the interceptor 4xx.
+# Do not copy hop-by-hop / framing headers onto the FastAPI JSON error.
+# JSONResponse sets a new Content-Length; emitting that together with a
+# copied Transfer-Encoding violates RFC 9112 §6.2:
+#   "A sender MUST NOT send a Content-Length header field in any
+#    message that contains a Transfer-Encoding header field."
+# Connection / Keep-Alive / TE / Trailer / Upgrade / Transfer-Encoding
+# are hop-by-hop. RFC 9110 §7.6.1:
+#   "intermediaries SHOULD remove or replace fields that are known to
+#    require removal before forwarding ... This includes but is not
+#    limited to: ... Keep-Alive ... TE ... Transfer-Encoding ...
+#    Upgrade"
+# Content-Length / Content-Encoding are end-to-end but stale here
+# (new JSON body, not the upstream encoding); listed so they cannot
+# leak back via headers.raw after the dels below.
 _HOP_BY_HOP_HEADERS = frozenset(
     {
         "content-length",
