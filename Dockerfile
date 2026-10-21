@@ -20,18 +20,25 @@ COPY . .
 RUN poetry install --no-interaction --no-ansi --no-cache --with=main --extras=examples
 RUN poetry run codegen
 
+# pip is not needed at runtime; removing it fixes all pip CVEs.
+RUN .venv/bin/python -m pip uninstall -y pip
+
 # Stage 2: Final image
 FROM python:3.11-alpine AS server
 
 RUN apk update && apk upgrade --no-cache libcrypto3 libssl3
 # fix CVE-2023-52425
 RUN apk upgrade --no-cache libexpat
-# fix CVE-2026-23949
-RUN pip install setuptools==80.10.2
+# fix CVE-2026-23949 and CVE-2026-59890
+RUN pip install setuptools==83.0.0
 # fix CVE-2026-24049
 RUN pip install wheel==0.46.2
 # fix CVE-2025-6965 and CVE-2026-22184 and CVE-2026-40200
 RUN apk upgrade --no-cache sqlite-libs zlib musl musl-utils
+
+# pip is not needed at runtime; removing it fixes all pip CVEs.
+# Must stay after the last pip usage.
+RUN pip uninstall -y pip
 
 WORKDIR /app
 
