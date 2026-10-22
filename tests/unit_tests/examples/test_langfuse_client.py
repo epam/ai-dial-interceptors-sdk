@@ -1,5 +1,5 @@
+import time
 from collections.abc import Sequence
-from datetime import datetime, timedelta
 from typing import cast
 
 import pytest
@@ -12,8 +12,7 @@ from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client i
     LangfuseClient,
 )
 
-start_time = datetime(2026, 10, 22, 12, 0, 0)
-end_time = start_time + timedelta(seconds=4, milliseconds=200)
+STREAM_DURATION = 0.2
 
 exporter = InMemorySpanExporter()
 
@@ -29,6 +28,19 @@ class OfflineLangfuseClient(LangfuseClient):
         )
 
 
+def create_client(is_model: bool) -> OfflineLangfuseClient:
+    return OfflineLangfuseClient(
+        session_id="sess-1",
+        tags=["gpt-4o", "gpt-4o-deployment"],
+        request_messages=[{"role": "user", "content": "hi"}],
+        model_name="gpt-4o",
+        deployment_id="gpt-4o-deployment",
+        user_id="someone@epam.com",
+        metadata={"x_conversation_id": "conv-1", "is_model": is_model},
+        is_model=is_model,
+    )
+
+
 @pytest.mark.parametrize(
     "is_model,expected_name,expected_type",
     [
@@ -36,22 +48,13 @@ class OfflineLangfuseClient(LangfuseClient):
         (False, "Processing", "span"),
     ],
 )
-def test_transmit(is_model: bool, expected_name: str, expected_type: str):
+def test_observation(is_model: bool, expected_name: str, expected_type: str):
     exporter.clear()
 
-    OfflineLangfuseClient(
-        session_id="sess-1",
-        tags=["gpt-4o", "gpt-4o-deployment"],
-        request_messages=[{"role": "user", "content": "hi"}],
-        response_message={"role": "assistant", "content": "hello"},
-        model_name="gpt-4o",
-        deployment_id="gpt-4o-deployment",
-        start_time=start_time,
-        end_time=end_time,
-        user_id="someone@epam.com",
-        metadata={"x_conversation_id": "conv-1", "is_model": is_model},
-        is_model=is_model,
-    ).transmit()
+    client = create_client(is_model)
+    client.start()
+    time.sleep(STREAM_DURATION)
+    client.finish({"role": "assistant", "content": "hello"})
 
     spans = exporter.get_finished_spans()
     assert len(spans) == 1
@@ -74,14 +77,24 @@ def test_transmit(is_model: bool, expected_name: str, expected_type: str):
 
     assert "hi" in str(attributes["langfuse.observation.input"])
     assert "hello" in str(attributes["langfuse.observation.output"])
-    assert "hi" in str(attributes["langfuse.trace.input"])
-    assert "hello" in str(attributes["langfuse.trace.output"])
 
-    assert (
-        attributes["langfuse.observation.metadata.start_time"]
-        == start_time.isoformat()
-    )
-    assert (
-        attributes["langfuse.observation.metadata.end_time"]
-        == end_time.isoformat()
-    )
+
+def test_observation_measures_the_stream():
+    exporter.clear()
+
+    client = create_client(is_model=True)
+    client.start()
+    time.sleep(STREAM_DURATION)
+    client.finish({"role": "assistant", "content": "hello"})
+
+    span = exporter.get_finished_spans()[0]
+    assert span.start_time is not None and span.end_time is not None
+    assert (span.end_time - span.start_time) / 1e9 >= STREAM_DURATION
+
+
+def test_finish_without_start_is_a_noop():
+    exporter.clear()
+
+    create_client(is_model=True).finish({"role": "assistant"})
+
+    assert exporter.get_finished_spans() == ()

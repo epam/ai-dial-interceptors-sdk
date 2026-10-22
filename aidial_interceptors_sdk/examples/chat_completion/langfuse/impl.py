@@ -1,9 +1,10 @@
-from datetime import datetime
-
 import httpx
 from aidial_sdk.utils.merge_chunks import merge
 from typing_extensions import override
 
+from aidial_interceptors_sdk.chat_completion.annotated_value import (
+    AnnotatedException,
+)
 from aidial_interceptors_sdk.chat_completion.base import (
     ChatCompletionInterceptor,
 )
@@ -26,8 +27,8 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
     request_deployment_id: str = ""
     request_model: str = ""
     merged_response_message = {}
-    start_time: datetime | None
     x_conversation_id: str = ""
+    langfuse_client: LangfuseClient | None = None
 
     @override
     async def on_response_message(
@@ -53,10 +54,8 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_start(self) -> None:
-        self.start_time = datetime.now()
-
-    @override
-    async def on_stream_end(self) -> None:
+        # The observation is opened here, rather than when the stream ends,
+        # so that the interval it reports is the real span of the stream.
         model_info = await self._get_model_info()
         user_email = await self._get_user_email()
         is_model = bool(model_info)
@@ -65,15 +64,12 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
             tags.append(self.request_model)
         if self.request_deployment_id:
             tags.append(self.request_deployment_id)
-        LangfuseClient(
+        self.langfuse_client = LangfuseClient(
             session_id=self.session.session_id,
             tags=tags,
             request_messages=self.request.messages,
-            response_message=self.merged_response_message,
             model_name=self.request_model,
             deployment_id=self.request_deployment_id,
-            start_time=self.start_time or datetime.now(),
-            end_time=datetime.now(),
             user_id=user_email,
             metadata={
                 "model": self.request_model,
@@ -83,7 +79,21 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
                 "model_info": model_info,
             },
             is_model=is_model,
-        ).transmit()
+        )
+        self.langfuse_client.start()
+
+    @override
+    async def on_stream_end(self) -> None:
+        if self.langfuse_client:
+            self.langfuse_client.finish(self.merged_response_message)
+
+    @override
+    async def on_stream_error(self, error: AnnotatedException) -> None:
+        # Close the observation the failed stream left open, then let the
+        # error through as the base interceptor does.
+        if self.langfuse_client:
+            self.langfuse_client.finish(self.merged_response_message)
+        await super().on_stream_error(error)
 
     async def _get_user_email(self) -> str:
         response = await self._get_dial_client().get("/v1/user/info")
