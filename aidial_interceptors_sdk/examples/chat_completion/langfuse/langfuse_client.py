@@ -1,7 +1,10 @@
-from typing import Any
-
 from aidial_sdk.pydantic_v1 import BaseModel, PrivateAttr
-from langfuse import Langfuse, propagate_attributes
+from langfuse import (
+    Langfuse,
+    LangfuseGeneration,
+    LangfuseSpan,
+    propagate_attributes,
+)
 
 
 class LangfuseClient(BaseModel):
@@ -14,8 +17,8 @@ class LangfuseClient(BaseModel):
     metadata: dict = {}
     is_model: bool
 
-    _connection: Any = PrivateAttr(None)
-    _observation: Any = PrivateAttr(None)
+    _connection: Langfuse | None = PrivateAttr(None)
+    _observation: LangfuseSpan | LangfuseGeneration | None = PrivateAttr(None)
 
     def connect(self):
         return Langfuse()
