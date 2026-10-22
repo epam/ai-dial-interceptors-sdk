@@ -8,6 +8,9 @@ from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
     InMemorySpanExporter,
 )
 
+from aidial_interceptors_sdk.examples.chat_completion.langfuse import (
+    langfuse_client,
+)
 from aidial_interceptors_sdk.examples.chat_completion.langfuse.langfuse_client import (
     LangfuseClient,
 )
@@ -17,17 +20,22 @@ STREAM_DURATION = 0.2
 exporter = InMemorySpanExporter()
 
 
-class OfflineLangfuseClient(LangfuseClient):
-    def connect(self):
-        return Langfuse(
+@pytest.fixture(autouse=True)
+def offline_langfuse(monkeypatch: pytest.MonkeyPatch):
+    exporter.clear()
+    monkeypatch.setattr(
+        langfuse_client,
+        "Langfuse",
+        lambda: Langfuse(
             public_key="pk",
             secret_key="sk",  # noqa: S106
             span_exporter=exporter,
-        )
+        ),
+    )
 
 
-def create_client(is_model: bool) -> OfflineLangfuseClient:
-    return OfflineLangfuseClient(
+def create_client(is_model: bool) -> LangfuseClient:
+    return LangfuseClient(
         session_id="sess-1",
         tags=["gpt-4o", "gpt-4o-deployment"],
         request_messages=[{"role": "user", "content": "hi"}],
@@ -47,8 +55,6 @@ def create_client(is_model: bool) -> OfflineLangfuseClient:
     ],
 )
 def test_observation(is_model: bool, expected_name: str, expected_type: str):
-    exporter.clear()
-
     client = create_client(is_model)
     client.start()
     time.sleep(STREAM_DURATION)
@@ -78,8 +84,6 @@ def test_observation(is_model: bool, expected_name: str, expected_type: str):
 
 
 def test_observation_measures_the_stream():
-    exporter.clear()
-
     client = create_client(is_model=True)
     client.start()
     time.sleep(STREAM_DURATION)
@@ -91,8 +95,6 @@ def test_observation_measures_the_stream():
 
 
 def test_finish_without_start_is_a_noop():
-    exporter.clear()
-
     create_client(is_model=True).finish({"role": "assistant"})
 
     assert exporter.get_finished_spans() == ()

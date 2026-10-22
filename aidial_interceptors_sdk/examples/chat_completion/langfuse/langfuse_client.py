@@ -20,11 +20,8 @@ class LangfuseClient(BaseModel):
     _connection: Langfuse | None = PrivateAttr(None)
     _observation: LangfuseSpan | LangfuseGeneration | None = PrivateAttr(None)
 
-    def connect(self):
-        return Langfuse()
-
     def start(self):
-        self._connection = self.connect()
+        self._connection = Langfuse()
 
         with propagate_attributes(
             trace_name=self.model_name,
