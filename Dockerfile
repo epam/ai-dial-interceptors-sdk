@@ -13,11 +13,14 @@ WORKDIR /app
 
 # Install dependencies using Poetry
 COPY pyproject.toml poetry.lock poetry.toml ./
-RUN poetry install --no-interaction --no-ansi --no-cache --no-root --with=main --extras=examples
+# --only=main: the runtime image needs the main group and the examples extra only.
+# --with=main would ADD main to the default set, dragging the dev/test/lint groups
+# (nox, pre-commit, pytest, pyright, ruff and their virtualenv dep) into the image.
+RUN poetry install --no-interaction --no-ansi --no-cache --no-root --only=main --extras=examples
 
 # Copy the rest of the application
 COPY . .
-RUN poetry install --no-interaction --no-ansi --no-cache --with=main --extras=examples
+RUN poetry install --no-interaction --no-ansi --no-cache --only=main --extras=examples
 RUN poetry run codegen
 
 # pip is not needed at runtime; removing it fixes all pip CVEs.
