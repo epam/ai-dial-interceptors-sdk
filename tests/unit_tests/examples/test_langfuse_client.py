@@ -18,8 +18,6 @@ exporter = InMemorySpanExporter()
 
 
 class OfflineLangfuseClient(LangfuseClient):
-    """Keeps the real Langfuse calls, collects the spans in memory."""
-
     def connect(self):
         return Langfuse(
             public_key="pk",

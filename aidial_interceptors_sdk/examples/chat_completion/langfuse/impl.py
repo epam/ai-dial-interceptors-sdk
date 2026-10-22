@@ -54,8 +54,6 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_start(self) -> None:
-        # The observation is opened here, rather than when the stream ends,
-        # so that the interval it reports is the real span of the stream.
         model_info = await self._get_model_info()
         user_email = await self._get_user_email()
         is_model = bool(model_info)
@@ -89,8 +87,6 @@ class LangfuseInterceptor(ChatCompletionInterceptor):
 
     @override
     async def on_stream_error(self, error: AnnotatedException) -> None:
-        # Close the observation the failed stream left open, then let the
-        # error through as the base interceptor does.
         if self.langfuse_client:
             self.langfuse_client.finish(self.merged_response_message)
         await super().on_stream_error(error)

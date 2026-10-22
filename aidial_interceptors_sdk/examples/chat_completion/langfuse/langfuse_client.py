@@ -21,16 +21,8 @@ class LangfuseClient(BaseModel):
         return Langfuse()
 
     def start(self):
-        """
-        Opens the observation.
-
-        Langfuse times an observation by its own clock, so this must be called
-        when the stream starts for the reported duration to be the real one.
-        """
         self._connection = self.connect()
 
-        # The attributes are stamped onto the observation as it is created,
-        # so the context only has to be open for that call.
         with propagate_attributes(
             trace_name=self.model_name,
             session_id=self.session_id,
@@ -53,10 +45,6 @@ class LangfuseClient(BaseModel):
                 )
 
     def finish(self, response_message: dict):
-        """
-        Closes the observation opened by `start`, ending the interval it
-        measures. Does nothing when the observation was never opened.
-        """
         if self._connection is None or self._observation is None:
             return
 
