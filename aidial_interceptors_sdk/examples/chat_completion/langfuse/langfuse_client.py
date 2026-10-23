@@ -1,51 +1,53 @@
-from datetime import datetime
-
-from aidial_sdk.pydantic_v1 import BaseModel
-from langfuse import Langfuse
+from aidial_sdk.pydantic_v1 import BaseModel, PrivateAttr
+from langfuse import (
+    Langfuse,
+    LangfuseGeneration,
+    LangfuseSpan,
+    propagate_attributes,
+)
 
 
 class LangfuseClient(BaseModel):
     session_id: str
     tags: list[str]
     request_messages: list
-    response_message: dict
     model_name: str = ""
     deployment_id: str = ""
-    start_time: datetime
-    end_time: datetime
     user_id: str | None
     metadata: dict = {}
     is_model: bool
 
-    def connect(self):
-        return Langfuse()
+    _connection: Langfuse | None = PrivateAttr(None)
+    _observation: LangfuseSpan | LangfuseGeneration | None = PrivateAttr(None)
 
-    def transmit(self):
-        conn = self.connect()
-        trace = conn.trace(
-            name=self.model_name,
+    def start(self):
+        self._connection = Langfuse()
+
+        with propagate_attributes(
+            trace_name=self.model_name,
             session_id=self.session_id,
             tags=self.tags,
-            input=self.request_messages,
-            output=self.response_message,
             user_id=self.user_id,
             metadata=self.metadata,
-        )
-        if self.is_model:
-            trace.generation(
-                model=self.model_name,
-                input=self.request_messages,
-                output=self.response_message,
-                start_time=self.start_time,
-                end_time=self.end_time,
-            )
-        else:
-            trace.span(
-                name="Processing",
-                input=self.request_messages,
-                output=self.response_message,
-                start_time=self.start_time,
-                end_time=self.end_time,
-            )
-        conn.flush()
-        return
+        ):
+            if self.is_model:
+                self._observation = self._connection.start_observation(
+                    name=self.model_name,
+                    as_type="generation",
+                    model=self.model_name,
+                    input=self.request_messages,
+                )
+            else:
+                self._observation = self._connection.start_observation(
+                    name="Processing",
+                    as_type="span",
+                    input=self.request_messages,
+                )
+
+    def finish(self, response_message: dict):
+        if self._connection is None or self._observation is None:
+            return
+
+        self._observation.update(output=response_message)
+        self._observation.end()
+        self._connection.flush()
