@@ -4,11 +4,10 @@ from typing import (
 )
 
 import aiostream
-from aidial_sdk.chat_completion import Stage
+from aidial_sdk.chat_completion import Choice, FinishReason, Stage
 from aidial_sdk.chat_completion.chunks import (
     ContentChunk,
     EndChoiceChunk,
-    FinishReason,
     UsageChunk,
 )
 from aidial_sdk.exceptions import HTTPException as DialException
@@ -40,7 +39,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
     content_stages: dict[int, Stage] = {}
     stage_index_mapper: IndexMapper[tuple[int, int]] = IndexMapper()
 
-    total_usage: UsageChunk = UsageChunk(0, 0, None)
+    total_usage: UsageChunk = UsageChunk(0, 0, None, None)
     finish_reasons: dict[int, str] = {}
     role_sent: bool = False
     chunk_template: dict = {}
@@ -57,8 +56,7 @@ class ReplicatorInterceptor(ChatCompletionInterceptor):
 
         if response_idx not in self.content_stages:
             stage = Stage(
-                self.response._queue,
-                0,
+                Choice(self.response._queue, 0),
                 self.stage_index_mapper((response_idx, -1)),
                 f"{response_idx + 1} | CONTENT",
             )
