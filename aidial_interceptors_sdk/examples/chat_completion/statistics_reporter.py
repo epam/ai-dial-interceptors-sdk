@@ -1,7 +1,7 @@
 import time
 from collections import defaultdict
 
-from aidial_sdk.chat_completion import Stage
+from aidial_sdk.chat_completion import Choice, Stage
 from aidial_sdk.pydantic_v1 import BaseModel
 from typing_extensions import override
 
@@ -147,8 +147,7 @@ class StatisticsReporterInterceptor(ChatCompletionInterceptor):
         # This is not what we want - we want these stages to *always* come first.
         for choice_idx in range(self.request_n):
             stage = Stage(
-                self.response._queue,
-                choice_idx,
+                Choice(self.response._queue, choice_idx),
                 self.reserve_stage_index(choice_idx),
                 "Statistics",
             )
