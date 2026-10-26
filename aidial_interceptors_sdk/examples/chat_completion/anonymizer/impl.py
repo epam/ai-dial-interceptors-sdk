@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
 
-from aidial_sdk.chat_completion import Stage
+from aidial_sdk.chat_completion import Choice, Stage
 from typing_extensions import override
 
 from aidial_interceptors_sdk.chat_completion.base import (
@@ -73,16 +73,14 @@ class AnonymizerInterceptor(ChatCompletionInterceptor, ABC):
     async def on_stream_start(self) -> None:
         for choice_idx in range(self.request_n):
             with Stage(
-                self.response._queue,
-                choice_idx,
+                Choice(self.response._queue, choice_idx),
                 self.reserve_stage_index(choice_idx),
                 "Anonymized request",
             ) as stage:
                 stage.append_content(self.anonymized_request)
 
             self.original_response_stages[choice_idx] = Stage(
-                self.response._queue,
-                choice_idx,
+                Choice(self.response._queue, choice_idx),
                 self.reserve_stage_index(choice_idx),
                 "Original response",
             )

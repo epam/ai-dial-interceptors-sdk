@@ -2,37 +2,37 @@
 
 [[package]]
 name = "aidial-sdk"
-version = "0.28.0"
+version = "0.46.0"
 description = "Framework to create applications and model adapters for AI DIAL"
 optional = false
-python-versions = "<4.0,>=3.9"
+python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "aidial_sdk-0.28.0-py3-none-any.whl", hash = "sha256:b579e683f66c30b0d6d76dde3cb039edc49abf56f92a7a503439b1542e15cf3d"},
-    {file = "aidial_sdk-0.28.0.tar.gz", hash = "sha256:2c6764ffa29d45b3779c46a60e555eaf4f75b7e38c27cb87f3820d0ee0830766"},
+    {file = "aidial_sdk-0.46.0-py3-none-any.whl", hash = "sha256:a681e8753fdb14fe8cf930a8aaf444bdbfd5e2df232f4926c64a980b76785cf4"},
+    {file = "aidial_sdk-0.46.0.tar.gz", hash = "sha256:1fe075f71bcfac25af0657449f1a1c178b03a604a8290f8724de4fee7536056c"},
 ]
 
 [package.dependencies]
 fastapi = ">=0.51,<1.0"
 opentelemetry-api = {version = ">=1.22.0,<2.0", optional = true, markers = "extra == \"telemetry\""}
 opentelemetry-exporter-otlp-proto-grpc = {version = ">=1.22.0,<2.0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-exporter-prometheus = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-aiohttp-client = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-fastapi = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-httpx = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-logging = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-requests = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-system-metrics = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
-opentelemetry-instrumentation-urllib = {version = ">=0.43b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-exporter-prometheus = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-aiohttp-client = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-fastapi = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-httpx = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-logging = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-requests = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-system-metrics = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
+opentelemetry-instrumentation-urllib = {version = ">=0.64b0", optional = true, markers = "extra == \"telemetry\""}
 opentelemetry-sdk = {version = ">=1.22.0,<2.0", optional = true, markers = "extra == \"telemetry\""}
-prometheus-client = {version = ">=0.17.1,<=0.21", optional = true, markers = "extra == \"telemetry\""}
+prometheus-client = {version = ">=0.17.1,<1.0", optional = true, markers = "extra == \"telemetry\""}
 pydantic = ">=1.10.17,<3"
 uvicorn = ">=0.19,<1.0"
-wrapt = ">=1.10,<2"
+wrapt = ">=1.10,<3"
 
 [package.extras]
-httpx = ["httpx (>=0.25.0,<1)"]
-telemetry = ["opentelemetry-api (>=1.22.0,<2.0)", "opentelemetry-exporter-otlp-proto-grpc (>=1.22.0,<2.0)", "opentelemetry-exporter-prometheus (>=0.43b0)", "opentelemetry-instrumentation-aiohttp-client (>=0.43b0)", "opentelemetry-instrumentation-fastapi (>=0.43b0)", "opentelemetry-instrumentation-httpx (>=0.43b0)", "opentelemetry-instrumentation-logging (>=0.43b0)", "opentelemetry-instrumentation-requests (>=0.43b0)", "opentelemetry-instrumentation-system-metrics (>=0.43b0)", "opentelemetry-instrumentation-urllib (>=0.43b0)", "opentelemetry-sdk (>=1.22.0,<2.0)", "prometheus-client (>=0.17.1,<=0.21)"]
+httpx = ["httpx (>=0.25.0,<1.0)"]
+telemetry = ["opentelemetry-api (>=1.22.0,<2.0)", "opentelemetry-exporter-otlp-proto-grpc (>=1.22.0,<2.0)", "opentelemetry-exporter-prometheus (>=0.64b0)", "opentelemetry-instrumentation-aiohttp-client (>=0.64b0)", "opentelemetry-instrumentation-fastapi (>=0.64b0)", "opentelemetry-instrumentation-httpx (>=0.64b0)", "opentelemetry-instrumentation-logging (>=0.64b0)", "opentelemetry-instrumentation-requests (>=0.64b0)", "opentelemetry-instrumentation-system-metrics (>=0.64b0)", "opentelemetry-instrumentation-urllib (>=0.64b0)", "opentelemetry-sdk (>=1.22.0,<2.0)", "prometheus-client (>=0.17.1,<1.0)"]
 
 [[package]]
 name = "aiostream"
