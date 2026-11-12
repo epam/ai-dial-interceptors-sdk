@@ -38,6 +38,8 @@ RUN pip install setuptools==84.2.1
 RUN pip install wheel==0.46.2
 # fix CVE-2025-6965 and CVE-2026-22184 and CVE-2026-40200
 RUN apk upgrade --no-cache sqlite-libs zlib musl musl-utils
+# fix CVE-2026-40355, CVE-2026-40356, CVE-2026-71199, CVE-2026-71200, CVE-2026-107364, CVE-2026-107708, CVE-2026-107778, CVE-2026-107884, CVE-2026-111423, CVE-2026-112314, CVE-2026-112315, CVE-2026-112316, CVE-2026-112317, CVE-2026-112318, CVE-2026-112319, CVE-2026-112320, CVE-2026-112321, CVE-2026-112322, CVE-2026-112323, CVE-2026-118380, CVE-2026-119079
+RUN apk upgrade --no-cache krb5-libs
 
 # pip is not needed at runtime; removing it fixes all pip CVEs.
 # Must stay after the last pip usage.
